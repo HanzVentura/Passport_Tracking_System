@@ -727,7 +727,7 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             try {
-                const response = await fetch('/api/user-data');
+                const response = await fetch('../api/user-data.php');
                 const data = await response.json();
 
                 if (data.loggedIn && data.fullName) {
@@ -745,7 +745,7 @@
             }
 
             try {
-                const response = await fetch(`/api/applications/${encodeURIComponent(userEmail)}`);
+                const response = await fetch(`../api/get-application.php?email=${encodeURIComponent(userEmail)}`);
                 const result = await response.json();
                 const application = result.application;
 

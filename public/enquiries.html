@@ -369,7 +369,7 @@
 
             if (userEmail) {
                 try {
-                    const response = await fetch(`/api/applications/${encodeURIComponent(userEmail)}`);
+                    const response = await fetch(`../api/get-application.php?email=${encodeURIComponent(userEmail)}`);
                     const result = await response.json();
                     const application = result.application;
 
@@ -420,7 +420,7 @@
             }
 
             try {
-                const response = await fetch('/api/enquiries', {
+                const response = await fetch('../api/enquiries.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: userEmail, applicationId: appId, subject, message })
@@ -442,7 +442,7 @@
         async function loadEnquiries(userEmail) {
             const tableBody = document.getElementById('enquiryTableBody');
             try {
-                const response = await fetch('/api/enquiries');
+                const response = await fetch('../api/enquiries.php');
                 const result = await response.json();
                 let enquiries = result.enquiries || [];
 

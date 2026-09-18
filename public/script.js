@@ -78,10 +78,10 @@ if (showSignupBtn && signupSection && loginSection && mainLayout) {
 }
 
 // --- SHOW/HIDE PASSWORD TOGGLE LOGIC ---
-const togglePasswordSpans = document.querySelectorAll('.show-password');
+const togglePasswordButtons = document.querySelectorAll('.toggle-password');
 
-togglePasswordSpans.forEach(span => {
-    span.addEventListener('click', function() {
+togglePasswordButtons.forEach(button => {
+    button.addEventListener('click', function() {
         const input = this.previousElementSibling;
         if (input.type === 'password') {
             input.type = 'text';
@@ -129,7 +129,7 @@ signupForm.addEventListener('submit', async function(event) {
     }
 
     try {
-        const response = await fetch('/api/signup', {
+        const response = await fetch('../api/signup.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fullname, email: emailVal, password })
@@ -176,7 +176,7 @@ async function handleLoginSubmit(event) {
     }
 
     try {
-        const response = await fetch('/api/login', {
+        const response = await fetch('../api/login.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: emailInput, password: passInput })

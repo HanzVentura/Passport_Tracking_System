@@ -220,13 +220,13 @@
                 return;
             }
             try {
-                const userResponse = await fetch('/api/user-data');
+                const userResponse = await fetch('../api/user-data.php');
                 const userData = await userResponse.json();
                 if (userData.fullName) {
                     document.getElementById('userName').textContent = userData.fullName;
                     document.getElementById('greetingText').textContent = `Good Day, ${userData.fullName}`;
                 } else { document.getElementById('userName').textContent = userEmail; }
-                const response = await fetch(`/api/applications/${encodeURIComponent(userEmail)}`);
+                const response = await fetch(`../api/get-application.php?email=${encodeURIComponent(userEmail)}`);
                 const result = await response.json();
                 if (!response.ok || !result.application) throw new Error('No active application was found. Start an application from the dashboard first.');
                 displayApplication(result.application);
@@ -250,7 +250,7 @@
                 || 'New First-Time Application';
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
             try {
-                const response = await fetch('/api/payments', {
+                const response = await fetch('../api/payments.php', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: userEmail, applicationId: activeApplication.applicationId, processingType: selectedPlan.value, amount: paymentAmount, paymentMethod })
                 });

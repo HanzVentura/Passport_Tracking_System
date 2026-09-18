@@ -290,7 +290,7 @@
         async function loadAdminEnquiries() {
             const tableBody = document.getElementById('adminTableBody');
             try {
-                const response = await fetch('/api/enquiries');
+                const response = await fetch('../api/enquiries.php');
                 const result = await response.json();
                 adminEnquiries = result.enquiries || [];
             } catch (error) {
@@ -343,7 +343,7 @@
             }
 
             try {
-                const response = await fetch('/api/enquiries/reply', {
+                const response = await fetch('../api/enquiries.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ enquiryId: enquiry.id, reply: replyText })

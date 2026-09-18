@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadUserData() {
     try {
-        const response = await fetch('/api/user-data');
+        const response = await fetch('../api/user-data.php');
         const data = await response.json();
         if (data.loggedIn && data.fullName) {
             document.getElementById('greetingText').textContent = `Good Day, ${data.fullName}`;
@@ -123,7 +123,7 @@ async function completePayment() {
     }
 
     try {
-        const response = await fetch('/api/applications', {
+        const response = await fetch('../api/applications.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
