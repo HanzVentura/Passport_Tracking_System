@@ -7,8 +7,36 @@ $dbPath = __DIR__ . '/../database.db';
 try {
     $pdo = new PDO("sqlite:$dbPath");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Auto-create table if it doesn't exist
+    $pdo->exec("CREATE TABLE IF NOT EXISTS applications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT,
+        application_id TEXT,
+        application_type TEXT,
+        status TEXT,
+        appointment_date TEXT,
+        appointment_location TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // Ensure application_id column exists if table was already created previously
+    $columns = $pdo->query("PRAGMA table_info(applications)")->fetchAll(PDO::FETCH_ASSOC);
+    $hasAppId = false;
+    foreach ($columns as $col) {
+        if ($col['name'] === 'application_id') {
+            $hasAppId = true;
+            break;
+        }
+    }
+    if (!$hasAppId) {
+        $pdo->exec("ALTER TABLE applications ADD COLUMN application_id TEXT");
+    }
+
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Database connection failed.']);
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . $e->getMessage()]);
     exit;
 }
 
@@ -26,7 +54,7 @@ if (!$email || !$applicationId) {
 
 try {
     // Tries to update an existing application for this email
-    $updateStmt = $pdo->prepare("UPDATE applications SET application_id = ?, application_type = ?, status = 'Pending Payment', appointment_date = NULL, appointment_location = NULL, updated_at = CURRENT_TIMESTAMP WHERE email = ?");
+    $updateStmt = $pdo->prepare("UPDATE applications SET application_id = ?, application_type = ?, status = 'Pending Payment', updated_at = CURRENT_TIMESTAMP WHERE email = ?");
     $updateStmt->execute([$applicationId, $applicationType, $email]);
 
     if ($updateStmt->rowCount() > 0) {
@@ -34,15 +62,13 @@ try {
             'success' => true,
             'applicationId' => $applicationId,
             'applicationType' => $applicationType,
-            'status' => 'Pending Payment',
-            'appointmentDate' => null,
-            'appointmentLocation' => null
+            'status' => 'Pending Payment'
         ]);
         exit;
     }
 
     // Inserts a new application record if none existed yet
-    $insertStmt = $pdo->prepare("INSERT INTO applications (email, application_id, application_type, status, appointment_date, appointment_location) VALUES (?, ?, ?, 'Pending Payment', NULL, NULL)");
+    $insertStmt = $pdo->prepare("INSERT INTO applications (email, application_id, application_type, status) VALUES (?, ?, ?, 'Pending Payment')");
     $insertStmt->execute([$email, $applicationId, $applicationType]);
 
     http_response_code(201);
@@ -51,12 +77,10 @@ try {
         'id' => $pdo->lastInsertId(),
         'applicationId' => $applicationId,
         'applicationType' => $applicationType,
-        'status' => 'Pending Payment',
-        'appointmentDate' => null,
-        'appointmentLocation' => null
+        'status' => 'Pending Payment'
     ]);
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Unable to save application.']);
+    echo json_encode(['success' => false, 'message' => 'DB Error: ' . $e->getMessage()]);
 }
 ?>

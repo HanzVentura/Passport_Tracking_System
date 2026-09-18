@@ -1,36 +1,48 @@
 <?php
-// Fetches a single passport application by email
 header('Content-Type: application/json');
 
-// Connects to the SQLite database
 $dbPath = __DIR__ . '/../database.db';
 try {
     $pdo = new PDO("sqlite:$dbPath");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Database connection failed.']);
-    exit;
-}
 
-$email = $_GET['email'] ?? '';
+    $email = $_GET['email'] ?? '';
+    $applicationId = $_GET['applicationId'] ?? '';
 
-if (!$email) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Email parameter is required.']);
-    exit;
-}
+    $stmt = null;
+    if ($applicationId) {
+        $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? ORDER BY id DESC LIMIT 1");
+        $stmt->execute([$applicationId]);
+    } else if ($email) {
+        $stmt = $pdo->prepare("SELECT * FROM applications WHERE email = ? ORDER BY id DESC LIMIT 1");
+        $stmt->execute([$email]);
+    } else {
+        $stmt = $pdo->query("SELECT * FROM applications ORDER BY id DESC LIMIT 1");
+    }
 
-try {
-    $stmt = $pdo->prepare("SELECT id, email, application_id AS applicationId, application_type AS applicationType, status, processing_type AS processingType, COALESCE(amount, payment_amount) AS amount, payment_amount AS paymentAmount, payment_method AS paymentMethod, appointment_date AS appointmentDate, appointment_location AS appointmentLocation, created_at AS createdAt, updated_at AS updatedAt FROM applications WHERE email = ?");
-    $stmt->execute([$email]);
     $application = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    echo json_encode([
-        'success' => true,
-        'application' => $application ?: null
-    ]);
-} catch (PDOException $e) {
+    if ($application) {
+        $appId = $application['application_id'] ?: ('PH-' . rand(100000, 999900));
+        echo json_encode([
+            'success' => true,
+            'application' => [
+                'application_id' => $appId,
+                'applicationId' => $appId,
+                'application_type' => $application['application_type'] ?? 'New First-Time Application',
+                'applicationType' => $application['application_type'] ?? 'New First-Time Application',
+                'status' => $application['status'] ?? 'Pending Payment',
+                'email' => $application['email'] ?? $email,
+                'appointmentDate' => $application['appointment_date'] ?? null,
+                'appointmentLocation' => $application['appointment_location'] ?? null,
+                'createdAt' => $application['created_at'] ?? date('Y-m-d H:i:s')
+            ]
+        ]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'No active application found.']);
+    }
+} catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Unable to fetch application.']);
+    echo json_encode(['success' => false, 'message' => 'DB Error: ' . $e->getMessage()]);
 }
 ?>

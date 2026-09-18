@@ -99,7 +99,7 @@ input[type="password"]:focus {
 
 .toggle-password {
     position: absolute;
-    right: 4px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
     padding: 8px;
@@ -216,6 +216,10 @@ input[type="password"]:focus {
 
 .login-password-input {
     letter-spacing: 2px;
+}
+
+.password-container .login-password-input {
+    padding-right: 125px !important;
 }
 
 /* Massive gap above the Log In button matching your target screenshot */

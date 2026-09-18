@@ -137,7 +137,9 @@ async function completePayment() {
         if (!response.ok || !result.success) {
             throw new Error(result.message || 'Unable to save your application.');
         }
-        localStorage.setItem('activeAppId', result.applicationId || randomId);
+        const savedApplicationId = result.application_id || result.applicationId || randomId;
+        localStorage.setItem('currentApplicationId', savedApplicationId);
+        localStorage.setItem('activeAppId', savedApplicationId);
         localStorage.setItem('applicationType', result.applicationType || labels.category);
         window.location.href = 'payments.html';
     } catch (error) {
