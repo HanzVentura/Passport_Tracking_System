@@ -57,7 +57,7 @@ async function loadUserData() {
         const data = await response.json();
         if (data.loggedIn && data.fullName) {
             document.getElementById('greetingText').textContent = `Good Day, ${data.fullName}`;
-            document.getElementById('userName').textContent = data.fullName;
+            document.getElementById('user-name').textContent = data.fullName;
             document.getElementById('summaryFullName').textContent = data.fullName;
         }
     } catch (error) {

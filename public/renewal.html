@@ -10,14 +10,14 @@
 <body data-application-type="renewal">
     <aside class="sidebar">
         <div class="sidebar-top">
-            <div class="user-profile-mini"><i class="fa-solid fa-circle-user"></i><div class="user-info"><div class="name" id="userName">Loading...</div></div></div>
+            <div class="user-profile-mini"><i class="fa-solid fa-circle-user"></i><div class="user-info"><div class="name" id="user-name">Loading...</div></div></div>
             <ul class="nav-links">
                 <li><a href="dashboard.html"><i class="fa-solid fa-house"></i>Dashboard</a></li>
                 <li><a href="payments.html"><i class="fa-solid fa-wallet"></i>Payments</a></li>
                 <li><a href="#"><i class="fa-solid fa-receipt"></i>Receipts</a></li>
                 <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i>Enquiries</a></li>
                 <li><a href="#"><i class="fa-solid fa-user"></i>Profile</a></li>
-                <li><a href="#"><i class="fa-solid fa-gear"></i>Settings</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
         </div>
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
@@ -48,6 +48,7 @@
             <section class="step-pane" id="pane2" hidden><div class="form-section-card"><div class="section-title">Applicant Summary</div><div class="section-subtitle">Review your renewal details before continuing to payment.</div><div class="form-row two-col" style="background: #f9fafb; padding: 15px; border-radius: 8px; font-size: 14px;"><div><p><strong>Full Name:</strong> <span id="summaryFullName">Loading...</span></p><p><strong>Category:</strong> <span id="summaryCategory"></span></p></div><div><p><strong>Primary ID:</strong> <span id="summaryIdType">Government-Issued ID</span></p><p><strong>Current Passport:</strong> <span id="summaryCitizenship"></span></p></div></div></div><div class="form-actions"><button type="button" class="btn-secondary" onclick="goToWizardStep(1)">Back</button><button type="button" class="btn-primary" onclick="completePayment()">Save &amp; Continue</button></div></section>
         </div>
     </main>
+    <script src="script.js"></script>
     <script src="passport-application.js"></script>
 </body>
 </html>

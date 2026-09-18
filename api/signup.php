@@ -5,17 +5,19 @@ header('Content-Type: application/json');
 
 // Connects to the SQLite database
 $dbPath = __DIR__ . '/../database.db';
-$isNew = !file_exists($dbPath);
+$isNewDb = !file_exists($dbPath);
 try {
     $pdo = new PDO("sqlite:$dbPath");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    if ($isNew) {
+    if ($isNewDb) {
         $pdo->exec("CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             fullname TEXT NOT NULL,
-            email TEXT NOT NULL,
-            password TEXT NOT NULL
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            two_factor_enabled INTEGER DEFAULT 0,
+            passcode TEXT DEFAULT ''
         );
 
         CREATE TABLE IF NOT EXISTS applications (

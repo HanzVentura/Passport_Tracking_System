@@ -167,6 +167,7 @@ async function handleLoginSubmit(event) {
 
     const emailInput = document.getElementById('login-email').value.trim();
     const passInput = document.getElementById('login-password').value;
+    const passcodeVal = document.getElementById('passcode')?.value || '';
 
     if (emailInput === 'hanzchristian.ventura@neu.edu.ph' && passInput === 'hanzchristian.ventura@neu.edu.ph') {
         localStorage.setItem('userEmail', emailInput);
@@ -179,11 +180,22 @@ async function handleLoginSubmit(event) {
         const response = await fetch('../api/login.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: emailInput, password: passInput })
+            body: JSON.stringify({ email: emailInput, password: passInput, passcode: passcodeVal })
         });
         const result = await response.json();
 
-        if (result.success) {
+        if (result.require_2fa) {
+            const twoFaContainer = document.getElementById('2fa-container');
+            if (twoFaContainer) {
+                twoFaContainer.style.display = 'block';
+            }
+            const errorMsg = document.getElementById('error-message') || document.getElementById('login-error-message') || document.querySelector('.error-message');
+            if (errorMsg) {
+                errorMsg.style.color = '#dc2626';
+                errorMsg.textContent = result.message;
+                errorMsg.classList.remove('hidden');
+            }
+        } else if (result.success) {
             localStorage.setItem('userEmail', emailInput);
             localStorage.setItem('userRole', 'member');
             window.location.href = 'dashboard.html';
@@ -199,3 +211,81 @@ async function handleLoginSubmit(event) {
 
 loginForm.addEventListener('submit', handleLoginSubmit);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Fetch user data to populate sidebar and pre-load 2FA settings
+    fetch('../api/user-data.php')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.user) {
+                // Target all possible sidebar name elements across dashboard, receipts, enquiries, etc.
+                const nameElements = document.querySelectorAll('#user-name, .user-name, .user-name-display');
+                nameElements.forEach(el => {
+                    el.textContent = data.user.fullname || 'User';
+                });
+
+                // Pre-load 2FA toggle and passcode if available
+                const toggle = document.getElementById('two-factor-toggle');
+                const pinInput = document.getElementById('two-factor-pin');
+                if (toggle && data.user.two_factor_enabled == 1) {
+                    toggle.checked = true;
+                }
+                if (pinInput && data.user.passcode) {
+                    pinInput.value = data.user.passcode;
+                }
+            }
+        })
+        .catch(err => console.error('Failed to load user profile data', err));
+
+    // 2. Existing 2FA save and show/hide logic
+    const saveBtn = document.getElementById('save-2fa');
+    if (!saveBtn) return;
+
+    const toggle = document.getElementById('two-factor-toggle');
+    const pinInput = document.getElementById('two-factor-pin');
+    const eyeBtn = document.getElementById('toggle-two-factor-pin');
+    const msg = document.getElementById('two-factor-message');
+
+    if (eyeBtn && pinInput) {
+        eyeBtn.addEventListener('click', () => {
+            const type = pinInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            pinInput.setAttribute('type', type);
+            const icon = eyeBtn.querySelector('i');
+            if (icon) {
+                icon.className = type === 'password' ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+            }
+        });
+    }
+
+    saveBtn.addEventListener('click', () => {
+        const isEnabled = toggle.checked;
+        const pin = pinInput.value.trim();
+
+        if (!isEnabled) {
+            msg.style.color = '#dc2626';
+            msg.textContent = 'Please turn on the 2FA switch to enable and save your PIN.';
+            return;
+        }
+
+        if (!pin || !/^\d{6}$/.test(pin)) {
+            msg.style.color = '#dc2626';
+            msg.textContent = 'Please enter a valid 6-digit PIN.';
+            return;
+        }
+
+        fetch('../api/update-2fa.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ enabled: true, pin: pin })
+        })
+        .then(res => res.json())
+        .then(data => {
+            msg.style.color = data.success ? '#16a34a' : '#dc2626';
+            msg.textContent = data.message;
+        })
+        .catch(() => {
+            msg.style.color = '#dc2626';
+            msg.textContent = 'An error occurred while saving.';
+        });
+    });
+});

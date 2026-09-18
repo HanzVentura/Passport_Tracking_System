@@ -85,7 +85,7 @@
         <div>
             <div class="user-profile-mini">
                 <i class="fa-solid fa-circle-user"></i>
-                <div class="user-info"><div class="name" id="userName">Loading...</div></div>
+                <div class="user-info"><div class="name" id="user-name">Loading...</div></div>
             </div>
             <ul class="nav-links">
                 <li><a href="dashboard.html"><i class="fa-solid fa-house"></i>Dashboard</a></li>
@@ -93,7 +93,7 @@
                 <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i>Receipts</a></li>
                 <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i>Enquiries</a></li>
                 <li><a href="#"><i class="fa-solid fa-user"></i>Profile</a></li>
-                <li><a href="#"><i class="fa-solid fa-gear"></i>Settings</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
         </div>
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
@@ -236,9 +236,9 @@
                 const userResponse = await fetch('../api/user-data.php');
                 const userData = await userResponse.json();
                 if (userData.fullName) {
-                    document.getElementById('userName').textContent = userData.fullName;
+                    document.getElementById('user-name').textContent = userData.fullName;
                     document.getElementById('greetingText').textContent = `Good Day, ${userData.fullName}`;
-                } else { document.getElementById('userName').textContent = userEmail; }
+                } else { document.getElementById('user-name').textContent = userEmail; }
                 const response = await fetch(`../api/get-application.php?email=${encodeURIComponent(userEmail)}`);
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.message || 'Unable to load the active application.');

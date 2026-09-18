@@ -569,7 +569,7 @@
             <div class="user-profile-mini">
                 <i class="fa-solid fa-circle-user"></i>
                 <div class="user-info">
-                    <div class="name" id="userName">Loading...</div>
+                    <div class="name" id="user-name">Loading...</div>
                 </div>
             </div>
             <ul class="nav-links">
@@ -578,7 +578,7 @@
                 <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
                 <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
                 <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
-                <li><a href="#"><i class="fa-solid fa-gear"></i> Settings</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
         </div>
         <div class="sidebar-bottom">
@@ -732,7 +732,7 @@
 
                 if (data.loggedIn && data.fullName) {
                     document.getElementById('greetingText').textContent = 'Good Day, ' + data.fullName;
-                    document.getElementById('userName').textContent = data.fullName;
+                    document.getElementById('user-name').textContent = data.fullName;
                     document.getElementById('summaryFullName').textContent = data.fullName;
                 }
             } catch (error) {
@@ -760,5 +760,6 @@
         });
 
     </script>
+    <script src="script.js"></script>
 </body>
 </html>

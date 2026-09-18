@@ -79,6 +79,15 @@
                                 <button type="button" class="toggle-password">Show Password</button>
                             </div>
                         </div>
+
+                        <!-- 2FA Passcode Field (Hidden by default until login requests 2FA) -->
+                        <div id="2fa-container" style="display: none; margin-bottom: 20px;">
+                            <label for="passcode" style="font-size: 13px; color: #334155; display: block; margin-bottom: 6px;">6-digit Passcode</label>
+                            <div class="password-container">
+                                <input type="password" id="passcode" maxlength="6" placeholder="------" class="login-input">
+                                <button type="button" class="toggle-password">Show Passcode</button>
+                            </div>
+                        </div>
                         
                         <div class="forgot-password-container">
                             <a href="#" class="forgot-password-link">Forgot Password</a>
