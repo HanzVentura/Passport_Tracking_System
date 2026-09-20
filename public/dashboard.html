@@ -666,7 +666,6 @@
                         <h3>New Passport</h3>
                         <p>First-time application or replacement of a lost/damaged passport.</p>
                     </a>
-
                     <a class="selection-card" href="renewal.html">
                         <i class="fa-solid fa-passport" style="font-size: 42px; color: #3b82f6; margin-bottom: 16px;"></i>
                         <h3>Passport Renewal</h3>
@@ -679,20 +678,32 @@
     </div>
 
     <script>
-        function formatAppointmentDate(dateValue) {
+        function formatAppointmentDate(dateValue, timeValue) {
             if (!dateValue) {
                 return '---';
             }
-
             const date = new Date(`${dateValue}T00:00:00`);
-            return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ' at 10:30 AM';
+            const formattedDate = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            return `${formattedDate} at ${timeValue || '09:00 AM'}`;
         }
 
-        function updateStatusTracker(status) {
-            const isPendingPayment = status === 'Pending Payment';
-            const activeSteps = isPendingPayment
-                ? ['submitted']
-                : ['submitted', 'payment', 'review', 'processing'];
+       function updateStatusTracker(status) {
+            const normalizedStatus = (status || '').toLowerCase().trim();
+            let activeSteps = ['submitted'];
+
+            // Only light up payment if status is strictly paid (not pending payment)
+            if (normalizedStatus === 'paid' || (normalizedStatus.includes('paid') && !normalizedStatus.includes('pending'))) {
+                activeSteps = ['submitted', 'payment'];
+            }
+            if (normalizedStatus.includes('review')) {
+                activeSteps = ['submitted', 'payment', 'review'];
+            }
+            if (normalizedStatus.includes('process') || normalizedStatus.includes('approved')) {
+                activeSteps = ['submitted', 'payment', 'review', 'processing'];
+            }
+            if (normalizedStatus.includes('pickup') || normalizedStatus.includes('ready')) {
+                activeSteps = ['submitted', 'payment', 'review', 'processing', 'pickup'];
+            }
 
             document.querySelectorAll('[data-status-step]').forEach(step => {
                 const isActive = activeSteps.includes(step.dataset.statusStep);
@@ -703,62 +714,72 @@
         }
 
         function displaySavedApplication(application) {
-            document.getElementById('dispAppId').innerText = application.applicationId;
-            document.getElementById('dispAppType').innerText = application.applicationType || localStorage.getItem('applicationType') || 'New First-Time Application';
+            const appId = application.application_id || application.applicationId;
+            document.getElementById('dispAppId').innerText = appId;
+            localStorage.setItem('currentApplicationId', appId);
+            localStorage.setItem('activeAppId', appId);
+           
+            document.getElementById('dispAppType').innerText = application.application_type || application.applicationType || 'New First-Time Application';
             document.getElementById('dispAppStatus').innerText = application.status;
             updateStatusTracker(application.status);
-            document.getElementById('dispComeDate').innerText = formatAppointmentDate(application.appointmentDate);
-            document.getElementById('dispAppointmentLocation').innerText = application.appointmentLocation
-                ? `in ${application.appointmentLocation}.`
-                : 'Appointment location not assigned yet.';
-
-            if (application.createdAt) {
-                document.getElementById('dispSubDate').innerText = new Date(application.createdAt)
+           
+            const isPaid = (application.status || '').toLowerCase().trim() === 'paid';
+            if (isPaid) {
+                document.getElementById('dispComeDate').innerText = formatAppointmentDate(application.appointmentDate || application.appointment_date, application.appointmentTime || application.appointment_time);
+                document.getElementById('dispAppointmentLocation').innerText = (application.appointmentLocation || application.appointment_location)
+                    ? `in DFA ${application.appointmentLocation || application.appointment_location}.`
+                    : 'Appointment location assigned.';
+                document.getElementById('pendingAppDefault').style.display = 'none';
+                document.getElementById('pendingAppFilled').style.display = 'flex';
+            } else {
+                document.getElementById('pendingAppDefault').style.display = 'flex';
+                document.getElementById('pendingAppFilled').style.display = 'none';
+            }
+            if (application.createdAt || application.created_at) {
+                document.getElementById('dispSubDate').innerText = new Date(application.createdAt || application.created_at)
                     .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
             }
-
             document.getElementById('activeAppDefault').style.display = 'none';
             document.getElementById('activeAppFilled').style.display = 'block';
             document.getElementById('statusAppDefault').style.display = 'none';
             document.getElementById('statusAppFilled').style.display = 'flex';
-            document.getElementById('pendingAppDefault').style.display = 'none';
-            document.getElementById('pendingAppFilled').style.display = 'flex';
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch('../api/user-data.php');
                 const data = await response.json();
-
                 if (data.loggedIn && data.fullName) {
                     document.getElementById('greetingText').textContent = 'Good Day, ' + data.fullName;
                     document.getElementById('user-name').textContent = data.fullName;
-                    document.getElementById('summaryFullName').textContent = data.fullName;
                 }
             } catch (error) {
                 console.error('Unable to load user data:', error);
             }
-
+           
+            const urlParams = new URLSearchParams(window.location.search);
+            const explicitAppId = urlParams.get('id') || urlParams.get('applicationId') || localStorage.getItem('activeAppId');
             const userEmail = localStorage.getItem('userEmail');
-            if (!userEmail) {
+            let fetchUrl = '../api/get-application.php';
+            if (explicitAppId) {
+                fetchUrl += `?applicationId=${encodeURIComponent(explicitAppId)}`;
+            } else if (userEmail) {
+                fetchUrl += `?email=${encodeURIComponent(userEmail)}`;
+            } else {
                 return;
             }
-
             try {
-                const response = await fetch(`../api/get-application.php?email=${encodeURIComponent(userEmail)}`);
+                const response = await fetch(fetchUrl);
                 const result = await response.json();
                 const application = result.application;
-
                 if (!response.ok || !application) {
                     return;
                 }
-
                 displaySavedApplication(application);
             } catch (error) {
                 console.error('Unable to load saved application:', error);
             }
         });
-
     </script>
     <script src="script.js"></script>
 </body>

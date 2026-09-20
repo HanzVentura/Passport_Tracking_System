@@ -1,24 +1,9 @@
 <?php
 header('Content-Type: application/json');
-
 $dbPath = __DIR__ . '/../database.db';
 try {
     $pdo = new PDO("sqlite:$dbPath");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // Ensure payments table exists
-    $pdo->exec("CREATE TABLE IF NOT EXISTS payments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT,
-        application_id TEXT,
-        amount REAL,
-        processing_type TEXT,
-        payment_method TEXT,
-        status TEXT,
-        appointment_date TEXT,
-        appointment_location TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )");
 
     $input = json_decode(file_get_contents('php://input'), true);
     $email = $input['email'] ?? '';
@@ -27,21 +12,33 @@ try {
     $processingType = $input['processingType'] ?? 'regular';
     $paymentMethod = $input['paymentMethod'] ?? 'GCash';
 
-    // Generate appointment date (e.g., 7 or 12 days from now)
-    $daysToAdd = ($processingType === 'expedited') ? 7 : 12;
-    $appointmentDate = date('Y-m-d', strtotime("+$daysToAdd days"));
-    $appointmentLocation = 'DFA NCR Central (Robinsons Galleria)';
+    if (!$email || !$applicationId) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Email and Application ID are required for payment.']);
+        exit;
+    }
 
-    // Update application status to Paid
-    $update = $pdo->prepare("UPDATE applications SET status = 'Paid', appointment_date = ?, appointment_location = ? WHERE application_id = ? OR email = ?");
-    $update->execute([$appointmentDate, $appointmentLocation, $applicationId, $email]);
+    // Find the specific application record matching this exact application_id
+    $stmt = $pdo->prepare("SELECT appointment_date, appointment_location FROM applications WHERE application_id = ? LIMIT 1");
+    $stmt->execute([$applicationId]);
+    $existingApp = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Insert payment record
-    $insert = $pdo->prepare("INSERT INTO payments (email, application_id, amount, processing_type, payment_method, status, appointment_date, appointment_location) VALUES (?, ?, ?, ?, ?, 'Paid', ?, ?)");
-    $insert->execute([$email, $applicationId, $amount, $processingType, $paymentMethod, $appointmentDate, $appointmentLocation]);
+    if (!$existingApp) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Active application ID not found.']);
+        exit;
+    }
+
+    $appointmentDate = $existingApp['appointment_date'] ?? date('Y-m-d');
+    $appointmentLocation = $existingApp['appointment_location'] ?? 'ANGLES';
+
+    // Update that EXACT application record to Paid
+    $update = $pdo->prepare("UPDATE applications SET status = 'Paid', processing_type = ?, amount = ?, payment_status = 'Paid', payment_method = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
+    $update->execute([$processingType, $amount, $paymentMethod, $applicationId]);
 
     echo json_encode([
         'success' => true,
+        'applicationId' => $applicationId,
         'status' => 'Paid',
         'amount' => $amount,
         'processingType' => $processingType,
@@ -49,7 +46,6 @@ try {
         'appointmentLocation' => $appointmentLocation,
         'message' => 'Payment recorded successfully.'
     ]);
-
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Payment Error: ' . $e->getMessage()]);

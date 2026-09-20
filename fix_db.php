@@ -1,12 +1,14 @@
 <?php
 try {
-    $dbPath = __DIR__ . '/database.db';$pdo = new PDO('sqlite:' . $dbPath);$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $dbPath = __DIR__ . '/database.db';
+    $pdo = new PDO('sqlite:' . $dbPath);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    // Safely add the application_id column to the applications table
+    $pdo->exec("ALTER TABLE applications ADD COLUMN application_id TEXT;");
 
-    $pdo->exec("ALTER TABLE users ADD COLUMN two_factor_enabled INTEGER DEFAULT 0;");
-    $pdo->exec("ALTER TABLE users ADD COLUMN passcode TEXT DEFAULT NULL;");
-
-    echo "<h2 style='color: green;'>Success! Columns added.</h2>";
+    echo "<h2 style='color: green;'>Success! application_id column added to applications table.</h2>";
 } catch (Exception $e) {
-    echo "<h2 style='color: orange;'>Notice: " . $e->getMessage() . "</h2>";
+    echo "<h2 style='color: orange;'>Notice: " . $e->getMessage() . " </h2>";
 }
 ?>

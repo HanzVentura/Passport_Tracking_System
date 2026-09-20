@@ -278,7 +278,7 @@
             </div>
             <ul class="nav-links">
                 <li><a href="dashboard.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
-                <li><a href="#"><i class="fa-solid fa-wallet"></i> Payments</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-wallet"></i> Payments</a></li>
                 <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
                 <li class="active"><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
                 <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
@@ -361,6 +361,9 @@
     <script>
         window.addEventListener('DOMContentLoaded', async () => {
             const userEmail = localStorage.getItem('userEmail');
+            const urlParams = new URLSearchParams(window.location.search);
+            const explicitAppId = urlParams.get('id') || urlParams.get('applicationId') || localStorage.getItem('activeAppId');
+            
             const appIdInput = document.getElementById('enquiryAppId');
             const noAppWarning = document.getElementById('noAppWarning');
             const submitBtn = document.getElementById('submitBtn');
@@ -369,13 +372,16 @@
 
             if (userEmail) {
                 try {
-                    const response = await fetch(`../api/get-application.php?email=${encodeURIComponent(userEmail)}`);
+                    let fetchUrl = `../api/get-application.php?email=${encodeURIComponent(userEmail)}`;
+                    if (explicitAppId) {
+                        fetchUrl = `../api/get-application.php?applicationId=${encodeURIComponent(explicitAppId)}`;
+                    }
+                    const response = await fetch(fetchUrl);
                     const result = await response.json();
                     const application = result.application;
-
                     if (response.ok && application) {
-                        appIdInput.value = application.applicationId;
-                        localStorage.setItem('activeAppId', application.applicationId);
+                        appIdInput.value = application.application_id || application.applicationId;
+                        localStorage.setItem('activeAppId', appIdInput.value);
                         noAppWarning.style.display = 'none';
                         submitBtn.disabled = false;
                         messageBox.disabled = false;
@@ -390,9 +396,7 @@
             } else {
                 showNoApplicationState();
             }
-
             loadEnquiries(userEmail);
-
             function showNoApplicationState() {
                 appIdInput.value = "No Active Application";
                 noAppWarning.style.display = 'flex';

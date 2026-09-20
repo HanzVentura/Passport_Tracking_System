@@ -24,14 +24,6 @@
         .btn-group { background: #475569; }
         .btn-group:hover { background: #334155; }
         
-        /* Modern Grid Pill Wizard Layout */
-        .wizard-steps { display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; margin-bottom: 25px; background: #fff; padding: 16px 20px; border-radius: 10px; border: 1px solid #e2e8f0; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .wizard-step { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; font-weight: 600; color: #64748b; white-space: nowrap; background: #f8fafc; padding: 8px 10px; border-radius: 6px; border: 1px solid #f1f5f9; transition: all 0.2s ease; }
-        .wizard-step.active { color: #2563eb; background: #eff6ff; border-color: #bfdbfe; }
-        .step-badge { width: 22px; height: 22px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: 700; }
-        .wizard-step.active .step-badge { background: #2563eb; color: #fff; }
-        .wizard-divider { display: none; }
-
         /* DFA Custom Calendar Grid Styles */
         .dfa-calendar-container { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; margin-bottom: 15px; font-size: 15px; color: #0f172a; }
@@ -52,6 +44,13 @@
         .review-section-block h4 { border-bottom: 1px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 10px; color: #0f172a; font-size: 14px; }
         .review-item { margin-bottom: 6px; }
         .review-item strong { display: inline-block; width: 140px; font-weight: 600; }
+    /* Clean Group Wizard Step Layout */
+.wizard-steps { display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; margin-bottom: 25px; background: #fff; padding: 16px 20px; border-radius: 10px; border: 1px solid #e2e8f0; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .wizard-step { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; font-weight: 600; color: #64748b; white-space: nowrap; background: #f8fafc; padding: 8px 10px; border-radius: 6px; border: 1px solid #f1f5f9; transition: all 0.2s ease; }
+        .wizard-step.active { color: #2563eb; background: #eff6ff; border-color: #bfdbfe; }
+        .step-badge { width: 22px; height: 22px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: 700; }
+        .wizard-step.active .step-badge { background: #2563eb; color: #fff; }
+        .wizard-divider { display: none; } /* Removed awkward lines for a clean, modern pill-grid layout */
     </style>
 </head>
 <body data-application-type="new">
@@ -73,45 +72,22 @@
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
     </aside>
     <main class="main-content">
-        <div class="header" id="pageHeaderTitle">NEW PASSPORT APPLICATION</div>
+        <div class="header" id="pageHeaderTitle">GROUP PASSPORT APPLICATION WIZARD</div>
         <div class="dashboard-container">
             
-            <div class="wizard-steps" id="wizardHeader" style="display: none;">
-                <div class="wizard-step active" id="wStep1"><div class="step-badge">1</div><span>Site</span></div>
-                <div class="wizard-step" id="wStep2"><div class="step-badge">2</div><span>Schedule</span></div>
-                <div class="wizard-step" id="wStep3"><div class="step-badge">3</div><span>Personal</span></div>
-                <div class="wizard-step" id="wStep4"><div class="step-badge">4</div><span>Family</span></div>
+            <div class="wizard-steps" id="wizardHeader">
+                <div class="wizard-step active" id="wStep1"><div class="step-badge">1</div><span>Site</span></div><div class="wizard-divider"></div>
+                <div class="wizard-step" id="wStep2"><div class="step-badge">2</div><span>Schedule</span></div><div class="wizard-divider"></div>
+                <div class="wizard-step" id="wStep3"><div class="step-badge">3</div><span>Personal</span></div><div class="wizard-divider"></div>
+                <div class="wizard-step" id="wStep4"><div class="step-badge">4</div><span>Family</span></div><div class="wizard-divider"></div>
                 <div class="wizard-step" id="wStep5"><div class="step-badge">5</div><span>Application & Contact</span></div>
                 <div class="wizard-step" id="wStep6"><div class="step-badge">6</div><span>Review</span></div>
             </div>
             <form id="passportForm" action="../api/submit-application.php" method="POST" novalidate>
-                <input type="hidden" name="appointment_mode" id="appointmentMode" value="individual">
-                <!-- STEP 0: Terms & Mode Selection -->
-                <section class="step-pane active" id="step0">
-                    <div class="form-section-card">
-                        <div class="section-title">Terms and Conditions</div>
-                        <div class="alert-box" style="background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a;">
-                            <strong>Reminder:</strong> Applicants are strongly advised to use official Google or Yahoo email accounts when booking appointments to prevent technical delivery issues. Please note that email accessibility and domain restrictions may vary based on your network location, home country, or mail server configurations.
-                        </div>
-                        <div style="background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; line-height: 1.6; margin-bottom: 20px;">
-                            <p style="margin-bottom: 12px;">This appointment scheduling platform distributes available booking slots strictly on a first-come, first-served basis.</p>
-                            <p style="margin-bottom: 12px;">All applicants bear full responsibility for correctly inputting, inspecting, and validating every detail supplied during registration. Submitting inaccurate, false, or flawed information can lead to the outright forfeiture of your passport application.</p>
-                            <p><strong>For ePayment Services:</strong> All paid fees are strictly non-refundable. Fees will be forfeited if you fail to attend your confirmed appointment slot, request a cancellation, or face application rejection due to inconsistent, incorrect, or fraudulent documentation.</p>
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
-                            <input type="checkbox" id="termsAgree" required style="width: 18px; height: 18px;">
-                            <label for="termsAgree" style="margin: 0; cursor: pointer; font-weight: 500; font-size: 13px; line-height: 1.5; color: #991b1b;">
-                                <em>By proceeding with this application, I understand that I am signifying my unequivocal consent to the disclosure, collection, and use of my personal information and data required under the Philippine Passport Act and the Data Privacy Act of 2012, along with all pertinent DFA rules, regulations, and implementation guidelines.</em>
-                            </label>
-                        </div>
-                        <div class="mode-btn-container">
-                            <button type="button" class="mode-btn btn-individual" onclick="selectModeAndNext('individual')"><i class="fa-solid fa-user"></i> Start Individual Appointment</button>
-                            <button type="button" class="mode-btn btn-group" onclick="startGroupAppointment()"><i class="fa-solid fa-users"></i> Start Group Appointment</button>
-                        </div>
-                    </div>
-                </section>
+                <input type="hidden" name="appointment_mode" id="appointmentMode" value="group">
+                
                 <!-- STEP 1: Site Location -->
-                <section class="step-pane" id="step1">
+                <section class="step-pane active" id="step1">
                     <div class="form-section-card">
                         <div class="section-title">Site Location</div>
                         <div class="form-row">
@@ -176,8 +152,8 @@
                         <div class="form-group"><label>Office Address</label><input type="text" class="form-control" id="officeAddress" readonly value="-"></div>
                     </div>
                     <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="resetToTerms()">Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(2)">Next</button>
+                        <a href="group-appointment.html" class="btn-secondary" style="padding: 10px 20px; border: 1px solid #cbd5e1; border-radius: 8px; text-decoration: none; color: #374151;">Back</a>
+                        <button type="button" class="btn-primary" onclick="groupHandleNext(2)">Next</button>
                     </div>
                 </section>
                 <!-- STEP 2: Date & Time -->
@@ -220,7 +196,7 @@
                     </div>
                     <div class="action-buttons">
                         <button type="button" class="btn-secondary" onclick="goToStep(1)">Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(3)">Next</button>
+                        <button type="button" class="btn-primary" onclick="groupHandleNext(3)">Next</button>
                     </div>
                 </section>
                 <!-- STEP 3: Personal Information -->
@@ -293,7 +269,7 @@
                     </div>
                     <div class="action-buttons">
                         <button type="button" class="btn-secondary" onclick="goToStep(2)">Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(4)">Next</button>
+                        <button type="button" class="btn-primary" onclick="groupHandleNext(4)">Next</button>
                     </div>
                 </section>
                 <!-- STEP 4: Family Information -->
@@ -421,7 +397,7 @@
                     </div>
                     <div class="action-buttons">
                         <button type="button" class="btn-secondary" onclick="goToStep(3)">Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(5)">Next</button>
+                        <button type="button" class="btn-primary" onclick="groupHandleNext(5)">Next</button>
                     </div>
                 </section>
                 <!-- STEP 5: Application & Contact -->
@@ -478,7 +454,7 @@
                     </div>
                     <div class="action-buttons">
                         <button type="button" class="btn-secondary" onclick="goToStep(4)">Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(6)">Next</button>
+                        <button type="button" class="btn-primary" onclick="groupHandleNext(6)">Next</button>
                     </div>
                 </section>
                 <!-- STEP 6: Review -->
@@ -492,7 +468,7 @@
                             <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px;">
                                 <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Appointment Details</h4>
                                 <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Mode:</strong> <span id="rev-mode">INDIVIDUAL</span></div>
+                                    <div><strong>Mode:</strong> <span id="rev-mode">GROUP</span></div>
                                     <div><strong>Site Location:</strong> <span id="rev-site">-</span></div>
                                     <div><strong>Date:</strong> <span id="rev-date">-</span></div>
                                     <div><strong>Time:</strong> <span id="rev-time">-</span></div>
@@ -546,13 +522,13 @@
                         </div>
                         <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 25px;">
                             <input type="checkbox" id="finalAgree" required style="width: 18px; height: 18px;">
-                            <label for="finalAgree" style="margin: 0; font-weight: 500;">I confirm that all information provided is accurate and complete.</label>
+                            <label for="finalAgree" style="margin: 0; font-weight: 500;">I confirm that all information provided for this group is accurate and complete.</label>
                         </div>
                     </div>
                     
                     <div class="action-buttons">
                         <button type="button" class="btn-secondary" onclick="goToStep(5)">Back</button>
-                        <button type="submit" class="btn-primary" style="background: #28a745;">Save & Submit</button>
+                        <button type="submit" class="btn-primary" style="background: #28a745;">Save & Submit Group</button>
                     </div>
                 </section>
             </form>
@@ -763,50 +739,6 @@
                 document.getElementById('officeContact').value = "-";
             }
         }
-        function startGroupAppointment() {
-            const terms = document.getElementById('termsAgree');
-            if (!terms.checked) {
-                alert('Please agree to the Terms and Conditions to proceed.');
-                return;
-            }
-            window.location.href = 'group-appointment.html';
-        }
-        function selectModeAndNext(mode) {
-            const terms = document.getElementById('termsAgree');
-            if (!terms.checked) {
-                alert('Please agree to the Terms and Conditions to proceed.');
-                return;
-            }
-            document.getElementById('appointmentMode').value = mode;
-            document.getElementById('wizardHeader').style.display = 'grid';
-            goToStep(1);
-        }
-        function resetToTerms() {
-            document.getElementById('wizardHeader').style.display = 'none';
-            document.querySelectorAll('.step-pane').forEach(pane => pane.classList.remove('active'));
-            document.getElementById('step0').classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        async function populateReviewData() {
-            const getValue = (name) => document.querySelector(`[name="${name}"]`) ? document.querySelector(`[name="${name}"]`).value : '';
-           
-            document.getElementById('rev-mode').textContent = document.getElementById('appointmentMode').value.toUpperCase();
-            document.getElementById('rev-site').textContent = getValue('site') || '-';
-            document.getElementById('rev-date').textContent = getValue('app_date') || '-';
-            document.getElementById('rev-time').textContent = getValue('app_time') || '-';
-           
-            const fullName = `${getValue('givenname')} ${getValue('middlename')} ${getValue('lastname')}`.trim().replace(/\s+/g, ' ');
-            document.getElementById('rev-fullname').textContent = fullName || '-';
-            document.getElementById('rev-dob').textContent = getValue('dob') || '-';
-            document.getElementById('rev-email').textContent = getValue('email') || '-';
-            document.getElementById('rev-mobile').textContent = getValue('mobile') || '-';
-           
-            const userEmail = getValue('email') || localStorage.getItem('userEmail');
-            if (userEmail) {
-                localStorage.setItem('userEmail', userEmail);
-            }
-        }
-        
         function goToStep(stepNumber) {
             if (stepNumber === 2 && !selectedDateStr) {
                 renderCalendar();
@@ -824,12 +756,9 @@
                     }
                 }
             }
-            
             if (stepNumber === 6) {
                 populateReviewSummary();
-                populateReviewData();
             }
-            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
@@ -838,7 +767,6 @@
             if (e.target && e.target.id === 'citizenshipBasisSelect') {
                 const othersContainer = document.getElementById('othersBasisContainer');
                 const othersInput = othersContainer ? othersContainer.querySelector('input') : null;
-                
                 if (e.target.value === 'OTHERS') {
                     othersContainer.style.display = 'block';
                     if (othersInput) othersInput.required = true;
@@ -851,7 +779,7 @@
                 }
             }
         });
-        // Populate Review Screen dynamically when entering Step 6
+
         function populateReviewSummary() {
             const getVal = (name) => {
                 const el = document.querySelector(`[name="${name}"]`);
@@ -927,6 +855,110 @@
             document.getElementById('rev-citizenshipbasis').innerText = citizenshipBasisText;
             document.getElementById('rev-foreignpassport').innerText = getVal('foreign_passport');
         }
+    </script>
+
+    <!-- Group Wizard Multi-Applicant Loop Controller -->
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentStep = parseInt(urlParams.get('step')) || 1;
+        let currentApplicant = parseInt(urlParams.get('applicant')) || 1;
+        const totalApplicants = parseInt(localStorage.getItem('groupCount')) || 2;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // For applicants 2+, automatically lock/skip steps 1 & 2 if site/schedule are already saved
+            if (currentApplicant > 1 && currentStep < 3) {
+                currentStep = 3;
+            }
+            goToStep(currentStep);
+
+            const dashboardContainer = document.querySelector('.dashboard-container');
+            if (dashboardContainer && !document.getElementById('groupApplicantBadge')) {
+                const badgeDiv = document.createElement('div');
+                badgeDiv.id = 'groupApplicantBadge';
+                badgeDiv.style.cssText = 'background: #eff6ff; color: #1d4ed8; padding: 10px 15px; border-radius: 8px; font-weight: 600; font-size: 14px; margin-bottom: 20px; border: 1px solid #bfdbfe;';
+                badgeDiv.textContent = `Group Booking: Filling out details for Applicant ${currentApplicant} of ${totalApplicants}`;
+                dashboardContainer.insertBefore(badgeDiv, dashboardContainer.firstChild);
+            }
+        });
+
+        function groupHandleNext(targetStep) {
+            saveCurrentApplicantData();
+
+            if (targetStep > 5) {
+                if (currentApplicant < totalApplicants) {
+                    // Move to next applicant, skipping site & schedule (start directly at Step 3: Personal)
+                    currentApplicant++;
+                    currentStep = 3; 
+                    window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
+                    return;
+                } else {
+                    // All applicants completed, go to dynamic group review
+                    currentStep = 6;
+                }
+            } else {
+                currentStep = targetStep;
+            }
+            goToStep(currentStep);
+        }
+
+        function groupHandleBack(targetStep) {
+            if (targetStep < 3 && currentApplicant > 1) {
+                // If trying to go back past personal info on applicant 2+, go back to applicant 1's review/contact step
+                currentApplicant--;
+                currentStep = 5;
+                window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
+                return;
+            }
+            goToStep(targetStep);
+        }
+
+        function saveCurrentApplicantData() {
+            const formData = new FormData(document.getElementById('passportForm'));
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            
+            // If applicant 2+, carry over shared site and schedule from applicant 1 automatically
+            if (currentApplicant > 1 && groupData['applicant_1']) {
+                formData.set('site', groupData['applicant_1']['site'] || '');
+                formData.set('app_date', groupData['applicant_1']['app_date'] || '');
+                formData.set('app_time', groupData['applicant_1']['app_time'] || '');
+            }
+
+            let appData = groupData[`applicant_${currentApplicant}`] || {};
+            formData.forEach((value, key) => {
+                appData[key] = value;
+            });
+            groupData[`applicant_${currentApplicant}`] = appData;
+            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+        }
+
+        // Overriding review population to dynamically generate cards for ALL applicants
+        const originalPopulateReview = window.populateReviewSummary;
+        window.populateReviewSummary = function() {
+            const reviewGrid = document.querySelector('.review-grid');
+            if (!reviewGrid) return;
+            
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            let htmlContent = '';
+
+            for (let i = 1; i <= totalApplicants; i++) {
+                let app = groupData[`applicant_${i}`] || {};
+                htmlContent += `
+                    <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px; grid-column: span 2; margin-bottom: 15px;">
+                        <h4 style="font-size: 15px; color: #1d4ed8; margin-bottom: 10px; border-bottom: 2px solid #3b82f6; padding-bottom: 5px;">Applicant ${i} Details</h4>
+                        <div style="font-size: 13px; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div><strong>Full Name:</strong> ${app.givenname || ''} ${app.middlename || ''} ${app.lastname || ''}</div>
+                            <div><strong>Date of Birth:</strong> ${app.dob || '-'}</div>
+                            <div><strong>Application Type:</strong> ${app.application_type || '-'}</div>
+                            <div><strong>Mobile:</strong> ${app.mobile || '-'}</div>
+                            <div><strong>Email:</strong> ${app.email || '-'}</div>
+                            <div><strong>Site Location:</strong> ${app.site || groupData['applicant_1']?.site || '-'}</div>
+                            <div><strong>Appointment Date:</strong> ${app.app_date || groupData['applicant_1']?.app_date || '-'} (${app.app_time || groupData['applicant_1']?.app_time || '-'})</div>
+                        </div>
+                    </div>
+                `;
+            }
+            reviewGrid.innerHTML = htmlContent;
+        };
     </script>
 </body>
 </html>

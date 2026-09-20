@@ -99,7 +99,6 @@
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
     </aside>
 
-
     <main class="main-content">
         <div class="header">PAYMENTS</div>
         <div class="dashboard-container">
@@ -107,7 +106,6 @@
                 <h1 id="greetingText">Passport Payment</h1>
                 <p>Complete your payment to lock in your appointment schedule.</p>
             </div>
-
 
             <div class="content-grid" id="paymentContent">
                 <section class="card">
@@ -131,7 +129,6 @@
                         </label>
                     </div>
 
-
                     <form id="paymentForm">
                         <span class="section-label">Payment method</span>
                         <div class="method-list">
@@ -146,10 +143,9 @@
                             <div class="form-group"><label for="paymentNote">Reference note <span style="font-weight:400;color:#9ca3af;">(optional)</span></label><input class="form-control" id="paymentNote" type="text" placeholder="e.g. payment reference"></div>
                         </div>
                         <div id="formMessage" class="message" role="status"></div>
-                        <div class="button-row"><a class="btn-secondary" href="dashboard.html">Back to Dashboard</a><button class="btn-primary" id="payButton" type="submit"><i class="fa-solid fa-lock"></i> Pay Now</button></div>
+                        <div class="button-row"><a class="btn-secondary" id="backToDashBtn" href="dashboard.html">Back to Dashboard</a><button class="btn-primary" id="payButton" type="submit"><i class="fa-solid fa-lock"></i> Pay Now</button></div>
                     </form>
                 </section>
-
 
                 <aside class="card">
                     <div class="card-title">Payment Summary</div>
@@ -167,14 +163,12 @@
             </div>
         </div>
     </main>
-
-
+    
     <script src="script.js"></script>
     <script>
-        const userEmail = localStorage.getItem('userEmail');
         const urlParams = new URLSearchParams(window.location.search);
-        const storedApplicationId = urlParams.get('application_id')
-            || urlParams.get('applicationId')
+        const storedApplicationId = urlParams.get('id')
+            || urlParams.get('application_id')
             || localStorage.getItem('currentApplicationId')
             || localStorage.getItem('activeAppId');
         let activeApplication = null;
@@ -182,12 +176,10 @@
         const message = document.getElementById('formMessage');
         const payButton = document.getElementById('payButton');
 
-
         function showMessage(text, type) {
             message.textContent = text;
             message.className = `message ${type}`;
         }
-
 
         function updateSelectedPlan() {
             const selected = document.querySelector('input[name="processingType"]:checked');
@@ -200,7 +192,6 @@
             document.getElementById('summaryAmount').textContent = `₱${Number(selected.dataset.amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
         }
 
-
         function displayApplication(application) {
             const applicationId = storedApplicationId || application.application_id || application.applicationId;
             if (!applicationId) {
@@ -211,12 +202,15 @@
             activeApplication = application;
             localStorage.setItem('currentApplicationId', applicationId);
             localStorage.setItem('activeAppId', applicationId);
+            document.getElementById('backToDashBtn').href = `dashboard.html?id=${applicationId}`;
             document.getElementById('applicationSummary').style.display = 'none';
             document.getElementById('summaryDetails').style.display = 'block';
             document.getElementById('summaryId').textContent = applicationId;
-            document.getElementById('summaryApplicant').textContent = userEmail;
+            document.getElementById('summaryApplicant').textContent = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || 'User');
             document.getElementById('summaryStatus').textContent = application.status;
-            document.getElementById('paymentEmail').value = userEmail;
+            if (document.getElementById('paymentEmail')) {
+                document.getElementById('paymentEmail').value = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || '');
+            }
             payButton.disabled = false;
             if (application.status === 'Paid') {
                 payButton.disabled = true;
@@ -225,28 +219,31 @@
             }
         }
 
-
         async function loadPage() {
-            if (!userEmail) {
-                document.getElementById('applicationSummary').innerHTML = '<i class="fa-solid fa-lock"></i><p>Please log in before making a payment.</p>';
-                payButton.disabled = true;
-                return;
-            }
             try {
                 const userResponse = await fetch('../api/user-data.php');
                 const userData = await userResponse.json();
+                const activeEmail = userData.email || localStorage.getItem('userEmail');
+
                 if (userData.fullName) {
                     document.getElementById('user-name').textContent = userData.fullName;
                     document.getElementById('greetingText').textContent = `Good Day, ${userData.fullName}`;
-                } else { document.getElementById('user-name').textContent = userEmail; }
-                const response = await fetch(`../api/get-application.php?email=${encodeURIComponent(userEmail)}`);
+                } else if (activeEmail) {
+                    document.getElementById('user-name').textContent = activeEmail;
+                }
+
+                // Query the backend using the specific Application ID from the URL or storage first
+                const targetId = storedApplicationId;
+                const fetchUrl = targetId ? `../api/get-application.php?applicationId=${encodeURIComponent(targetId)}` : `../api/get-application.php?email=${encodeURIComponent(activeEmail)}`;
+                
+                const response = await fetch(fetchUrl);
                 const result = await response.json();
-                if (!response.ok) throw new Error(result.message || 'Unable to load the active application.');
-                if (result.application) {
+
+                if (response.ok && result.application) {
                     displayApplication(result.application);
-                } else if (storedApplicationId) {
+                } else if (targetId) {
                     displayApplication({
-                        application_id: storedApplicationId,
+                        application_id: targetId,
                         applicationType: localStorage.getItem('applicationType') || 'New First-Time Application',
                         status: 'Pending Payment'
                     });
@@ -259,34 +256,34 @@
             }
         }
 
-
         document.querySelectorAll('input[name="processingType"]').forEach(input => input.addEventListener('change', updateSelectedPlan));
+        
         form.addEventListener('submit', async event => {
             event.preventDefault();
             if (!activeApplication) return showMessage('No active application is available for payment.', 'error');
             payButton.disabled = true;
             payButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+            
             const selectedPlan = document.querySelector('input[name="processingType"]:checked');
             const paymentAmount = Number(selectedPlan.dataset.amount);
             const applicationType = activeApplication.applicationType
                 || localStorage.getItem('applicationType')
                 || 'New First-Time Application';
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const currentEmail = typeof userEmail !== 'undefined' ? userEmail : localStorage.getItem('userEmail');
+
             try {
                 const response = await fetch('../api/payments.php', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: userEmail, applicationId: activeApplication.applicationId, processingType: selectedPlan.value, amount: paymentAmount, paymentMethod })
+                    body: JSON.stringify({ email: currentEmail, applicationId: activeApplication.applicationId, processingType: selectedPlan.value, amount: paymentAmount, paymentMethod })
                 });
                 const result = await response.json();
                 if (!response.ok || !result.success) throw new Error(result.message || 'Unable to process payment.');
+                
                 activeApplication.status = result.status;
                 activeApplication.paymentAmount = result.amount ?? paymentAmount;
                 activeApplication.applicationType = applicationType;
-                savePaymentSelection(
-                    activeApplication.paymentAmount,
-                    result.processingType || selectedPlan.value,
-                    applicationType
-                );
+                
                 document.getElementById('summaryStatus').textContent = result.status;
                 document.getElementById('successMessage').textContent = `${result.message} Appointment date: ${new Date(`${result.appointmentDate}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} at ${result.appointmentLocation}.`;
                 document.getElementById('successState').style.display = 'block';
@@ -300,7 +297,6 @@
         });
 
         loadPage();
-      
     </script>
 </body>
 

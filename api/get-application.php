@@ -1,15 +1,14 @@
 <?php
 header('Content-Type: application/json');
-
 $dbPath = __DIR__ . '/../database.db';
 try {
     $pdo = new PDO("sqlite:$dbPath");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
     $email = $_GET['email'] ?? '';
     $applicationId = $_GET['applicationId'] ?? '';
-
     $stmt = null;
+    
+    // Require an explicit applicationId or email; remove the wildcard global fallback
     if ($applicationId) {
         $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? ORDER BY id DESC LIMIT 1");
         $stmt->execute([$applicationId]);
@@ -17,11 +16,11 @@ try {
         $stmt = $pdo->prepare("SELECT * FROM applications WHERE email = ? ORDER BY id DESC LIMIT 1");
         $stmt->execute([$email]);
     } else {
-        $stmt = $pdo->query("SELECT * FROM applications ORDER BY id DESC LIMIT 1");
+        echo json_encode(['success' => false, 'message' => 'No application ID or email provided.']);
+        exit;
     }
-
+    
     $application = $stmt->fetch(PDO::FETCH_ASSOC);
-
     if ($application) {
         $appId = $application['application_id'] ?: ('PH-' . rand(100000, 999900));
         echo json_encode([

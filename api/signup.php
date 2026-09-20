@@ -2,14 +2,12 @@
 // Handles new user registration with universal input parsing (FormData & JSON)
 session_start();
 header('Content-Type: application/json');
-
 // Connects to the SQLite database
 $dbPath = __DIR__ . '/../database.db';
 $isNewDb = !file_exists($dbPath);
 try {
     $pdo = new PDO("sqlite:$dbPath");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
     if ($isNewDb) {
         $pdo->exec("CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,9 +17,9 @@ try {
             two_factor_enabled INTEGER DEFAULT 0,
             passcode TEXT DEFAULT ''
         );
-
         CREATE TABLE IF NOT EXISTS applications (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            application_id TEXT,
             email TEXT NOT NULL,
             application_type TEXT,
             status TEXT,
@@ -34,7 +32,6 @@ try {
             created_at TEXT,
             updated_at TEXT
         );
-
         CREATE TABLE IF NOT EXISTS enquiries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT NOT NULL,
@@ -50,20 +47,17 @@ try {
     echo json_encode(['success' => false, 'message' => 'Database connection failed.']);
     exit;
 }
-
 // Read raw JSON input if sent as JSON
 $jsonInput = json_decode(file_get_contents('php://input'), true) ?? [];
-
 // Capture fields from $_POST (FormData) or JSON payload fallback
 $fullName = $_POST['fullname'] ?? $_POST['fullName'] ?? $_POST['name'] ?? $jsonInput['fullname'] ?? $jsonInput['fullName'] ?? $jsonInput['name'] ?? '';
 $email = $_POST['email'] ?? $jsonInput['email'] ?? '';
 $password = $_POST['password'] ?? $jsonInput['password'] ?? '';
-
 // Validate that all fields are present
 if (empty($fullName) || empty($email) || empty($password)) {
     http_response_code(400);
     echo json_encode([
-        'success' => false, 
+        'success' => false,
         'message' => 'Please fill in all required fields.',
         'debug' => [
             'received_post' => $_POST,
@@ -72,7 +66,6 @@ if (empty($fullName) || empty($email) || empty($password)) {
     ]);
     exit;
 }
-
 try {
     // Checks if email is already registered
     $checkStmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
@@ -82,22 +75,18 @@ try {
         echo json_encode(['success' => false, 'message' => 'This email address is already registered. Please log in instead.']);
         exit;
     }
-
     // Hashes password and inserts new user matching the 'fullname' schema
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    
+   
     $stmt = $pdo->prepare("INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)");
     $stmt->execute([$fullName, $email, $hashedPassword]);
-
     $userId = $pdo->lastInsertId();
-
     // Sets session data
     $_SESSION['user'] = [
         'id' => $userId,
         'name' => $fullName,
         'email' => $email
     ];
-
     http_response_code(201);
     echo json_encode([
         'success' => true,
