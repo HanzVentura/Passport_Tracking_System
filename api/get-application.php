@@ -7,8 +7,7 @@ try {
     $email = $_GET['email'] ?? '';
     $applicationId = $_GET['applicationId'] ?? '';
     $stmt = null;
-    
-    // Require an explicit applicationId or email; remove the wildcard global fallback
+   
     if ($applicationId) {
         $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? ORDER BY id DESC LIMIT 1");
         $stmt->execute([$applicationId]);
@@ -19,7 +18,7 @@ try {
         echo json_encode(['success' => false, 'message' => 'No application ID or email provided.']);
         exit;
     }
-    
+   
     $application = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($application) {
         $appId = $application['application_id'] ?: ('PH-' . rand(100000, 999900));
@@ -33,7 +32,11 @@ try {
                 'status' => $application['status'] ?? 'Pending Payment',
                 'email' => $application['email'] ?? $email,
                 'appointmentDate' => $application['appointment_date'] ?? null,
+                'appointment_date' => $application['appointment_date'] ?? null,
                 'appointmentLocation' => $application['appointment_location'] ?? null,
+                'appointment_location' => $application['appointment_location'] ?? null,
+                'appointmentTime' => $application['appointment_time'] ?? '09:00 AM',
+                'appointment_time' => $application['appointment_time'] ?? '09:00 AM',
                 'createdAt' => $application['created_at'] ?? date('Y-m-d H:i:s')
             ]
         ]);

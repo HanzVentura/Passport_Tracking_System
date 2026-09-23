@@ -12,40 +12,38 @@ try {
         }
         $app1 = $groupData['applicant_1'] ?? [];
        
-        $email = $_POST['email'] ?? ($app1['email'] ?? '');
+        $email = !empty($_POST['email']) ? $_POST['email'] : ($app1['email'] ?? '');
         if (!$email) {
             die("Error: Email is required.");
         }
 
-        // Always generate a fresh unique application ID for group bookings
+        // Generate a fresh unique application ID for group bookings
         $application_id = 'PH-' . rand(100000, 999999);
-        
-        // STRICTLY FORCE 'Group Appointment' for all group wizard submissions
         $application_type = 'Group Appointment';
         $status = 'Pending Payment';
        
-        // Extract the exact user-selected location, date, and time from hidden fields or payload
-        $appointment_location = $_POST['site'] ?? ($app1['site_selection'] ?? ($_POST['site_selection'] ?? 'DFA NCR CENTRAL'));
-        $appointment_date = $_POST['app_date'] ?? ($app1['app_date_selection'] ?? date('Y-m-d'));
-        $appointment_time = $_POST['app_time'] ?? ($app1['app_time_selection'] ?? '09:00 AM');
+        // Extract site, date, and time strictly from user choices (checking non-empty values)
+        $appointment_location = !empty($app1['site_selection']) ? $app1['site_selection'] : (!empty($_POST['site']) ? $_POST['site'] : ($_POST['site_selection'] ?? ''));
+        $appointment_date     = !empty($app1['app_date_selection']) ? $app1['app_date_selection'] : (!empty($_POST['app_date']) ? $_POST['app_date'] : '');
+        $appointment_time     = !empty($app1['app_time_selection']) ? $app1['app_time_selection'] : (!empty($_POST['app_time']) ? $_POST['app_time'] : '');
        
         // Insert new group application record with exact user selections
         $sql = "INSERT INTO applications (application_id, email, application_type, status, appointment_date, appointment_location, appointment_time, created_at)
                 VALUES (:app_id, :email, :app_type, :status, :app_date, :app_location, :app_time, CURRENT_TIMESTAMP)";
         $stmt = $db->prepare($sql);
         $stmt->execute([
-            ':app_id' => $application_id,
-            ':email' => $email,
-            ':app_type' => $application_type,
-            ':status' => $status,
-            ':app_date' => $appointment_date,
+            ':app_id'       => $application_id,
+            ':email'        => $email,
+            ':app_type'     => $application_type,
+            ':status'       => $status,
+            ':app_date'     => $appointment_date,
             ':app_location' => $appointment_location,
-            ':app_time' => $appointment_time
+            ':app_time'     => $appointment_time
         ]);
 
         setcookie('userEmail', $email, time() + (86400 * 30), "/");
         setcookie('currentApplicationId', $application_id, time() + (86400 * 30), "/");
-        
+       
         header("Location: ../public/payments.html?id=" . $application_id);
         exit();
     }

@@ -31,7 +31,6 @@
         .step-badge { width: 22px; height: 22px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: 700; }
         .wizard-step.active .step-badge { background: #2563eb; color: #fff; }
         .wizard-divider { display: none; }
-
         /* DFA Custom Calendar Grid Styles */
         .dfa-calendar-container { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; margin-bottom: 15px; font-size: 15px; color: #0f172a; }
@@ -86,6 +85,8 @@
             </div>
             <form id="passportForm" action="../api/submit-application.php" method="POST" novalidate>
                 <input type="hidden" name="appointment_mode" id="appointmentMode" value="individual">
+                <input type="hidden" name="appointment_location" id="appointmentLocationFull">
+                
                 <!-- STEP 0: Terms & Mode Selection -->
                 <section class="step-pane active" id="step0">
                     <div class="form-section-card">
@@ -751,7 +752,12 @@
             "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City", contact: "(062) 991-0000" }
         };
         function updateSiteInfo() {
-            const selectedSite = document.getElementById('siteSelect').value;
+            const selectEl = document.getElementById('siteSelect');
+            const selectedSite = selectEl.value;
+            
+            const fullText = selectEl.selectedIndex > 0 ? selectEl.options[selectEl.selectedIndex].text : '';
+            document.getElementById('appointmentLocationFull').value = fullText;
+
             const info = dfaOfficeData[selectedSite];
             if (info) {
                 document.getElementById('officeName').value = info.name;
@@ -791,7 +797,7 @@
             const getValue = (name) => document.querySelector(`[name="${name}"]`) ? document.querySelector(`[name="${name}"]`).value : '';
            
             document.getElementById('rev-mode').textContent = document.getElementById('appointmentMode').value.toUpperCase();
-            document.getElementById('rev-site').textContent = getValue('site') || '-';
+            document.getElementById('rev-site').textContent = getValue('appointment_location') || getValue('site') || '-';
             document.getElementById('rev-date').textContent = getValue('app_date') || '-';
             document.getElementById('rev-time').textContent = getValue('app_time') || '-';
            
@@ -921,7 +927,7 @@
             document.getElementById('rev-occupation').innerText = getVal('occupation');
             
             let citizenshipBasisText = getVal('citizenship_basis');
-            if (citizenshipBasisText === 'OTHERS') {
+            if (citizenshipBasisText === 'OTHORS') {
                 citizenshipBasisText += ` (${getVal('citizenship_basis_others')})`;
             }
             document.getElementById('rev-citizenshipbasis').innerText = citizenshipBasisText;

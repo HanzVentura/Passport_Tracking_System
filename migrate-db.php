@@ -20,7 +20,7 @@ try {
         }
     }
 
-    // 2. Ensure applications table exists with application_id
+    // 2. Ensure applications table exists with application_id and appointment_time
     $pdo->exec("CREATE TABLE IF NOT EXISTS applications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         application_id TEXT,
@@ -32,20 +32,26 @@ try {
         payment_status TEXT,
         payment_method TEXT,
         appointment_date TEXT,
+        appointment_time TEXT,
         appointment_location TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );");
 
-    // If table already existed without application_id, add it safely
+    // If table already existed without application_id or appointment_time, add them safely
     $appColumns = $pdo->query('PRAGMA table_info(applications)')->fetchAll(PDO::FETCH_COLUMN, 1);
-    if (!empty($appColumns) && !in_array('application_id', $appColumns, true)) {
-        $pdo->exec('ALTER TABLE applications ADD COLUMN application_id TEXT;');
+    if (!empty($appColumns)) {
+        if (!in_array('application_id', $appColumns, true)) {
+            $pdo->exec('ALTER TABLE applications ADD COLUMN application_id TEXT;');
+        }
+        if (!in_array('appointment_time', $appColumns, true)) {
+            $pdo->exec("ALTER TABLE applications ADD COLUMN appointment_time TEXT DEFAULT '09:00 AM';");
+        }
     }
 
     $pdo->commit();
 
-    echo "<h2 style='color: green;'>Success! Database schema and application_id are fully up to date.</h2>";
+    echo "<h2 style='color: green;'>Success! Database schema, application_id, and appointment_time are fully up to date.</h2>";
 } catch (Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();

@@ -83,8 +83,12 @@
                 <div class="wizard-step" id="wStep5"><div class="step-badge">5</div><span>Application & Contact</span></div>
                 <div class="wizard-step" id="wStep6"><div class="step-badge">6</div><span>Review</span></div>
             </div>
-            <form id="passportForm" action="../api/submit-application.php" method="POST" novalidate>
+            <form id="passportForm" action="../api/submit-group-application.php" method="POST" novalidate>
                 <input type="hidden" name="appointment_mode" id="appointmentMode" value="group">
+                <input type="hidden" name="site" id="hiddenSite">
+                <input type="hidden" name="app_date" id="hiddenAppDate">
+                <input type="hidden" name="app_time" id="hiddenAppTime">
+                <input type="hidden" name="group_data_payload" id="groupDataPayload">
                 
                 <!-- STEP 1: Site Location -->
                 <section class="step-pane active" id="step1">
@@ -97,7 +101,7 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Site *</label>
-                                <select class="form-control" name="site" id="siteSelect" onchange="updateSiteInfo()" required>
+                                <select class="form-control" name="site_selection" id="siteSelect" onchange="updateSiteInfo()" required>
                                     <option value="">- PLEASE SELECT A SITE -</option>
                                     <option value="ANGELES">ANGELES (SM CITY CLARK, ANGELES CITY)</option>
                                     <option value="ANTIPOLO">ANTIPOLO (SM CENTER, ANTIPOLO CITY, RIZAL)</option>
@@ -163,7 +167,7 @@
                         <div class="alert-box" style="background: #fef9c3; border-color: #fef08a; color: #854d0e;">
                             Please be advised that your chosen time slot is reserved temporarily for 30 minutes.
                         </div>
-                        <input type="hidden" name="app_date" id="selectedDateVal" required>
+                        <input type="hidden" name="app_date_selection" id="selectedDateVal">
                         
                         <div class="form-row">
                             <!-- Custom DFA Calendar Widget -->
@@ -188,7 +192,7 @@
                             <!-- Dynamic Time Slots -->
                             <div class="form-group">
                                 <label>Time Slot *</label>
-                                <select class="form-control" name="app_time" id="appTimeSelect" required style="margin-top: 5px;">
+                                <select class="form-control" name="app_time_selection" id="appTimeSelect" style="margin-top: 5px;" onchange="updateTimeSelection()" required>
                                     <option value="">- PLEASE SELECT A DATE FIRST -</option>
                                 </select>
                             </div>
@@ -463,62 +467,7 @@
                         <div class="section-title">Information Review</div>
                         
                         <div class="review-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            
-                            <!-- Appointment Details Card -->
-                            <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px;">
-                                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Appointment Details</h4>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Mode:</strong> <span id="rev-mode">GROUP</span></div>
-                                    <div><strong>Site Location:</strong> <span id="rev-site">-</span></div>
-                                    <div><strong>Date:</strong> <span id="rev-date">-</span></div>
-                                    <div><strong>Time:</strong> <span id="rev-time">-</span></div>
-                                </div>
-                            </div>
-                            <!-- Personal Information Card -->
-                            <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px;">
-                                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Personal Information</h4>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Full Name:</strong> <span id="rev-fullname">-</span></div>
-                                    <div><strong>Date of Birth:</strong> <span id="rev-dob">-</span></div>
-                                    <div><strong>Civil Status:</strong> <span id="rev-civilstatus">-</span></div>
-                                    <div><strong>Gender:</strong> <span id="rev-gender">-</span></div>
-                                    <div><strong>Birth Legitimacy:</strong> <span id="rev-legitimacy">-</span></div>
-                                    <div><strong>Country of Birth:</strong> <span id="rev-birthcountry">-</span></div>
-                                    <div><strong>Email:</strong> <span id="rev-email">-</span></div>
-                                    <div><strong>Mobile:</strong> <span id="rev-mobile">-</span></div>
-                                </div>
-                            </div>
-                            <!-- Minor Companion Card (Dynamic) -->
-                            <div class="summary-card" id="rev-companion-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px; display: none; grid-column: span 2;">
-                                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Travelling Companion Information (Minor Applicant)</h4>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Companion Name:</strong> <span id="rev-companion-name">-</span></div>
-                                    <div><strong>Relationship:</strong> <span id="rev-companion-rel">-</span></div>
-                                    <div><strong>Contact Number:</strong> <span id="rev-companion-contact">-</span></div>
-                                </div>
-                            </div>
-                            <!-- Family Information Card -->
-                            <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px;">
-                                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Family Information</h4>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Father's Name:</strong> <span id="rev-fathername">-</span></div>
-                                    <div><strong>Father's Citizenship:</strong> <span id="rev-fathercitizenship">-</span></div>
-                                    <div style="margin-top: 5px;"><strong>Mother's Name:</strong> <span id="rev-mothername">-</span></div>
-                                    <div><strong>Mother's Citizenship:</strong> <span id="rev-mothercitizenship">-</span></div>
-                                </div>
-                            </div>
-                            <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px;">
-                                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Application & Contact</h4>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Application Type:</strong> <span id="rev-applicationtype">-</span></div>
-                                    <div><strong>Address:</strong> <span id="rev-address">-</span></div>
-                                    <div><strong>City / Province:</strong> <span id="rev-cityprovince">-</span></div>
-                                    <div><strong>Emergency Contact:</strong> <span id="rev-emergency">-</span> (<span id="rev-emergency-num">-</span>)</div>
-                                    <div><strong>Occupation:</strong> <span id="rev-occupation">-</span></div>
-                                    <div><strong>Citizenship Basis:</strong> <span id="rev-citizenshipbasis">-</span></div>
-                                    <div><strong>Foreign Passport Holder:</strong> <span id="rev-foreignpassport">-</span></div>
-                                </div>
-                            </div>
+                            <!-- This will be dynamically populated by populateReviewSummary() -->
                         </div>
                         <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 25px;">
                             <input type="checkbox" id="finalAgree" required style="width: 18px; height: 18px;">
@@ -667,7 +616,7 @@
             const slots = getSlotsForDate(dayNum);
             slots.forEach(slot => {
                 const opt = document.createElement('option');
-                opt.value = slot.time.split(' ')[0];
+                opt.value = slot.time;
                 if (slot.status === 'booked') {
                     opt.disabled = true;
                     opt.style.color = 'red';
@@ -677,9 +626,60 @@
                 }
                 timeSelect.appendChild(opt);
             });
+            // Update applicant_1 storage immediately when schedule is selected
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            if (!groupData['applicant_1']) groupData['applicant_1'] = {};
+            groupData['applicant_1']['site_selection'] = document.getElementById('siteSelect')?.value || '';
+            groupData['applicant_1']['app_date_selection'] = dateStr;
+            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
         }
+        
+        // NEW FIX: Updates localStorage the exact moment a user selects a time from the dropdown
+        function updateTimeSelection() {
+            const timeVal = document.getElementById('appTimeSelect').value;
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            if (!groupData['applicant_1']) groupData['applicant_1'] = {};
+            groupData['applicant_1']['app_time_selection'] = timeVal;
+            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             renderCalendar();
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            if (groupData['applicant_1']) {
+                if (groupData['applicant_1']['site_selection']) {
+                    const siteEl = document.getElementById('siteSelect');
+                    if (siteEl) {
+                        siteEl.value = groupData['applicant_1']['site_selection'];
+                        updateSiteInfo();
+                    }
+                }
+                if (groupData['applicant_1']['app_date_selection']) {
+                    selectedDateStr = groupData['applicant_1']['app_date_selection'];
+                    document.getElementById('selectedDateVal').value = selectedDateStr;
+                    const dayNum = parseInt(selectedDateStr.split('-')[2]) || 1;
+                    const timeSelect = document.getElementById('appTimeSelect');
+                    if (timeSelect) {
+                        timeSelect.innerHTML = '<option value="">- SELECT TIME SLOT -</option>';
+                        const slots = getSlotsForDate(dayNum);
+                        slots.forEach(slot => {
+                            const opt = document.createElement('option');
+                            opt.value = slot.time;
+                            if (slot.status === 'booked') {
+                                opt.disabled = true;
+                                opt.style.color = 'red';
+                                opt.textContent = `${slot.time} (Fully Booked)`;
+                            } else {
+                                opt.textContent = `${slot.time} (Available Slots: ${slot.slots})`;
+                            }
+                            timeSelect.appendChild(opt);
+                        });
+                        if (groupData['applicant_1']['app_time_selection']) {
+                            timeSelect.value = groupData['applicant_1']['app_time_selection'];
+                        }
+                    }
+                }
+            }
         });
         const dfaOfficeData = {
             "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City", contact: "(045) 304-0194" },
@@ -738,6 +738,11 @@
                 document.getElementById('officeAddress').value = "-";
                 document.getElementById('officeContact').value = "-";
             }
+            // Save site selection into applicant_1 storage immediately
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            if (!groupData['applicant_1']) groupData['applicant_1'] = {};
+            groupData['applicant_1']['site_selection'] = selectedSite;
+            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
         }
         function goToStep(stepNumber) {
             if (stepNumber === 2 && !selectedDateStr) {
@@ -779,98 +784,65 @@
                 }
             }
         });
-
+        
+        // NEW FIX: Updates the review layout to explicitly format the full office location 
+        // and pull dynamic dates, rather than just raw shortcodes or placeholders.
         function populateReviewSummary() {
-            const getVal = (name) => {
-                const el = document.querySelector(`[name="${name}"]`);
-                return el ? el.value : '-';
-            };
-            const siteSelect = document.querySelector('select[name="site"]');
-            const siteText = siteSelect && siteSelect.selectedIndex > 0 ? siteSelect.options[siteSelect.selectedIndex].text : '-';
-            document.getElementById('rev-site').innerText = siteText;
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            let app1 = groupData['applicant_1'] || {};
             
-            const rawDate = getVal('app_date');
-            document.getElementById('rev-date').innerText = rawDate !== '-' ? rawDate : '-';
+            // Map the short site code to the full descriptive name
+            const rawSite = app1.site_selection || '';
+            const siteText = dfaOfficeData[rawSite] ? dfaOfficeData[rawSite].name : (rawSite || '-');
+
+            // Fetch the live dynamic date and time
+            const appDate = app1.app_date_selection || '-';
+            const appTime = app1.app_time_selection || '-';
+            const combinedDateTime = appDate !== '-' ? `${appDate} (${appTime})` : '-';
+
+            const reviewGrid = document.querySelector('.review-grid');
+            if (!reviewGrid) return;
             
-            const timeSelectEl = document.getElementById('appTimeSelect');
-            let timeText = '-';
-            if (timeSelectEl && timeSelectEl.selectedIndex > 0) {
-                let fullOptText = timeSelectEl.options[timeSelectEl.selectedIndex].text;
-                timeText = fullOptText.split('(')[0].trim();
-            } else {
-                timeText = getVal('app_time');
-            }
-            document.getElementById('rev-time').innerText = timeText;
+            let htmlContent = '';
             
-            document.getElementById('rev-fullname').innerText = `${getVal('givenname')} ${getVal('middlename')} ${getVal('lastname')}`.trim();
-            document.getElementById('rev-dob').innerText = getVal('dob');
-            document.getElementById('rev-civilstatus').innerText = getVal('civil_status');
-            document.getElementById('rev-gender').innerText = getVal('gender');
-            document.getElementById('rev-legitimacy').innerText = getVal('legitimacy');
-            document.getElementById('rev-birthcountry').innerText = getVal('birth_country');
-            document.getElementById('rev-email').innerText = getVal('email');
-            document.getElementById('rev-mobile').innerText = getVal('mobile');
-            
-            const dobVal = new Date(getVal('dob'));
-            const refDate = new Date(2026, 8, 20);
-            let age = refDate.getFullYear() - dobVal.getFullYear();
-            const m = refDate.getMonth() - dobVal.getMonth();
-            if (m < 0 || (m === 0 && refDate.getDate() < dobVal.getDate())) age--;
-            
-            const companionCard = document.getElementById('rev-companion-card');
-            if (!isNaN(age) && age < 18) {
-                companionCard.style.display = 'block';
-                document.getElementById('rev-companion-name').innerText = getVal('companion_name');
-                document.getElementById('rev-companion-rel').innerText = getVal('companion_relationship');
-                document.getElementById('rev-companion-contact').innerText = getVal('companion_contact');
-            } else {
-                companionCard.style.display = 'none';
+            for (let i = 1; i <= totalApplicants; i++) {
+                let app = groupData[`applicant_${i}`] || {};
+                let fullName = `${app.givenname || ''} ${app.middlename || ''} ${app.lastname || ''}`.trim() || '-';
+                
+                htmlContent += `
+                    <div class="summary-card" style="background: #ffffff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; grid-column: span 2; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                        <h4 style="font-size: 16px; color: #2563eb; margin-bottom: 15px; border-bottom: 2px solid #2563eb; padding-bottom: 8px;">Applicant ${i} Details</h4>
+                        <div style="font-size: 13px; line-height: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; color: #334155;">
+                            <div>
+                                <div><strong>Full Name:</strong> ${fullName}</div>
+                                <div><strong>Application Type:</strong> ${app.application_type || '-'}</div>
+                                <div><strong>Email:</strong> ${app.email || '-'}</div>
+                                <div><strong>Appointment Date:</strong> ${combinedDateTime}</div>
+                            </div>
+                            <div>
+                                <div><strong>Date of Birth:</strong> ${app.dob || '-'}</div>
+                                <div><strong>Mobile:</strong> ${app.mobile || '-'}</div>
+                                <div><strong>Site Location:</strong> ${siteText}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
             
-            document.getElementById('rev-fathername').innerText = `${getVal('father_givenname')} ${getVal('father_middlename')} ${getVal('father_lastname')}`.trim();
-            document.getElementById('rev-fathercitizenship').innerText = getVal('father_citizenship');
-            document.getElementById('rev-mothername').innerText = `${getVal('mother_givenname')} ${getVal('mother_middlename')} ${getVal('mother_lastname')}`.trim();
-            document.getElementById('rev-mothercitizenship').innerText = getVal('mother_citizenship');
-            
-            const rawAppType = getVal('application_type');
-            let displayAppType = rawAppType;
-            if (rawAppType === 'LOST PASSPORT') {
-                displayAppType = 'Replacement of Lost Passport';
-            } else if (rawAppType === 'DAMAGED PASSPORT') {
-                displayAppType = 'Replacement of Damaged Passport';
-            } else if (rawAppType === 'FIRST TIME PASSPORT') {
-                displayAppType = 'First-Time Passport';
-            }
-            document.getElementById('rev-applicationtype').innerText = displayAppType;
-            document.getElementById('rev-address').innerText = getVal('address');
-            document.getElementById('rev-cityprovince').innerText = `${getVal('address_city')}, ${getVal('address_province')}`;
-            document.getElementById('rev-emergency').innerText = getVal('emergency_contact');
-            document.getElementById('rev-emergency-num').innerText = getVal('emergency_number');
-            document.getElementById('rev-occupation').innerText = getVal('occupation');
-            
-            let citizenshipBasisText = getVal('citizenship_basis');
-            if (citizenshipBasisText === 'OTHERS') {
-                citizenshipBasisText += ` (${getVal('citizenship_basis_others')})`;
-            }
-            document.getElementById('rev-citizenshipbasis').innerText = citizenshipBasisText;
-            document.getElementById('rev-foreignpassport').innerText = getVal('foreign_passport');
+            reviewGrid.innerHTML = htmlContent;
         }
     </script>
-
     <!-- Group Wizard Multi-Applicant Loop Controller -->
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         let currentStep = parseInt(urlParams.get('step')) || 1;
         let currentApplicant = parseInt(urlParams.get('applicant')) || 1;
         const totalApplicants = parseInt(localStorage.getItem('groupCount')) || 2;
-
         document.addEventListener('DOMContentLoaded', () => {
-            // For applicants 2+, automatically lock/skip steps 1 & 2 if site/schedule are already saved
             if (currentApplicant > 1 && currentStep < 3) {
                 currentStep = 3;
             }
             goToStep(currentStep);
-
             const dashboardContainer = document.querySelector('.dashboard-container');
             if (dashboardContainer && !document.getElementById('groupApplicantBadge')) {
                 const badgeDiv = document.createElement('div');
@@ -880,19 +852,15 @@
                 dashboardContainer.insertBefore(badgeDiv, dashboardContainer.firstChild);
             }
         });
-
         function groupHandleNext(targetStep) {
             saveCurrentApplicantData();
-
             if (targetStep > 5) {
                 if (currentApplicant < totalApplicants) {
-                    // Move to next applicant, skipping site & schedule (start directly at Step 3: Personal)
                     currentApplicant++;
                     currentStep = 3; 
                     window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
                     return;
                 } else {
-                    // All applicants completed, go to dynamic group review
                     currentStep = 6;
                 }
             } else {
@@ -900,10 +868,8 @@
             }
             goToStep(currentStep);
         }
-
         function groupHandleBack(targetStep) {
             if (targetStep < 3 && currentApplicant > 1) {
-                // If trying to go back past personal info on applicant 2+, go back to applicant 1's review/contact step
                 currentApplicant--;
                 currentStep = 5;
                 window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
@@ -911,18 +877,14 @@
             }
             goToStep(targetStep);
         }
-
         function saveCurrentApplicantData() {
             const formData = new FormData(document.getElementById('passportForm'));
             let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
             
-            // If applicant 2+, carry over shared site and schedule from applicant 1 automatically
-            if (currentApplicant > 1 && groupData['applicant_1']) {
-                formData.set('site', groupData['applicant_1']['site'] || '');
-                formData.set('app_date', groupData['applicant_1']['app_date'] || '');
-                formData.set('app_time', groupData['applicant_1']['app_time'] || '');
-            }
-
+            if (!groupData['applicant_1']) groupData['applicant_1'] = {};
+            groupData['applicant_1']['site_selection'] = document.getElementById('siteSelect')?.value || groupData['applicant_1']['site_selection'] || '';
+            groupData['applicant_1']['app_date_selection'] = document.getElementById('selectedDateVal')?.value || groupData['applicant_1']['app_date_selection'] || '';
+            groupData['applicant_1']['app_time_selection'] = document.getElementById('appTimeSelect')?.value || groupData['applicant_1']['app_time_selection'] || '';
             let appData = groupData[`applicant_${currentApplicant}`] || {};
             formData.forEach((value, key) => {
                 appData[key] = value;
@@ -930,35 +892,17 @@
             groupData[`applicant_${currentApplicant}`] = appData;
             localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
         }
-
-        // Overriding review population to dynamically generate cards for ALL applicants
-        const originalPopulateReview = window.populateReviewSummary;
-        window.populateReviewSummary = function() {
-            const reviewGrid = document.querySelector('.review-grid');
-            if (!reviewGrid) return;
-            
+        // Inject shared site & schedule into hidden inputs right before form submission
+        document.getElementById('passportForm').addEventListener('submit', function(e) {
+            saveCurrentApplicantData();
             let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
-            let htmlContent = '';
-
-            for (let i = 1; i <= totalApplicants; i++) {
-                let app = groupData[`applicant_${i}`] || {};
-                htmlContent += `
-                    <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px; grid-column: span 2; margin-bottom: 15px;">
-                        <h4 style="font-size: 15px; color: #1d4ed8; margin-bottom: 10px; border-bottom: 2px solid #3b82f6; padding-bottom: 5px;">Applicant ${i} Details</h4>
-                        <div style="font-size: 13px; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <div><strong>Full Name:</strong> ${app.givenname || ''} ${app.middlename || ''} ${app.lastname || ''}</div>
-                            <div><strong>Date of Birth:</strong> ${app.dob || '-'}</div>
-                            <div><strong>Application Type:</strong> ${app.application_type || '-'}</div>
-                            <div><strong>Mobile:</strong> ${app.mobile || '-'}</div>
-                            <div><strong>Email:</strong> ${app.email || '-'}</div>
-                            <div><strong>Site Location:</strong> ${app.site || groupData['applicant_1']?.site || '-'}</div>
-                            <div><strong>Appointment Date:</strong> ${app.app_date || groupData['applicant_1']?.app_date || '-'} (${app.app_time || groupData['applicant_1']?.app_time || '-'})</div>
-                        </div>
-                    </div>
-                `;
-            }
-            reviewGrid.innerHTML = htmlContent;
-        };
+            let app1 = groupData['applicant_1'] || {};
+            
+            document.getElementById('hiddenSite').value = app1.site_selection || document.getElementById('siteSelect')?.value || '';
+            document.getElementById('hiddenAppDate').value = app1.app_date_selection || document.getElementById('selectedDateVal')?.value || '';
+            document.getElementById('hiddenAppTime').value = app1.app_time_selection || document.getElementById('appTimeSelect')?.value || '';
+            document.getElementById('groupDataPayload').value = JSON.stringify(groupData);
+        });
     </script>
 </body>
 </html>

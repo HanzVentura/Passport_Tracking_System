@@ -59,8 +59,6 @@
         </div>
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></div>
     </aside>
-
-
     <main class="main-content">
         <div class="header">RECEIPTS</div>
         <div class="dashboard-container">
@@ -78,8 +76,6 @@
             </section>
         </div>
     </main>
-
-
     <script>
         const userEmail = localStorage.getItem('userEmail');
         const receiptRows = document.getElementById('receiptRows');
@@ -100,7 +96,7 @@
                 : '---';
         }
         function renderReceipt(application) {
-            if (!application || application.status !== 'Paid') return;
+            if (!application || (application.status || '').toLowerCase().trim() !== 'paid') return;
             const applicationType = application.applicationType
                 || application.application_type
                 || localStorage.getItem('applicationType')
@@ -127,7 +123,7 @@
                 const userData = await userResponse.json();
                 document.getElementById('user-name').textContent = userData.fullName || userEmail;
                 document.getElementById('greetingText').textContent = userData.fullName ? `Good Day, ${userData.fullName}` : 'Good Day';
-                
+               
                 const response = await fetch(`../api/get-application.php?applicationId=${encodeURIComponent(activeAppId)}`);
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.message || 'Unable to load receipts.');
