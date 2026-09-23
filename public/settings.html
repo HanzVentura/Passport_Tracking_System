@@ -4,101 +4,257 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - Passport Tracking System</title>
+    <!-- FontAwesome & Google Plus Jakarta Sans Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="passport-application.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 0;
+            height: 100vh;
+        }
+        .sidebar-top {
+            display: flex;
+            flex-direction: column;
+        }
+        .user-profile-mini {
+            display: flex;
+            align-items: center;
+            padding: 0 24px 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 16px;
+        }
+        .user-profile-mini i {
+            font-size: 38px;
+            color: var(--primary);
+            margin-right: 12px;
+        }
+        .user-info .name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+        .nav-links {
+            list-style: none;
+            padding: 0 10px;
+        }
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+        .nav-links li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 18px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+        .nav-links li.active a, .nav-links li a:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .nav-links li a i {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        .sidebar-bottom {
+            padding: 0 24px;
+        }
+        .sidebar-bottom a {
+            display: flex;
+            align-items: center;
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 10px 0;
+        }
+        .sidebar-bottom a i {
+            margin-right: 12px;
+        }
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            background-color: var(--bg-main);
+        }
+        header.header {
+            background-color: var(--card-bg);
+            padding: 22px 36px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: -0.3px;
+        }
+        .dashboard-container {
+            padding: 35px 40px;
+            max-width: 950px;
+            width: 100%;
+        }
+        /* Cards */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-elevated);
+            border-color: #cbd5e1;
+        }
+        /* Toggle switches & elements */
+        #two-factor-toggle:checked + .slider { background-color: #16a34a !important; }
+        #two-factor-toggle:checked + .slider:before { transform: translateX(20px); }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%;
+        }
+        input.form-control-pin {
+            width: 100%;
+            padding: 11px 40px 11px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            letter-spacing: 4px;
+            outline: none;
+            transition: all 0.2s ease;
+            background: #fff;
+            color: var(--text-main);
+        }
+        input.form-control-pin:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+    </style>
 </head>
-<body style="display: flex; height: 100vh; background-color: #f8fbff; overflow: hidden; margin: 0;">
-
+<body>
     <!-- Sidebar Navigation -->
-    <aside class="sidebar" style="width: 260px; background-color: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; height: 100vh;">
+    <aside class="sidebar">
         <div class="sidebar-top">
-            <div class="user-profile-mini" style="display: flex; align-items: center; padding: 0 20px 20px 20px; border-bottom: 1px solid #edf2f7; margin-bottom: 15px;">
-                <i class="fa-solid fa-circle-user" style="font-size: 36px; color: #3b82f6; margin-right: 12px;"></i>
+            <div class="user-profile-mini">
+                <i class="fa-solid fa-circle-user"></i>
                 <div class="user-info">
-                    <div class="name" id="user-name" style="font-weight: 600; font-size: 14px; color: #1e293b;">Loading...</div>
+                    <div class="name" id="user-name">Loading...</div>
                 </div>
             </div>
-            <ul class="nav-links" style="list-style: none; padding: 0 10px;">
-                <li style="margin-bottom: 5px;"><a href="dashboard.html" style="display: flex; align-items: center; padding: 12px 15px; color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 6px;"><i class="fa-solid fa-house" style="margin-right: 12px;"></i> Dashboard</a></li>
-                <li style="margin-bottom: 5px;"><a href="payments.html" style="display: flex; align-items: center; padding: 12px 15px; color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 6px;"><i class="fa-solid fa-wallet" style="margin-right: 12px;"></i> Payments</a></li>
-                <li style="margin-bottom: 5px;"><a href="receipts.html" style="display: flex; align-items: center; padding: 12px 15px; color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 6px;"><i class="fa-solid fa-receipt" style="margin-right: 12px;"></i> Receipts</a></li>
-                <li style="margin-bottom: 5px;"><a href="enquiries.html" style="display: flex; align-items: center; padding: 12px 15px; color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 6px;"><i class="fa-solid fa-circle-question" style="margin-right: 12px;"></i> Enquiries</a></li>
-                <li style="margin-bottom: 5px;"><a href="profile.html" style="display: flex; align-items: center; padding: 12px 15px; color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 6px;"><i class="fa-solid fa-user" style="margin-right: 12px;"></i> Profile</a></li>
-                <li style="margin-bottom: 5px;" class="active"><a href="settings.html" style="display: flex; align-items: center; padding: 12px 15px; background-color: #eff6ff; color: #2563eb; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 6px;"><i class="fa-solid fa-gear" style="margin-right: 12px;"></i> Settings</a></li>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-wallet"></i> Payments</a></li>
+                <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
+                <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
+                <li><a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li class="active"><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
         </div>
-        <div class="sidebar-bottom" style="padding: 0 20px;">
-            <a href="index.html" style="display: flex; align-items: center; color: #ef4444; text-decoration: none; font-weight: 500; font-size: 14px; padding: 10px 0;"><i class="fa-solid fa-right-from-bracket" style="margin-right: 10px;"></i> Log Out</a>
+        <div class="sidebar-bottom">
+            <a href="index.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
         </div>
     </aside>
 
     <!-- Main Content Area -->
-    <main class="main-content" style="flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; background-color: #f8fbff;">
-        <header class="header" style="background-color: #ffffff; padding: 20px 30px; font-size: 20px; font-weight: bold; color: #1e293b; border-bottom: 1px solid #e2e8f0;">SETTINGS</header>
-        
-        <div class="dashboard-container" style="padding: 30px; max-width: 850px; width: 100%;">
-            
+    <main class="main-content">
+        <header class="header">SETTINGS</header>
+       
+        <div class="dashboard-container">
             <!-- Account Settings Card -->
-            <div class="card" style="background-color: #ffffff; border-radius: 12px; padding: 25px 30px; margin-bottom: 25px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);">
-                <h3 style="font-size: 18px; color: #1e293b; margin-bottom: 6px; font-weight: 600;">Account Settings</h3>
-                <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">Manage your account preferences and notifications.</p>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #f1f5f9;">
+            <div class="card">
+                <h3 style="font-size: 16px; color: var(--text-main); margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Account Settings</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Manage your account preferences and notifications.</p>
+               
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #f1f5f9;">
                     <div>
-                        <strong style="font-size: 14px; color: #334155;">Email Notifications</strong>
-                        <p style="font-size: 12px; color: #64748b; margin-top: 2px;">Receive updates regarding your passport status.</p>
+                        <strong style="font-size: 14px; color: #334155; font-weight: 600;">Email Notifications</strong>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Receive updates regarding your passport status.</p>
                     </div>
-                    <input type="checkbox" id="email-notif-toggle" checked style="width: 18px; height: 18px; cursor: pointer;">
+                    <input type="checkbox" id="email-notif-toggle" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
                 </div>
             </div>
 
             <!-- Security & 2FA Card -->
-            <div class="card" style="background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 24px;">
-                <h3 style="font-size: 18px; color: #1e293b; margin-bottom: 8px;">Security Settings</h3>
-                <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">Protect your account with an extra layer of security.</p>
-
+            <div class="card">
+                <h3 style="font-size: 16px; color: var(--text-main); margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Security Settings</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Protect your account with an extra layer of security.</p>
+               
                 <!-- 2FA Toggle Row -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px;">
                     <div>
-                        <strong style="font-size: 14px; color: #1e293b; display: block;">Two-Factor Authentication (2FA)</strong>
-                        <span style="font-size: 13px; color: #64748b;">Require a secure 6-digit PIN when logging in.</span>
+                        <strong style="font-size: 14px; color: #334155; font-weight: 600; display: block; margin-bottom: 2px;">Two-Factor Authentication (2FA)</strong>
+                        <span style="font-size: 12px; color: var(--text-muted);">Require a secure 6-digit PIN when logging in.</span>
                     </div>
                     <!-- Modern Toggle Switch -->
                     <label class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                         <input type="checkbox" id="two-factor-toggle" style="opacity: 0; width: 0; height: 0;">
-                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px;"></span>
+                        <span class="slider"></span>
                     </label>
                 </div>
 
                 <!-- 6-Digit PIN Section -->
-                <div id="two-factor-pin-section" style="margin-bottom: 20px;">
-                    <label style="font-size: 13px; font-weight: 500; color: #334155; display: block; margin-bottom: 6px;">6-digit PIN</label>
+                <div id="two-factor-pin-section" style="margin-bottom: 24px;">
+                    <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 6px;">6-digit PIN</label>
                     <div style="position: relative; max-width: 280px;">
-                        <input type="password" id="two-factor-pin" maxlength="6" placeholder="------" style="width: 100%; padding: 10px 40px 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; letter-spacing: 4px;">
-                        <button type="button" id="toggle-two-factor-pin" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b;">
+                        <input type="password" id="two-factor-pin" class="form-control-pin" maxlength="6" placeholder="------">
+                        <button type="button" id="toggle-two-factor-pin" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted);">
                             <i class="fa-solid fa-eye" aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <button type="button" id="save-2fa" style="background-color: #2563eb; color: #ffffff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;">Save 2FA Settings</button>
-                    <span id="two-factor-message" style="font-size: 14px; font-weight: 500;"></span>
+                    <button type="button" id="save-2fa" style="background-color: var(--primary); color: #ffffff; border: none; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; box-shadow: var(--shadow-subtle); transition: all 0.2s ease;">Save 2FA Settings</button>
+                    <span id="two-factor-message" style="font-size: 13px; font-weight: 600;"></span>
                 </div>
             </div>
-
-            <style>
-                /* Fixed toggle selector so it turns green when checked */
-                #two-factor-toggle:checked ~ .slider { background-color: #16a34a !important; }
-                #two-factor-toggle:checked ~ .slider:before { transform: translateX(20px); }
-                .slider:before {
-                    position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%;
-                }
-            </style>
-
         </div>
     </main>
 
+    <!-- Only script.js will handle everything now -->
     <script src="script.js"></script>
 </body>
 </html>

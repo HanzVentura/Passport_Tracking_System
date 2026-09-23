@@ -4,42 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipts - Passport Tracking</title>
+    <!-- FontAwesome & Google Plus Jakarta Sans Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f7f6; color: #333; display: flex; min-height: 100vh; overflow-x: hidden; }
-        .sidebar { width: 260px; flex: 0 0 260px; background-color: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; }
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
+        
+        .sidebar { width: 260px; flex: 0 0 260px; background-color: var(--card-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; }
         .sidebar-top { display: flex; flex-direction: column; }
-        .user-profile-mini { display: flex; align-items: center; padding: 0 20px 20px; border-bottom: 1px solid #eee; margin-bottom: 20px; }
-        .user-profile-mini i { font-size: 36px; color: #3b82f6; margin-right: 12px; }
-        .user-info .name { font-weight: 600; font-size: 14px; color: #1f2937; overflow-wrap: anywhere; }
+        .user-profile-mini { display: flex; align-items: center; padding: 0 24px 20px; border-bottom: 1px solid #f1f5f9; margin-bottom: 16px; }
+        .user-profile-mini i { font-size: 38px; color: var(--primary); margin-right: 12px; }
+        .user-info .name { font-weight: 700; font-size: 14px; color: var(--text-main); overflow-wrap: anywhere; }
+        
         .nav-links { list-style: none; }
-        .nav-links li a { display: flex; align-items: center; padding: 12px 20px; color: #4b5563; text-decoration: none; font-size: 14px; transition: all .2s ease; }
-        .nav-links li.active a, .nav-links li a:hover { background-color: #eff6ff; color: #3b82f6; border-right: 4px solid #3b82f6; }
+        .nav-links li a { display: flex; align-items: center; padding: 12px 24px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: all .2s ease; }
+        .nav-links li.active a, .nav-links li a:hover { background-color: var(--primary-light); color: var(--primary); border-right: 4px solid var(--primary); font-weight: 600; }
         .nav-links li a i { margin-right: 12px; font-size: 16px; }
-        .sidebar-bottom { padding: 0 20px; }
-        .sidebar-bottom a { display: flex; align-items: center; padding: 10px 0; color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 500; }
+        
+        .sidebar-bottom { padding: 0 24px; }
+        .sidebar-bottom a { display: flex; align-items: center; padding: 10px 0; color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 600; }
         .sidebar-bottom a i { margin-right: 12px; }
+        
         .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow-y: auto; }
-        .header { background-color: #fff; padding: 20px 30px; border-bottom: 1px solid #e0e0e0; font-size: 20px; font-weight: 700; color: #1f2937; }
-        .dashboard-container { padding: 30px; max-width: 1400px; margin: 0 auto; width: 100%; }
-        .welcome-banner { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; padding: 25px 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(59,130,246,.15); }
-        .welcome-banner h1 { font-size: 24px; margin-bottom: 8px; }
+        .header { background-color: var(--card-bg); padding: 22px 36px; border-bottom: 1px solid var(--border-color); font-size: 18px; font-weight: 700; color: var(--text-main); letter-spacing: -0.3px; }
+        .dashboard-container { padding: 35px 40px; max-width: 1350px; margin: 0 auto; width: 100%; }
+        
+        .welcome-banner { background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: #fff; padding: 28px 34px; border-radius: var(--radius-md); margin-bottom: 30px; box-shadow: var(--shadow-elevated); }
+        .welcome-banner h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
         .welcome-banner p { font-size: 14px; opacity: .9; }
-        .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,.02); }
-        .card-title { font-size: 16px; font-weight: 700; color: #1f2937; margin-bottom: 6px; }
-        .card-subtitle { color: #6b7280; font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
+        
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 28px; box-shadow: var(--shadow-subtle); transition: all 0.2s ease; }
+        .card:hover { box-shadow: var(--shadow-elevated); border-color: #cbd5e1; }
+        
+        .card-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .card-subtitle { color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
+        
         .table-wrap { overflow-x: auto; }
         .transaction-table { width: 100%; min-width: 720px; border-collapse: collapse; font-size: 14px; }
-        .transaction-table th { background: #f9fafb; color: #4b5563; font-size: 12px; font-weight: 700; letter-spacing: .03em; padding: 13px 14px; text-align: left; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; }
-        .transaction-table td { color: #374151; padding: 16px 14px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+        .transaction-table th { background: #f8fafc; color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 14px 16px; text-align: left; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+        .transaction-table td { color: #334155; padding: 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
         .transaction-table tbody tr:last-child td { border-bottom: 0; }
-        .transaction-table td strong { color: #1f2937; }
-        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 12px; font-weight: 700; }
-        .print-button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 7px; background: #fff; color: #374151; cursor: pointer; font-size: 12px; font-weight: 600; }
-        .print-button:hover { background: #f3f4f6; }
-        .message { color: #6b7280; font-size: 14px; line-height: 1.5; padding: 28px 10px; text-align: center; }
-        .message i { color: #9ca3af; display: block; font-size: 32px; margin-bottom: 12px; }
+        .transaction-table td strong { color: var(--text-main); font-weight: 600; }
+        
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 12px; font-weight: 700; }
+        .print-button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fff; color: #334155; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s ease; font-family: inherit; }
+        .print-button:hover { background: #f1f5f9; border-color: #cbd5e1; color: var(--primary); }
+        
+        .message { color: var(--text-muted); font-size: 14px; line-height: 1.5; padding: 36px 10px; text-align: center; }
+        .message i { color: #cbd5e1; display: block; font-size: 36px; margin-bottom: 12px; }
+        
         @media (max-width: 680px) { body { display: block; } .sidebar { width: 100%; height: auto; padding: 12px 0; } .sidebar-bottom { display: none; } .nav-links { display: grid; grid-template-columns: repeat(3, 1fr); } .nav-links li a { justify-content: center; padding: 10px 6px; font-size: 11px; gap: 4px; flex-direction: column; } .nav-links li a i { margin: 0; } .header { padding: 16px 20px; } .dashboard-container { padding: 20px 16px; } .welcome-banner { padding: 20px; } .card { padding: 18px 14px; } }
         @media print { .sidebar, .header, .welcome-banner, .card-subtitle, .print-button { display: none !important; } body, .main-content, .dashboard-container { background: #fff; display: block; min-height: 0; padding: 0; } .card { border: 0; box-shadow: none; padding: 0; } .transaction-table { min-width: 0; } }
     </style>
@@ -59,6 +88,7 @@
         </div>
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></div>
     </aside>
+    
     <main class="main-content">
         <div class="header">RECEIPTS</div>
         <div class="dashboard-container">
@@ -76,6 +106,7 @@
             </section>
         </div>
     </main>
+
     <script>
         const userEmail = localStorage.getItem('userEmail');
         const receiptRows = document.getElementById('receiptRows');

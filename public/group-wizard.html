@@ -416,6 +416,7 @@
                                 <select class="form-control" name="application_type" required>
                                     <option value="">- SELECT APPLICATION TYPE -</option>
                                     <option value="FIRST TIME PASSPORT">First-Time Passport</option>
+                                    <option value="PASSPORT RENEWAL">Passport Renewal</option>
                                     <option value="LOST PASSPORT">Replacement of Lost Passport</option>
                                     <option value="DAMAGED PASSPORT">Replacement of Damaged Passport</option>
                                 </select>
@@ -642,7 +643,6 @@
             groupData['applicant_1']['app_time_selection'] = timeVal;
             localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
         }
-
         document.addEventListener('DOMContentLoaded', () => {
             renderCalendar();
             let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
@@ -794,12 +794,10 @@
             // Map the short site code to the full descriptive name
             const rawSite = app1.site_selection || '';
             const siteText = dfaOfficeData[rawSite] ? dfaOfficeData[rawSite].name : (rawSite || '-');
-
             // Fetch the live dynamic date and time
             const appDate = app1.app_date_selection || '-';
             const appTime = app1.app_time_selection || '-';
             const combinedDateTime = appDate !== '-' ? `${appDate} (${appTime})` : '-';
-
             const reviewGrid = document.querySelector('.review-grid');
             if (!reviewGrid) return;
             

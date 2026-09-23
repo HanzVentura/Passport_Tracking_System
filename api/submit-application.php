@@ -4,34 +4,26 @@ try {
     $dbPath = __DIR__ . '/../database.db';
     $db = new PDO("sqlite:$dbPath");
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-   
+    
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $groupData = [];
-        if (isset($_POST['group_data_payload']) && !empty($_POST['group_data_payload'])) {
-            $groupData = json_decode($_POST['group_data_payload'], true);
-        }
-        $app1 = $groupData['applicant_1'] ?? [];
-       
-        $email = $_POST['email'] ?? ($app1['email'] ?? '');
+        $email = !empty($_POST['email']) ? $_POST['email'] : '';
         if (!$email) {
             die("Error: Email is required.");
         }
-
-        // Always generate a fresh unique application ID for group bookings
+        
         $application_id = 'PH-' . rand(100000, 999999);
         
-        // STRICTLY FORCE 'Group Appointment' for all group wizard submissions
-        $application_type = 'Group Appointment';
+        // Explicitly set type to Individual Appointment
+        $application_type = 'Individual Appointment';
         $status = 'Pending Payment';
-       
-        // Extract the exact user-selected location, date, and time from hidden fields or payload
-        $appointment_location = $_POST['site'] ?? ($app1['site_selection'] ?? ($_POST['site_selection'] ?? 'DFA NCR CENTRAL'));
-        $appointment_date = $_POST['app_date'] ?? ($app1['app_date_selection'] ?? date('Y-m-d'));
-        $appointment_time = $_POST['app_time'] ?? ($app1['app_time_selection'] ?? '09:00 AM');
-       
-        // Insert new group application record with exact user selections
+        
+        $appointment_location = !empty($_POST['site']) ? $_POST['site'] : (!empty($_POST['site_selection']) ? $_POST['site_selection'] : '');
+        $appointment_date = !empty($_POST['app_date']) ? $_POST['app_date'] : '';
+        $appointment_time = !empty($_POST['app_time']) ? $_POST['app_time'] : '';
+        
         $sql = "INSERT INTO applications (application_id, email, application_type, status, appointment_date, appointment_location, appointment_time, created_at)
                 VALUES (:app_id, :email, :app_type, :status, :app_date, :app_location, :app_time, CURRENT_TIMESTAMP)";
+        
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':app_id' => $application_id,
@@ -42,7 +34,7 @@ try {
             ':app_location' => $appointment_location,
             ':app_time' => $appointment_time
         ]);
-
+        
         setcookie('userEmail', $email, time() + (86400 * 30), "/");
         setcookie('currentApplicationId', $application_id, time() + (86400 * 30), "/");
         

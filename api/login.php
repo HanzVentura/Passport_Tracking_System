@@ -26,8 +26,11 @@ try {
         exit;
     }
 
-    // Check if 2FA is enabled for this user
-    if (isset($user['two_factor_enabled']) && $user['two_factor_enabled'] == 1) {
+    // Check if 2FA is toggled ON for this user in the database
+    $isTwoFactorEnabled = isset($user['two_factor_enabled']) && (int)$user['two_factor_enabled'] === 1;
+
+    if ($isTwoFactorEnabled) {
+        // If 2FA is enabled but user hasn't provided the passcode yet, request it
         if (empty($passcode)) {
             echo json_encode([
                 'success' => false,
@@ -37,16 +40,19 @@ try {
             exit;
         }
 
+        // Validate the entered passcode against the database record
         if ($passcode !== $user['passcode']) {
             echo json_encode(['success' => false, 'message' => 'Incorrect 6-digit passcode.']);
             exit;
         }
     }
 
+    // If 2FA is disabled OR passcode matches successfully:
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['user_email'] = $user['email'];
-
+    
     echo json_encode(['success' => true, 'message' => 'Login successful! Redirecting...']);
+
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }

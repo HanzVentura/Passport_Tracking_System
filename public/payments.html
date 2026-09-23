@@ -1,85 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payments - Passport Tracking</title>
+    <!-- FontAwesome & Google Plus Jakarta Sans Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f4f7f6; color: #333; display: flex; min-height: 100vh; overflow-x: hidden; }
-        .sidebar { width: 260px; flex: 0 0 260px; background: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; }
-        .user-profile-mini { display: flex; align-items: center; padding: 0 20px 20px; border-bottom: 1px solid #eee; margin-bottom: 20px; }
-        .user-profile-mini i { font-size: 36px; color: #3b82f6; margin-right: 12px; }
-        .user-info .name { font-weight: 600; font-size: 14px; color: #1f2937; overflow-wrap: anywhere; }
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
+        
+        .sidebar { width: 260px; flex: 0 0 260px; background: var(--card-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; }
+        .user-profile-mini { display: flex; align-items: center; padding: 0 24px 20px; border-bottom: 1px solid #f1f5f9; margin-bottom: 16px; }
+        .user-profile-mini i { font-size: 38px; color: var(--primary); margin-right: 12px; }
+        .user-info .name { font-weight: 700; font-size: 14px; color: var(--text-main); overflow-wrap: anywhere; }
+        
         .nav-links { list-style: none; }
-        .nav-links li a { display: flex; align-items: center; padding: 12px 20px; color: #4b5563; text-decoration: none; font-size: 14px; transition: all .2s ease; }
-        .nav-links li.active a, .nav-links li a:hover { background: #eff6ff; color: #3b82f6; border-right: 4px solid #3b82f6; }
+        .nav-links li a { display: flex; align-items: center; padding: 12px 24px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: all .2s ease; }
+        .nav-links li.active a, .nav-links li a:hover { background: var(--primary-light); color: var(--primary); border-right: 4px solid var(--primary); font-weight: 600; }
         .nav-links li a i { width: 16px; margin-right: 12px; text-align: center; }
-        .sidebar-bottom { padding: 0 20px; }
-        .sidebar-bottom a { display: flex; align-items: center; padding: 10px 0; color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 500; }
+        
+        .sidebar-bottom { padding: 0 24px; }
+        .sidebar-bottom a { display: flex; align-items: center; padding: 10px 0; color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 600; }
         .sidebar-bottom a i { margin-right: 12px; }
+        
         .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow-y: auto; }
-        .header { background: #fff; padding: 20px 30px; border-bottom: 1px solid #e0e0e0; font-size: 20px; font-weight: 700; color: #1f2937; }
-        .dashboard-container { padding: 30px; max-width: 1400px; margin: 0 auto; width: 100%; }
-        .welcome-banner { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; padding: 25px 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(59,130,246,.15); }
-        .welcome-banner h1 { font-size: 24px; margin-bottom: 8px; }
+        .header { background: var(--card-bg); padding: 22px 36px; border-bottom: 1px solid var(--border-color); font-size: 18px; font-weight: 700; color: var(--text-main); letter-spacing: -0.3px; }
+        .dashboard-container { padding: 35px 40px; max-width: 1350px; margin: 0 auto; width: 100%; }
+        
+        .welcome-banner { background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: #fff; padding: 28px 34px; border-radius: var(--radius-md); margin-bottom: 30px; box-shadow: var(--shadow-elevated); }
+        .welcome-banner h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
         .welcome-banner p { font-size: 14px; opacity: .9; }
+        
         .content-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 24px; align-items: start; }
-        .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,.02); }
-        .card-title { font-size: 16px; font-weight: 700; color: #1f2937; margin-bottom: 6px; }
-        .card-subtitle { color: #6b7280; font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
-        .notice { display: flex; gap: 14px; padding: 16px; margin-bottom: 24px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; color: #1e40af; }
-        .notice i { margin-top: 2px; font-size: 18px; }
-        .notice strong { display: block; font-size: 14px; margin-bottom: 5px; }
+        
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 28px; box-shadow: var(--shadow-subtle); transition: all 0.2s ease; }
+        .card:hover { box-shadow: var(--shadow-elevated); border-color: #cbd5e1; }
+        
+        .card-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .card-subtitle { color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
+        
+        .notice { display: flex; gap: 14px; padding: 16px; margin-bottom: 24px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-sm); color: #1e40af; }
+        .notice i { margin-top: 2px; font-size: 18px; color: var(--primary); }
+        .notice strong { display: block; font-size: 14px; margin-bottom: 4px; }
         .notice p { font-size: 13px; line-height: 1.5; }
-        .section-label { display: block; color: #374151; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+        
+        .section-label { display: block; color: #334155; font-size: 13px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+        
         .plan-list { display: grid; gap: 12px; margin-bottom: 24px; }
-        .plan-option { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; border: 2px solid #e5e7eb; border-radius: 10px; cursor: pointer; transition: border-color .2s, background .2s; }
-        .plan-option:hover, .plan-option.selected { border-color: #3b82f6; background: #eff6ff; }
+        .plan-option { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; border: 2px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; transition: border-color .2s, background .2s, box-shadow .2s; }
+        .plan-option:hover, .plan-option.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: var(--shadow-subtle); }
         .plan-option input { position: absolute; opacity: 0; }
         .plan-copy { display: flex; align-items: flex-start; gap: 12px; }
-        .plan-copy i { color: #9ca3af; margin-top: 3px; }
-        .plan-option.selected .plan-copy i { color: #2563eb; }
-        .plan-name { color: #1f2937; font-size: 14px; font-weight: 700; display: block; margin-bottom: 4px; }
-        .plan-time { color: #6b7280; font-size: 12px; }
-        .plan-price { color: #1d4ed8; font-size: 16px; font-weight: 700; white-space: nowrap; }
+        .plan-copy i { color: #94a3b8; margin-top: 3px; font-size: 16px; }
+        .plan-option.selected .plan-copy i { color: var(--primary); }
+        .plan-name { color: var(--text-main); font-size: 14px; font-weight: 700; display: block; margin-bottom: 4px; }
+        .plan-time { color: var(--text-muted); font-size: 12px; font-weight: 500; }
+        .plan-price { color: var(--primary); font-size: 16px; font-weight: 700; white-space: nowrap; }
+        
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group.full { grid-column: 1 / -1; }
-        .form-group label { color: #374151; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-        .form-control { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; background: #fff; color: #1f2937; font-size: 14px; }
-        .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+        .form-group label { color: #334155; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        
+        .form-control { width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); outline: none; background: #fff; color: var(--text-main); font-size: 14px; font-family: inherit; transition: all 0.2s ease; }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        
         .method-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
-        .method-option { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 8px; border: 1px solid #d1d5db; border-radius: 8px; color: #4b5563; font-size: 12px; font-weight: 600; cursor: pointer; }
-        .method-option:has(input:checked) { border-color: #3b82f6; color: #2563eb; background: #eff6ff; }
-        .method-option input { accent-color: #2563eb; }
+        .method-option { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 12px 8px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; background: #fff; }
+        .method-option:has(input:checked) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .method-option input { accent-color: var(--primary); }
+        
         .button-row { display: flex; justify-content: flex-end; align-items: center; gap: 16px; margin-top: 24px; }
-        .btn-primary, .btn-secondary { border-radius: 8px; padding: 11px 24px; font-size: 14px; font-weight: 600; cursor: pointer; }
-        .btn-primary { background: #3b82f6; color: #fff; border: 0; }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
-        .btn-secondary { background: #fff; color: #374151; border: 1px solid #d1d5db; text-decoration: none; }
-        .btn-secondary:hover { background: #f3f4f6; }
-        .summary-line { display: flex; justify-content: space-between; gap: 15px; padding: 12px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
-        .summary-line span:first-child { color: #6b7280; }
-        .summary-line strong { color: #1f2937; text-align: right; overflow-wrap: anywhere; }
+        .btn-primary, .btn-secondary { border-radius: var(--radius-sm); padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s ease; }
+        .btn-primary { background: var(--primary); color: #fff; border: 0; box-shadow: var(--shadow-subtle); }
+        .btn-primary:hover { background: var(--primary-hover); box-shadow: var(--shadow-elevated); }
+        .btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; box-shadow: none; }
+        .btn-secondary { background: #fff; color: #334155; border: 1px solid var(--border-color); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-secondary:hover { background: #f1f5f9; border-color: #cbd5e1; }
+        
+        .summary-line { display: flex; justify-content: space-between; gap: 15px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+        .summary-line span:first-child { color: var(--text-muted); font-weight: 500; }
+        .summary-line strong { color: var(--text-main); text-align: right; overflow-wrap: anywhere; font-weight: 600; }
         .total-line { border: 0; padding-top: 18px; font-size: 16px; }
-        .total-line strong { color: #1d4ed8; }
+        .total-line strong { color: var(--primary); font-weight: 700; }
+        
         .empty-state, .success-state { text-align: center; padding: 24px 8px; }
-        .empty-state i, .success-state i { color: #9ca3af; font-size: 32px; margin-bottom: 12px; }
-        .empty-state p, .success-state p { color: #6b7280; font-size: 13px; line-height: 1.5; }
+        .empty-state i, .success-state i { color: #cbd5e1; font-size: 36px; margin-bottom: 12px; }
+        .empty-state p, .success-state p { color: var(--text-muted); font-size: 13px; line-height: 1.5; }
         .success-state { display: none; }
         .success-state i { color: #10b981; }
-        .message { display: none; margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.4; }
+        
+        .message { display: none; margin-top: 16px; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.4; }
         .message.error { display: block; color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; }
         .message.success { display: block; color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; }
+        
         @media (max-width: 900px) { .content-grid { grid-template-columns: 1fr; } }
         @media (max-width: 680px) { body { display: block; } .sidebar { width: 100%; height: auto; padding: 12px 0; } .sidebar-bottom { display: none; } .nav-links { display: grid; grid-template-columns: repeat(3, 1fr); } .nav-links li a { justify-content: center; padding: 10px 6px; font-size: 11px; gap: 4px; flex-direction: column; } .nav-links li a i { margin: 0; } .header { padding: 16px 20px; } .dashboard-container { padding: 20px 16px; } .welcome-banner { padding: 20px; } .form-row, .method-list { grid-template-columns: 1fr; } .form-group.full { grid-column: auto; } .button-row { justify-content: stretch; flex-direction: column-reverse; } .button-row a, .button-row button { width: 100%; text-align: center; } }
     </style>
 </head>
-
 <body>
     <aside class="sidebar">
         <div>
@@ -98,7 +133,7 @@
         </div>
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
     </aside>
-
+    
     <main class="main-content">
         <div class="header">PAYMENTS</div>
         <div class="dashboard-container">
@@ -106,7 +141,6 @@
                 <h1 id="greetingText">Passport Payment</h1>
                 <p>Complete your payment to lock in your appointment schedule.</p>
             </div>
-
             <div class="content-grid" id="paymentContent">
                 <section class="card">
                     <div class="card-title">Passport Processing Fee</div>
@@ -128,7 +162,6 @@
                             <span class="plan-price">₱1,200.00</span>
                         </label>
                     </div>
-
                     <form id="paymentForm">
                         <span class="section-label">Payment method</span>
                         <div class="method-list">
@@ -140,13 +173,13 @@
                             <div class="form-group full"><label for="accountName">Account or cardholder name</label><input class="form-control" id="accountName" type="text" autocomplete="name" required placeholder="Juan Dela Cruz"></div>
                             <div class="form-group full"><label for="accountReference">Mobile number or card number</label><input class="form-control" id="accountReference" type="text" required placeholder="09XX XXX XXXX"></div>
                             <div class="form-group"><label for="paymentEmail">Email receipt to</label><input class="form-control" id="paymentEmail" type="email" required></div>
-                            <div class="form-group"><label for="paymentNote">Reference note <span style="font-weight:400;color:#9ca3af;">(optional)</span></label><input class="form-control" id="paymentNote" type="text" placeholder="e.g. payment reference"></div>
+                            <div class="form-group"><label for="paymentNote">Reference note <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label><input class="form-control" id="paymentNote" type="text" placeholder="e.g. payment reference"></div>
                         </div>
                         <div id="formMessage" class="message" role="status"></div>
                         <div class="button-row"><a class="btn-secondary" id="backToDashBtn" href="dashboard.html">Back to Dashboard</a><button class="btn-primary" id="payButton" type="submit"><i class="fa-solid fa-lock"></i> Pay Now</button></div>
                     </form>
                 </section>
-
+                
                 <aside class="card">
                     <div class="card-title">Payment Summary</div>
                     <div class="card-subtitle">Review your application before continuing.</div>
@@ -163,7 +196,7 @@
             </div>
         </div>
     </main>
-    
+   
     <script src="script.js"></script>
     <script>
         const dfaOfficeData = {
@@ -211,7 +244,6 @@
             "TUGUEGARAO": { name: "DFA Regional Consular Office – TugueGarao", address: "Regional Government Center, Carig Sur, TugueGarao City", contact: "(078) 844-0000" },
             "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City", contact: "(062) 991-0000" }
         };
-
         const urlParams = new URLSearchParams(window.location.search);
         const storedApplicationId = urlParams.get('id')
             || urlParams.get('application_id')
@@ -221,12 +253,10 @@
         const form = document.getElementById('paymentForm');
         const message = document.getElementById('formMessage');
         const payButton = document.getElementById('payButton');
-
         function showMessage(text, type) {
             message.textContent = text;
             message.className = `message ${type}`;
         }
-
         function updateSelectedPlan() {
             const selected = document.querySelector('input[name="processingType"]:checked');
             document.querySelectorAll('.plan-option').forEach(option => {
@@ -237,7 +267,6 @@
             document.getElementById('summaryPlan').textContent = selected.value === 'expedited' ? 'Expedited / Rush Processing' : 'Regular Processing';
             document.getElementById('summaryAmount').textContent = `₱${Number(selected.dataset.amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
         }
-
         function displayApplication(application) {
             const applicationId = storedApplicationId || application.application_id || application.applicationId;
             if (!applicationId) {
@@ -264,26 +293,22 @@
                 showMessage('This application has already been paid. Your appointment is locked in.', 'success');
             }
         }
-
         async function loadPage() {
             try {
                 const userResponse = await fetch('../api/user-data.php');
                 const userData = await userResponse.json();
                 const activeEmail = userData.email || localStorage.getItem('userEmail');
-
                 if (userData.fullName) {
                     document.getElementById('user-name').textContent = userData.fullName;
                     document.getElementById('greetingText').textContent = `Good Day, ${userData.fullName}`;
                 } else if (activeEmail) {
                     document.getElementById('user-name').textContent = activeEmail;
                 }
-
                 const targetId = storedApplicationId;
                 const fetchUrl = targetId ? `../api/get-application.php?applicationId=${encodeURIComponent(targetId)}` : `../api/get-application.php?email=${encodeURIComponent(activeEmail)}`;
-                
+               
                 const response = await fetch(fetchUrl);
                 const result = await response.json();
-
                 if (response.ok && result.application) {
                     displayApplication(result.application);
                 } else if (targetId) {
@@ -300,15 +325,14 @@
                 payButton.disabled = true;
             }
         }
-
         document.querySelectorAll('input[name="processingType"]').forEach(input => input.addEventListener('change', updateSelectedPlan));
-        
+       
         form.addEventListener('submit', async event => {
             event.preventDefault();
             if (!activeApplication) return showMessage('No active application is available for payment.', 'error');
             payButton.disabled = true;
             payButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-            
+           
             const selectedPlan = document.querySelector('input[name="processingType"]:checked');
             const paymentAmount = Number(selectedPlan.dataset.amount);
             const applicationType = activeApplication.applicationType
@@ -316,7 +340,6 @@
                 || 'New First-Time Application';
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
             const currentEmail = typeof userEmail !== 'undefined' ? userEmail : localStorage.getItem('userEmail');
-
             try {
                 const response = await fetch('../api/payments.php', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -324,18 +347,16 @@
                 });
                 const result = await response.json();
                 if (!response.ok || !result.success) throw new Error(result.message || 'Unable to process payment.');
-                
+               
                 activeApplication.status = result.status;
                 activeApplication.paymentAmount = result.amount ?? paymentAmount;
                 activeApplication.applicationType = applicationType;
-                
+               
                 document.getElementById('summaryStatus').textContent = result.status;
-                
-                // Lookup full office name and address using dfaOfficeData mapping dictionary
+               
                 const rawLoc = result.appointmentLocation || 'DFA NCR CENTRAL';
                 const officeInfo = dfaOfficeData[rawLoc];
                 const fullLocationText = officeInfo ? `${officeInfo.name} - ${officeInfo.address}` : rawLoc;
-
                 document.getElementById('successMessage').textContent = `${result.message} Appointment date: ${new Date(`${result.appointmentDate}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} at ${fullLocationText}.`;
                 document.getElementById('successState').style.display = 'block';
                 payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Payment Complete';
@@ -346,9 +367,7 @@
                 payButton.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Now';
             }
         });
-
         loadPage();
     </script>
 </body>
-
 </html>

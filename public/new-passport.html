@@ -3,54 +3,325 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Passport Application - Passport Tracking System</title>
-    <!-- FontAwesome is required for the sidebar icons -->
+    <title>Passport Application Wizard - Passport Tracking System</title>
+    <!-- FontAwesome & Google Inter Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="passport-application.css">
     <style>
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 500; font-size: 13px; color: #334155; margin-bottom: 6px; }
-        .form-control { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
-        .form-control:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-content {
+            padding: 30px 40px;
+            box-sizing: border-box;
+        }
+
+        .header-banner {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white;
+            padding: 28px 36px;
+            border-radius: var(--radius-md);
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-elevated);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-banner h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-banner p {
+            margin: 6px 0 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Modern Wizard Progress Bar */
+        .wizard-steps {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .wizard-step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: #f8fafc;
+            padding: 10px 8px;
+            border-radius: 8px;
+            border: 1px solid #f1f5f9;
+            transition: all 0.25s ease;
+        }
+
+        .wizard-step.active {
+            color: var(--primary);
+            background: var(--primary-light);
+            border-color: #c7d2fe;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+        }
+
+        .step-badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: background 0.25s ease;
+        }
+
+        .wizard-step.active .step-badge {
+            background: var(--primary);
+        }
+
+        /* Form Card Structure */
+        .form-section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 30px;
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-main);
+            background-color: #fff;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
         .step-pane { display: none; }
-        .step-pane.active { display: block; }
-        .alert-box { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
-        .action-buttons { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
-        .mode-btn-container { display: flex; gap: 15px; margin-top: 20px; }
-        .mode-btn { flex: 1; padding: 15px; font-size: 15px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; color: #fff; transition: background 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
-        .btn-individual { background: #2563eb; }
-        .btn-individual:hover { background: #1d4ed8; }
-        .btn-group { background: #475569; }
-        .btn-group:hover { background: #334155; }
-        
-        /* Modern Grid Pill Wizard Layout */
-        .wizard-steps { display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; margin-bottom: 25px; background: #fff; padding: 16px 20px; border-radius: 10px; border: 1px solid #e2e8f0; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .wizard-step { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; font-weight: 600; color: #64748b; white-space: nowrap; background: #f8fafc; padding: 8px 10px; border-radius: 6px; border: 1px solid #f1f5f9; transition: all 0.2s ease; }
-        .wizard-step.active { color: #2563eb; background: #eff6ff; border-color: #bfdbfe; }
-        .step-badge { width: 22px; height: 22px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: 700; }
-        .wizard-step.active .step-badge { background: #2563eb; color: #fff; }
-        .wizard-divider { display: none; }
+        .step-pane.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-box {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            color: #92400e;
+            padding: 16px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .alert-box.danger {
+            background: #fef2f2;
+            border-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-box.info {
+            background: #eff6ff;
+            border-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            justify-content: flex-end;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 11px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        .mode-btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .mode-btn {
+            padding: 24px;
+            font-size: 16px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            background: #fff;
+            color: var(--text-main);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .mode-btn i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .mode-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-elevated);
+        }
+
         /* DFA Custom Calendar Grid Styles */
-        .dfa-calendar-container { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; margin-bottom: 15px; font-size: 15px; color: #0f172a; }
-        .cal-header button { background: none; border: none; font-size: 16px; cursor: pointer; color: #2563eb; padding: 4px 10px; }
-        .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 8px; }
+        .dfa-calendar-container { background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 18px; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; margin-bottom: 15px; font-size: 15px; color: var(--text-main); }
+        .cal-header button { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--primary); padding: 6px 12px; border-radius: 6px; }
+        .cal-header button:hover { background: var(--primary-light); }
+        .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 600; font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
-        .cal-day { padding: 8px 0; font-size: 13px; border-radius: 4px; cursor: pointer; font-weight: 500; user-select: none; }
+        .cal-day { padding: 10px 0; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: 600; user-select: none; transition: all 0.15s; }
         .cal-day.disabled { color: #cbd5e1; cursor: not-allowed; background: transparent !important; }
         .cal-day.fully-booked { background: #fee2e2; color: #991b1b; }
-        .cal-day.available { background: #dcfce7; color: #166534; }
-        .cal-day.selected { background: #2563eb !important; color: #fff !important; font-weight: bold; }
-        .cal-legend { display: flex; gap: 20px; margin-top: 15px; font-size: 12px; align-items: center; justify-content: center; border-top: 1px solid #f1f5f9; padding-top: 10px; }
+        .cal-day.available { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+        .cal-day.available:hover { background: #dcfce7; }
+        .cal-day.selected { background: var(--primary) !important; color: #fff !important; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3); }
+        .cal-legend { display: flex; gap: 20px; margin-top: 18px; font-size: 12px; align-items: center; justify-content: center; border-top: 1px solid var(--border-color); padding-top: 12px; color: var(--text-muted); }
         .legend-item { display: flex; align-items: center; gap: 6px; }
-        .legend-box { width: 12px; height: 12px; border-radius: 3px; }
-        /* Review Step Styles */
-        .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 13px; color: #334155; margin-bottom: 20px; }
-        .review-section-block { background: #f8fafc; padding: 15px; border: 1px solid #e2e8f0; border-radius: 6px; }
-        .review-section-block h4 { border-bottom: 1px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 10px; color: #0f172a; font-size: 14px; }
-        .review-item { margin-bottom: 6px; }
-        .review-item strong { display: inline-block; width: 140px; font-weight: 600; }
+        .legend-box { width: 12px; height: 12px; border-radius: 4px; }
+
+        /* Review Grid Cards */
+        .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .summary-card { background: #f8fafc; border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-sm); }
+        .summary-card h4 { font-size: 14px; color: var(--primary); margin-top: 0; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-card div { font-size: 13px; line-height: 1.8; color: #334155; }
+        .summary-card strong { color: var(--text-main); }
     </style>
 </head>
 <body data-application-type="new">
@@ -72,17 +343,24 @@
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
     </aside>
     <main class="main-content">
-        <div class="header" id="pageHeaderTitle">NEW PASSPORT APPLICATION</div>
+        <div class="header-banner">
+            <div>
+                <h1 id="pageHeaderTitle">Passport Application Portal</h1>
+                <p>Complete your booking details securely, accurately, and step-by-step.</p>
+            </div>
+            <i class="fa-solid fa-passport" style="font-size: 40px; opacity: 0.8;"></i>
+        </div>
+        
         <div class="dashboard-container">
-            
             <div class="wizard-steps" id="wizardHeader" style="display: none;">
                 <div class="wizard-step active" id="wStep1"><div class="step-badge">1</div><span>Site</span></div>
                 <div class="wizard-step" id="wStep2"><div class="step-badge">2</div><span>Schedule</span></div>
                 <div class="wizard-step" id="wStep3"><div class="step-badge">3</div><span>Personal</span></div>
                 <div class="wizard-step" id="wStep4"><div class="step-badge">4</div><span>Family</span></div>
-                <div class="wizard-step" id="wStep5"><div class="step-badge">5</div><span>Application & Contact</span></div>
+                <div class="wizard-step" id="wStep5"><div class="step-badge">5</div><span>Application</span></div>
                 <div class="wizard-step" id="wStep6"><div class="step-badge">6</div><span>Review</span></div>
             </div>
+
             <form id="passportForm" action="../api/submit-application.php" method="POST" novalidate>
                 <input type="hidden" name="appointment_mode" id="appointmentMode" value="individual">
                 <input type="hidden" name="appointment_location" id="appointmentLocationFull">
@@ -90,40 +368,50 @@
                 <!-- STEP 0: Terms & Mode Selection -->
                 <section class="step-pane active" id="step0">
                     <div class="form-section-card">
-                        <div class="section-title">Terms and Conditions</div>
-                        <div class="alert-box" style="background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a;">
-                            <strong>Reminder:</strong> Applicants are strongly advised to use official Google or Yahoo email accounts when booking appointments to prevent technical delivery issues. Please note that email accessibility and domain restrictions may vary based on your network location, home country, or mail server configurations.
+                        <div class="section-title"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Terms and Conditions</div>
+                        <div class="alert-box info">
+                            <i class="fa-solid fa-circle-info" style="margin-top: 2px; font-size: 15px;"></i>
+                            <div><strong>Email Reminder:</strong> Applicants are strongly advised to use official Google or Yahoo email accounts when booking appointments to prevent technical delivery issues.</div>
                         </div>
-                        <div style="background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; line-height: 1.6; margin-bottom: 20px;">
-                            <p style="margin-bottom: 12px;">This appointment scheduling platform distributes available booking slots strictly on a first-come, first-served basis.</p>
-                            <p style="margin-bottom: 12px;">All applicants bear full responsibility for correctly inputting, inspecting, and validating every detail supplied during registration. Submitting inaccurate, false, or flawed information can lead to the outright forfeiture of your passport application.</p>
-                            <p><strong>For ePayment Services:</strong> All paid fees are strictly non-refundable. Fees will be forfeited if you fail to attend your confirmed appointment slot, request a cancellation, or face application rejection due to inconsistent, incorrect, or fraudulent documentation.</p>
+                        <div style="background: #f8fafc; padding: 22px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px; line-height: 1.7; margin-bottom: 22px; color: #334155;">
+                            <p style="margin-top:0; margin-bottom: 12px;">This appointment platform distributes available slots strictly on a first-come, first-served basis.</p>
+                            <p style="margin-bottom: 12px;">All applicants bear full responsibility for inputting, checking, and validating every detail supplied. Submitting inaccurate or false details can lead to the outright forfeiture of your application.</p>
+                            <p style="margin-bottom: 0;"><strong>ePayment Services:</strong> All paid fees are strictly non-refundable and will be forfeited upon failure to attend your scheduled slot or application rejection due to incorrect/fraudulent paperwork.</p>
                         </div>
-                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
-                            <input type="checkbox" id="termsAgree" required style="width: 18px; height: 18px;">
-                            <label for="termsAgree" style="margin: 0; cursor: pointer; font-weight: 500; font-size: 13px; line-height: 1.5; color: #991b1b;">
-                                <em>By proceeding with this application, I understand that I am signifying my unequivocal consent to the disclosure, collection, and use of my personal information and data required under the Philippine Passport Act and the Data Privacy Act of 2012, along with all pertinent DFA rules, regulations, and implementation guidelines.</em>
+                        <div class="form-group" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 25px;">
+                            <input type="checkbox" id="termsAgree" required style="width: 18px; height: 18px; margin-top: 3px; accent-color: var(--primary);">
+                            <label for="termsAgree" style="margin: 0; cursor: pointer; font-weight: 500; font-size: 13px; line-height: 1.5; color: #1e293b;">
+                                <em>I signify my unequivocal consent to the collection, use, and processing of my personal data under the Philippine Passport Act and the Data Privacy Act of 2012, along with all DFA rules and guidelines.</em>
                             </label>
                         </div>
                         <div class="mode-btn-container">
-                            <button type="button" class="mode-btn btn-individual" onclick="selectModeAndNext('individual')"><i class="fa-solid fa-user"></i> Start Individual Appointment</button>
-                            <button type="button" class="mode-btn btn-group" onclick="startGroupAppointment()"><i class="fa-solid fa-users"></i> Start Group Appointment</button>
+                            <button type="button" class="mode-btn" onclick="selectModeAndNext('individual')">
+                                <i class="fa-solid fa-user-check"></i>
+                                <span>Individual Appointment</span>
+                                <span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">Book a standard single slot</span>
+                            </button>
+                            <button type="button" class="mode-btn" onclick="startGroupAppointment()">
+                                <i class="fa-solid fa-users"></i>
+                                <span>Group Appointment</span>
+                                <span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">Book slots for multiple applicants</span>
+                            </button>
                         </div>
                     </div>
                 </section>
+
                 <!-- STEP 1: Site Location -->
                 <section class="step-pane" id="step1">
                     <div class="form-section-card">
-                        <div class="section-title">Site Location</div>
+                        <div class="section-title"><i class="fa-solid fa-location-dot" style="color:var(--primary);"></i> Consular Site Location</div>
                         <div class="form-row">
                             <div class="form-group"><label>Region *</label><select class="form-control" name="region"><option>ASIA PACIFIC</option></select></div>
                             <div class="form-group"><label>Country *</label><select class="form-control" name="country"><option>PHILIPPINES</option></select></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label>Site *</label>
+                            <div class="form-group full-width">
+                                <label>Consular Office / Site *</label>
                                 <select class="form-control" name="site" id="siteSelect" onchange="updateSiteInfo()" required>
-                                    <option value="">- PLEASE SELECT A SITE -</option>
+                                    <option value="">- PLEASE SELECT A CONSULAR SITE -</option>
                                     <option value="ANGELES">ANGELES (SM CITY CLARK, ANGELES CITY)</option>
                                     <option value="ANTIPOLO">ANTIPOLO (SM CENTER, ANTIPOLO CITY, RIZAL)</option>
                                     <option value="ANTIQUE">ANTIQUE (CITYMALL ANTIQUE)</option>
@@ -174,43 +462,43 @@
                             <div class="form-group"><label>Office Name</label><input type="text" class="form-control" id="officeName" readonly value="-"></div>
                             <div class="form-group"><label>Contact Number</label><input type="text" class="form-control" id="officeContact" readonly value="-"></div>
                         </div>
-                        <div class="form-group"><label>Office Address</label><input type="text" class="form-control" id="officeAddress" readonly value="-"></div>
+                        <div class="form-group full-width"><label>Office Address</label><input type="text" class="form-control" id="officeAddress" readonly value="-"></div>
                     </div>
                     <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="resetToTerms()">Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(2)">Next</button>
+                        <button type="button" class="btn-secondary" onclick="resetToTerms()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn-primary" onclick="goToStep(2)">Next <i class="fa-solid fa-arrow-right"></i></button>
                     </div>
                 </section>
+
                 <!-- STEP 2: Date & Time -->
                 <section class="step-pane" id="step2">
                     <div class="form-section-card">
-                        <div class="section-title">Date and Time</div>
-                        <div class="alert-box" style="background: #fef9c3; border-color: #fef08a; color: #854d0e;">
-                            Please be advised that your chosen time slot is reserved temporarily for 30 minutes.
+                        <div class="section-title"><i class="fa-regular fa-calendar-days" style="color:var(--primary);"></i> Appointment Date and Time</div>
+                        <div class="alert-box">
+                            <i class="fa-solid fa-clock" style="margin-top:2px; font-size:15px;"></i>
+                            <div>Your selected time slot is reserved temporarily for 30 minutes upon completion.</div>
                         </div>
                         <input type="hidden" name="app_date" id="selectedDateVal" required>
                         
                         <div class="form-row">
-                            <!-- Custom DFA Calendar Widget -->
                             <div class="form-group">
                                 <label>Appointment Date *</label>
                                 <div class="dfa-calendar-container">
                                     <div class="cal-header">
-                                        <button type="button" onclick="changeMonth(-1)">«</button>
+                                        <button type="button" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
                                         <span id="calMonthYear">September 2026</span>
-                                        <button type="button" onclick="changeMonth(1)">»</button>
+                                        <button type="button" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
                                     </div>
                                     <div class="cal-weekdays">
                                         <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
                                     </div>
                                     <div class="cal-grid" id="calGrid"></div>
                                     <div class="cal-legend">
-                                        <div class="legend-item"><div class="legend-box" style="background:#dcfce7;"></div><span>Available</span></div>
+                                        <div class="legend-item"><div class="legend-box" style="background:#f0fdf4; border:1px solid #dcfce7;"></div><span>Available</span></div>
                                         <div class="legend-item"><div class="legend-box" style="background:#fee2e2;"></div><span>Fully Booked</span></div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Dynamic Time Slots -->
                             <div class="form-group">
                                 <label>Time Slot *</label>
                                 <select class="form-control" name="app_time" id="appTimeSelect" required style="margin-top: 5px;">
@@ -220,20 +508,22 @@
                         </div>
                     </div>
                     <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(1)">Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(3)">Next</button>
+                        <button type="button" class="btn-secondary" onclick="goToStep(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn-primary" onclick="goToStep(3)">Next <i class="fa-solid fa-arrow-right"></i></button>
                     </div>
                 </section>
+
                 <!-- STEP 3: Personal Information -->
                 <section class="step-pane" id="step3">
                     <div class="form-section-card">
-                        <div class="section-title">Personal Information</div>
-                        <div class="alert-box">
-                            <strong>WARNING:</strong> Ensure all details in the name and date of birth fields are correct. Editing is not permitted on site.
+                        <div class="section-title"><i class="fa-solid fa-user" style="color:var(--primary);"></i> Personal Information</div>
+                        <div class="alert-box danger">
+                            <i class="fa-solid fa-triangle-exclamation" style="margin-top:2px; font-size:15px;"></i>
+                            <div><strong>Warning:</strong> Ensure all name and date of birth fields are 100% correct. Editing on site is strictly prohibited.</div>
                         </div>
-                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                            <input type="checkbox" id="infoAgree" required style="width: 18px; height: 18px;">
-                            <label for="infoAgree" style="margin: 0; color: #991b1b; font-weight: bold;">I agree to verify my details.</label>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 22px;">
+                            <input type="checkbox" id="infoAgree" required style="width: 18px; height: 18px; accent-color: var(--primary);">
+                            <label for="infoAgree" style="margin: 0; color: #991b1b; font-weight: 700; font-size: 13px;">I verify and confirm my details are accurate.</label>
                         </div>
                         
                         <div class="form-row">
@@ -262,7 +552,17 @@
                                     <option value="Female">Female</option>
                                 </select>
                             </div>
-                            <div class="form-group"><label>Civil Status *</label><select class="form-control" name="civil_status" required><option value="">- SELECT CIVIL STATUS -</option><option value="SINGLE">SINGLE</option><option value="MARRIED">MARRIED</option><option value="WIDOWED">WIDOWED</option><option value="SEPARATED">SEPARATED</option><option value="ANNULLED">ANNULLED</option></select></div>
+                            <div class="form-group">
+                                <label>Civil Status *</label>
+                                <select class="form-control" name="civil_status" required>
+                                    <option value="">- SELECT CIVIL STATUS -</option>
+                                    <option value="SINGLE">SINGLE</option>
+                                    <option value="MARRIED">MARRIED</option>
+                                    <option value="WIDOWED">WIDOWED</option>
+                                    <option value="SEPARATED">SEPARATED</option>
+                                    <option value="ANNULLED">ANNULLED</option>
+                                </select>
+                            </div>
                         </div>
                         
                         <div class="form-row">
@@ -280,28 +580,30 @@
                             <div class="form-group"><label>Province *</label><input type="text" class="form-control" name="birth_province" required></div>
                             <div class="form-group"><label>City/Municipality *</label><input type="text" class="form-control" name="birth_city" required></div>
                         </div>
-                        <!-- Dynamic Minor Companion Fields (Hidden by default) -->
-                        <div id="minorFieldsContainer" style="display: none; border-top: 1px dashed #cbd5e1; padding-top: 15px; margin-top: 15px;">
-                            <div class="alert-box" style="background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; margin-bottom: 15px;">
-                                <strong>Notice:</strong> Applicant is a minor. Please provide travelling companion details.
+
+                        <!-- Dynamic Minor Fields -->
+                        <div id="minorFieldsContainer" style="display: none; border-top: 1px dashed var(--border-color); padding-top: 18px; margin-top: 18px;">
+                            <div class="alert-box info" style="margin-bottom: 15px;">
+                                <i class="fa-solid fa-child" style="margin-top:2px;"></i>
+                                <div><strong>Minor Notice:</strong> Please provide details for the travelling companion.</div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>Travelling Companion's Name *</label><input type="text" class="form-control" name="companion_name"></div>
+                                <div class="form-group"><label>Companion Name *</label><input type="text" class="form-control" name="companion_name"></div>
                                 <div class="form-group"><label>Relationship *</label><input type="text" class="form-control" name="companion_relationship"></div>
-                                <div class="form-group"><label>Contact Number *</label><input type="text" class="form-control" name="companion_contact"></div>
                             </div>
                         </div>
                     </div>
                     <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(2)">Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(4)">Next</button>
+                        <button type="button" class="btn-secondary" onclick="goToStep(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn-primary" onclick="goToStep(4)">Next <i class="fa-solid fa-arrow-right"></i></button>
                     </div>
                 </section>
+
                 <!-- STEP 4: Family Information -->
                 <section class="step-pane" id="step4">
                     <div class="form-section-card">
-                        <div class="section-title">Family Information</div>
-                        <h4 style="margin-bottom: 10px; font-size: 14px;">Father's Information</h4>
+                        <div class="section-title"><i class="fa-solid fa-users-line" style="color:var(--primary);"></i> Family Information</div>
+                        <h4 style="margin-bottom: 12px; font-size: 14px; color: var(--text-main);">Father's Details</h4>
                         <div class="form-row">
                             <div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="father_lastname" required></div>
                             <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="father_givenname" required></div>
@@ -312,55 +614,19 @@
                                 <label>Country Citizenship *</label>
                                 <select class="form-control" name="father_citizenship" required>
                                     <option value="PHILIPPINES">PHILIPPINES</option>
-                                    <option value="AFGHANISTAN">AFGHANISTAN</option>
-                                    <option value="ALBANIA">ALBANIA</option>
-                                    <option value="ALGERIA">ALGERIA</option>
-                                    <option value="ANDORRA">ANDORRA</option>
-                                    <option value="ANGOLA">ANGOLA</option>
-                                    <option value="ARGENTINA">ARGENTINA</option>
-                                    <option value="ARMENIA">ARMENIA</option>
-                                    <option value="AUSTRALIA">AUSTRALIA</option>
-                                    <option value="AUSTRIA">AUSTRIA</option>
-                                    <option value="AZERBAIJAN">AZERBAIJAN</option>
-                                    <option value="BAHAMAS">BAHAMAS</option>
-                                    <option value="BAHRAIN">BAHRAIN</option>
-                                    <option value="BANGLADESH">BANGLADESH</option>
-                                    <option value="BELGIUM">BELGIUM</option>
-                                    <option value="BRAZIL">BRAZIL</option>
-                                    <option value="CANADA">CANADA</option>
-                                    <option value="CHINA">CHINA</option>
-                                    <option value="FRANCE">FRANCE</option>
-                                    <option value="GERMANY">GERMANY</option>
-                                    <option value="INDIA">INDIA</option>
-                                    <option value="INDONESIA">INDONESIA</option>
-                                    <option value="ITALY">ITALY</option>
-                                    <option value="JAPAN">JAPAN</option>
-                                    <option value="MALAYSIA">MALAYSIA</option>
-                                    <option value="MEXICO">MEXICO</option>
-                                    <option value="NETHERLANDS">NETHERLANDS</option>
-                                    <option value="NEW ZEALAND">NEW ZEALAND</option>
-                                    <option value="NIGERIA">NIGERIA</option>
-                                    <option value="NORWAY">NORWAY</option>
-                                    <option value="PAKISTAN">PAKISTAN</option>
-                                    <option value="QATAR">QATAR</option>
-                                    <option value="RUSSIA">RUSSIA</option>
-                                    <option value="SAUDI ARABIA">SAUDI ARABIA</option>
-                                    <option value="SINGAPORE">SINGAPORE</option>
-                                    <option value="SOUTH AFRICA">SOUTH AFRICA</option>
-                                    <option value="SOUTH KOREA">SOUTH KOREA</option>
-                                    <option value="SPAIN">SPAIN</option>
-                                    <option value="SWEDEN">SWEDEN</option>
-                                    <option value="SWITZERLAND">SWITZERLAND</option>
-                                    <option value="TAIWAN">TAIWAN</option>
-                                    <option value="THAILAND">THAILAND</option>
-                                    <option value="UNITED ARAB EMIRATES">UNITED ARAB EMIRATES</option>
-                                    <option value="UNITED KINGDOM">UNITED KINGDOM</option>
                                     <option value="UNITED STATES">UNITED STATES</option>
-                                    <option value="VIETNAM">VIETNAM</option>
+                                    <option value="CANADA">CANADA</option>
+                                    <option value="UNITED KINGDOM">UNITED KINGDOM</option>
+                                    <option value="AUSTRALIA">AUSTRALIA</option>
+                                    <option value="JAPAN">JAPAN</option>
+                                    <option value="SOUTH KOREA">SOUTH KOREA</option>
+                                    <option value="SINGAPORE">SINGAPORE</option>
+                                    <option value="OTHERS">OTHERS</option>
                                 </select>
                             </div>
                         </div>
-                        <h4 style="margin: 20px 0 10px; font-size: 14px;">Mother's Information</h4>
+
+                        <h4 style="margin: 24px 0 12px; font-size: 14px; color: var(--text-main);">Mother's Maiden Details</h4>
                         <div class="form-row">
                             <div class="form-group"><label>Maiden Last Name *</label><input type="text" class="form-control" name="mother_lastname" required></div>
                             <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="mother_givenname" required></div>
@@ -371,72 +637,35 @@
                                 <label>Country Citizenship *</label>
                                 <select class="form-control" name="mother_citizenship" required>
                                     <option value="PHILIPPINES">PHILIPPINES</option>
-                                    <option value="AFGHANISTAN">AFGHANISTAN</option>
-                                    <option value="ALBANIA">ALBANIA</option>
-                                    <option value="ALGERIA">ALGERIA</option>
-                                    <option value="ANDORRA">ANDORRA</option>
-                                    <option value="ANGOLA">ANGOLA</option>
-                                    <option value="ARGENTINA">ARGENTINA</option>
-                                    <option value="ARMENIA">ARMENIA</option>
-                                    <option value="AUSTRALIA">AUSTRALIA</option>
-                                    <option value="AUSTRIA">AUSTRIA</option>
-                                    <option value="AZERBAIJAN">AZERBAIJAN</option>
-                                    <option value="BAHAMAS">BAHAMAS</option>
-                                    <option value="BAHRAIN">BAHRAIN</option>
-                                    <option value="BANGLADESH">BANGLADESH</option>
-                                    <option value="BELGIUM">BELGIUM</option>
-                                    <option value="BRAZIL">BRAZIL</option>
-                                    <option value="CANADA">CANADA</option>
-                                    <option value="CHINA">CHINA</option>
-                                    <option value="FRANCE">FRANCE</option>
-                                    <option value="GERMANY">GERMANY</option>
-                                    <option value="INDIA">INDIA</option>
-                                    <option value="INDONESIA">INDONESIA</option>
-                                    <option value="ITALY">ITALY</option>
-                                    <option value="JAPAN">JAPAN</option>
-                                    <option value="MALAYSIA">MALAYSIA</option>
-                                    <option value="MEXICO">MEXICO</option>
-                                    <option value="NETHERLANDS">NETHERLANDS</option>
-                                    <option value="NEW ZEALAND">NEW ZEALAND</option>
-                                    <option value="NIGERIA">NIGERIA</option>
-                                    <option value="NORWAY">NORWAY</option>
-                                    <option value="PAKISTAN">PAKISTAN</option>
-                                    <option value="QATAR">QATAR</option>
-                                    <option value="RUSSIA">RUSSIA</option>
-                                    <option value="SAUDI ARABIA">SAUDI ARABIA</option>
-                                    <option value="SINGAPORE">SINGAPORE</option>
-                                    <option value="SOUTH AFRICA">SOUTH AFRICA</option>
-                                    <option value="SOUTH KOREA">SOUTH KOREA</option>
-                                    <option value="SPAIN">SPAIN</option>
-                                    <option value="SWEDEN">SWEDEN</option>
-                                    <option value="SWITZERLAND">SWITZERLAND</option>
-                                    <option value="TAIWAN">TAIWAN</option>
-                                    <option value="THAILAND">THAILAND</option>
-                                    <option value="UNITED ARAB EMIRATES">UNITED ARAB EMIRATES</option>
-                                    <option value="UNITED KINGDOM">UNITED KINGDOM</option>
                                     <option value="UNITED STATES">UNITED STATES</option>
-                                    <option value="VIETNAM">VIETNAM</option>
+                                    <option value="CANADA">CANADA</option>
+                                    <option value="UNITED KINGDOM">UNITED KINGDOM</option>
+                                    <option value="AUSTRALIA">AUSTRALIA</option>
+                                    <option value="JAPAN">JAPAN</option>
+                                    <option value="SOUTH KOREA">SOUTH KOREA</option>
+                                    <option value="SINGAPORE">SINGAPORE</option>
+                                    <option value="OTHERS">OTHERS</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(3)">Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(5)">Next</button>
+                        <button type="button" class="btn-secondary" onclick="goToStep(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn-primary" onclick="goToStep(5)">Next <i class="fa-solid fa-arrow-right"></i></button>
                     </div>
                 </section>
+
                 <!-- STEP 5: Application & Contact -->
                 <section class="step-pane" id="step5">
                     <div class="form-section-card">
-                        <div class="section-title">Application & Contact</div>
-                        
-                        <h4 style="margin-bottom: 10px; font-size: 14px;">Application Details</h4>
+                        <div class="section-title"><i class="fa-solid fa-file-lines" style="color:var(--primary);"></i> Application & Contact Information</div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Application Type *</label>
                                 <select class="form-control" name="application_type" required>
                                     <option value="">- SELECT APPLICATION TYPE -</option>
                                     <option value="FIRST TIME PASSPORT">First-Time Passport</option>
+                                    <option value="PASSPORT RENEWAL">Passport Renewal</option>
                                     <option value="LOST PASSPORT">Replacement of Lost Passport</option>
                                     <option value="DAMAGED PASSPORT">Replacement of Damaged Passport</option>
                                 </select>
@@ -444,7 +673,7 @@
                             <div class="form-group">
                                 <label>Basis of Philippine Citizenship *</label>
                                 <select class="form-control" name="citizenship_basis" id="citizenshipBasisSelect" required>
-                                    <option value="">- SELECT BASIS OF PHILIPPINE CITIZENSHIP -</option>
+                                    <option value="">- SELECT BASIS -</option>
                                     <option value="BIRTH">BIRTH</option>
                                     <option value="ELECTION">ELECTION</option>
                                     <option value="NATURALIZATION">NATURALIZATION</option>
@@ -455,18 +684,17 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group"><label>Foreign Passport Holder *</label><select class="form-control" name="foreign_passport" required><option>No</option><option>Yes</option></select></div>
-                            <!-- Dynamic Others Basis Field (Hidden by default, appears when OTHERS is selected) -->
                             <div class="form-group" id="othersBasisContainer" style="display: none;">
-                                <label>Others *</label>
-                                <input type="text" class="form-control" name="citizenship_basis_others" placeholder="PLEASE SPECIFY">
+                                <label>Please Specify Others *</label>
+                                <input type="text" class="form-control" name="citizenship_basis_others">
                             </div>
                         </div>
                         
-                        <h4 style="margin: 20px 0 10px; font-size: 14px;">Contact Information</h4>
-                        <div class="form-group"><label>Current Address *</label><input type="text" class="form-control" name="address" required></div>
+                        <h4 style="margin: 20px 0 12px; font-size: 14px; color: var(--text-main);">Current Contact Details</h4>
+                        <div class="form-group full-width"><label>Current Address *</label><input type="text" class="form-control" name="address" required></div>
                         <div class="form-row">
                             <div class="form-group"><label>City *</label><input type="text" class="form-control" name="address_city" required></div>
-                            <div class="form-group"><label>Province/State/Country *</label><input type="text" class="form-control" name="address_province" required></div>
+                            <div class="form-group"><label>Province / State *</label><input type="text" class="form-control" name="address_province" required></div>
                         </div>
                         <div class="form-row">
                             <div class="form-group"><label>Emergency Contact Person *</label><input type="text" class="form-control" name="emergency_contact" required></div>
@@ -478,101 +706,76 @@
                         </div>
                     </div>
                     <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(4)">Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(6)">Next</button>
+                        <button type="button" class="btn-secondary" onclick="goToStep(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn-primary" onclick="goToStep(6)">Review Details <i class="fa-solid fa-arrow-right"></i></button>
                     </div>
                 </section>
+
                 <!-- STEP 6: Review -->
                 <section class="step-pane" id="step6">
                     <div class="form-section-card">
-                        <div class="section-title">Information Review</div>
+                        <div class="section-title"><i class="fa-solid fa-clipboard-check" style="color:var(--primary);"></i> Information Review & Confirmation</div>
                         
-                        <div class="review-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            
-                            <!-- Appointment Details Card -->
-                            <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px;">
-                                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Appointment Details</h4>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Mode:</strong> <span id="rev-mode">INDIVIDUAL</span></div>
-                                    <div><strong>Site Location:</strong> <span id="rev-site">-</span></div>
-                                    <div><strong>Date:</strong> <span id="rev-date">-</span></div>
-                                    <div><strong>Time:</strong> <span id="rev-time">-</span></div>
-                                </div>
+                        <div class="review-grid">
+                            <div class="summary-card">
+                                <h4>Appointment Details</h4>
+                                <div><strong>Mode:</strong> <span id="rev-mode">INDIVIDUAL</span></div>
+                                <div><strong>Site:</strong> <span id="rev-site">-</span></div>
+                                <div><strong>Date:</strong> <span id="rev-date">-</span></div>
+                                <div><strong>Time:</strong> <span id="rev-time">-</span></div>
                             </div>
-                            <!-- Personal Information Card -->
-                            <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px;">
-                                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Personal Information</h4>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Full Name:</strong> <span id="rev-fullname">-</span></div>
-                                    <div><strong>Date of Birth:</strong> <span id="rev-dob">-</span></div>
-                                    <div><strong>Civil Status:</strong> <span id="rev-civilstatus">-</span></div>
-                                    <div><strong>Gender:</strong> <span id="rev-gender">-</span></div>
-                                    <div><strong>Birth Legitimacy:</strong> <span id="rev-legitimacy">-</span></div>
-                                    <div><strong>Country of Birth:</strong> <span id="rev-birthcountry">-</span></div>
-                                    <div><strong>Email:</strong> <span id="rev-email">-</span></div>
-                                    <div><strong>Mobile:</strong> <span id="rev-mobile">-</span></div>
-                                </div>
+                            <div class="summary-card">
+                                <h4>Personal Information</h4>
+                                <div><strong>Full Name:</strong> <span id="rev-fullname">-</span></div>
+                                <div><strong>Date of Birth:</strong> <span id="rev-dob">-</span></div>
+                                <div><strong>Civil Status:</strong> <span id="rev-civilstatus">-</span></div>
+                                <div><strong>Email:</strong> <span id="rev-email">-</span></div>
+                                <div><strong>Mobile:</strong> <span id="rev-mobile">-</span></div>
                             </div>
-                            <!-- Minor Companion Card (Dynamic) -->
-                            <div class="summary-card" id="rev-companion-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px; display: none; grid-column: span 2;">
-                                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Travelling Companion Information (Minor Applicant)</h4>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Companion Name:</strong> <span id="rev-companion-name">-</span></div>
-                                    <div><strong>Relationship:</strong> <span id="rev-companion-rel">-</span></div>
-                                    <div><strong>Contact Number:</strong> <span id="rev-companion-contact">-</span></div>
-                                </div>
+                            <div class="summary-card" id="rev-companion-card" style="display: none; grid-column: span 2;">
+                                <h4>Travelling Companion (Minor)</h4>
+                                <div><strong>Companion:</strong> <span id="rev-companion-name">-</span> (<span id="rev-companion-rel">-</span>)</div>
                             </div>
-                            <!-- Family Information Card -->
-                            <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px;">
-                                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Family Information</h4>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Father's Name:</strong> <span id="rev-fathername">-</span></div>
-                                    <div><strong>Father's Citizenship:</strong> <span id="rev-fathercitizenship">-</span></div>
-                                    <div style="margin-top: 5px;"><strong>Mother's Name:</strong> <span id="rev-mothername">-</span></div>
-                                    <div><strong>Mother's Citizenship:</strong> <span id="rev-mothercitizenship">-</span></div>
-                                </div>
+                            <div class="summary-card">
+                                <h4>Family Background</h4>
+                                <div><strong>Father:</strong> <span id="rev-fathername">-</span></div>
+                                <div><strong>Mother:</strong> <span id="rev-mothername">-</span></div>
                             </div>
-                            <div class="summary-card" style="background: #f8f9fa; border: 1px solid #dde2e6; padding: 15px; border-radius: 4px;">
-                                <h4 style="font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Application & Contact</h4>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    <div><strong>Application Type:</strong> <span id="rev-applicationtype">-</span></div>
-                                    <div><strong>Address:</strong> <span id="rev-address">-</span></div>
-                                    <div><strong>City / Province:</strong> <span id="rev-cityprovince">-</span></div>
-                                    <div><strong>Emergency Contact:</strong> <span id="rev-emergency">-</span> (<span id="rev-emergency-num">-</span>)</div>
-                                    <div><strong>Occupation:</strong> <span id="rev-occupation">-</span></div>
-                                    <div><strong>Citizenship Basis:</strong> <span id="rev-citizenshipbasis">-</span></div>
-                                    <div><strong>Foreign Passport Holder:</strong> <span id="rev-foreignpassport">-</span></div>
-                                </div>
+                            <div class="summary-card">
+                                <h4>Application Summary</h4>
+                                <div><strong>Type:</strong> <span id="rev-applicationtype">-</span></div>
+                                <div><strong>Address:</strong> <span id="rev-address">-</span>, <span id="rev-cityprovince">-</span></div>
+                                <div><strong>Emergency Contact:</strong> <span id="rev-emergency">-</span></div>
                             </div>
                         </div>
-                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 25px;">
-                            <input type="checkbox" id="finalAgree" required style="width: 18px; height: 18px;">
-                            <label for="finalAgree" style="margin: 0; font-weight: 500;">I confirm that all information provided is accurate and complete.</label>
+
+                        <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-top: 30px; background: #f8fafc; padding: 15px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                            <input type="checkbox" id="finalAgree" required style="width: 18px; height: 18px; accent-color: var(--primary);">
+                            <label for="finalAgree" style="margin: 0; font-weight: 600; font-size: 13px; color: var(--text-main);">I confirm that all information provided is completely accurate, truthful, and final.</label>
                         </div>
                     </div>
                     
                     <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(5)">Back</button>
-                        <button type="submit" class="btn-primary" style="background: #28a745;">Save & Submit</button>
+                        <button type="button" class="btn-secondary" onclick="goToStep(5)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                        <button type="submit" class="btn-primary" style="background-color: #10b981;"><i class="fa-solid fa-check"></i> Save & Submit Application</button>
                     </div>
                 </section>
             </form>
         </div>
     </main>
+
     <script src="script.js"></script>
     <script src="passport-application.js"></script>
     <script>
-        // Minor Applicant Age Verification Logic
+        // Minor Verification logic
         document.addEventListener('input', function (e) {
             if (e.target && e.target.name === 'dob') {
                 const dobVal = new Date(e.target.value);
                 if (!isNaN(dobVal.getTime())) {
-                    const today = new Date(2026, 8, 20); // September 20, 2026
+                    const today = new Date(2026, 8, 20);
                     let age = today.getFullYear() - dobVal.getFullYear();
                     const m = today.getMonth() - dobVal.getMonth();
-                    if (m < 0 || (m === 0 && today.getDate() < dobVal.getDate())) {
-                        age--;
-                    }
+                    if (m < 0 || (m === 0 && today.getDate() < dobVal.getDate())) age--;
                     const minorContainer = document.getElementById('minorFieldsContainer');
                     if (minorContainer) {
                         if (age < 18) {
@@ -586,56 +789,24 @@
                 }
             }
         });
-        // DFA Calendar Logic with Dynamic Time Slots per Date
+
+        // DFA Dynamic Calendar
         let currentYear = 2026;
-        let currentMonth = 8; // September (0-indexed)
+        let currentMonth = 8;
         let selectedDateStr = '';
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
         function getSlotsForDate(dayNum) {
-            const seed = (dayNum * 7) % 5;
-            switch(seed) {
-                case 0:
-                    return [
-                        { time: "08:00 AM - 09:00 AM", status: "available", slots: 3 },
-                        { time: "09:00 AM - 10:00 AM", status: "booked" },
-                        { time: "10:00 AM - 11:00 AM", status: "available", slots: 5 },
-                        { time: "11:00 AM - 12:00 PM", status: "booked" },
-                        { time: "13:00 PM - 14:00 PM", status: "available", slots: 1 },
-                        { time: "14:00 PM - 15:00 PM", status: "available", slots: 9 },
-                        { time: "15:00 PM - 16:00 PM", status: "booked" }
-                    ];
-                case 1:
-                    return [
-                        { time: "08:00 AM - 09:00 AM", status: "booked" },
-                        { time: "09:00 AM - 10:00 AM", status: "available", slots: 12 },
-                        { time: "10:00 AM - 11:00 AM", status: "available", slots: 4 },
-                        { time: "11:00 AM - 12:00 PM", status: "available", slots: 2 },
-                        { time: "13:00 PM - 14:00 PM", status: "booked" },
-                        { time: "14:00 PM - 15:00 PM", status: "booked" },
-                        { time: "15:00 PM - 16:00 PM", status: "available", slots: 6 }
-                    ];
-                case 2:
-                    return [
-                        { time: "08:00 AM - 09:00 AM", status: "available", slots: 8 },
-                        { time: "09:00 AM - 10:00 AM", status: "available", slots: 2 },
-                        { time: "10:00 AM - 11:00 AM", status: "booked" },
-                        { time: "11:00 AM - 12:00 PM", status: "booked" },
-                        { time: "13:00 PM - 14:00 PM", status: "available", slots: 11 },
-                        { time: "14:00 PM - 15:00 PM", status: "available", slots: 3 },
-                        { time: "15:00 PM - 16:00 PM", status: "available", slots: 1 }
-                    ];
-                default:
-                    return [
-                        { time: "08:00 AM - 09:00 AM", status: "available", slots: 5 },
-                        { time: "09:00 AM - 10:00 AM", status: "booked" },
-                        { time: "10:00 AM - 11:00 AM", status: "booked" },
-                        { time: "11:00 AM - 12:00 PM", status: "available", slots: 7 },
-                        { time: "13:00 PM - 14:00 PM", status: "available", slots: 4 },
-                        { time: "14:00 PM - 15:00 PM", status: "booked" },
-                        { time: "15:00 PM - 16:00 PM", status: "available", slots: 15 }
-                    ];
-            }
+            return [
+                { time: "08:00 AM - 09:00 AM", status: "available", slots: 5 },
+                { time: "09:00 AM - 10:00 AM", status: "booked" },
+                { time: "10:00 AM - 11:00 AM", status: "available", slots: 3 },
+                { time: "13:00 PM - 14:00 PM", status: "available", slots: 8 },
+                { time: "14:00 PM - 15:00 PM", status: "booked" },
+                { time: "15:00 PM - 16:00 PM", status: "available", slots: 2 }
+            ];
         }
+
         function renderCalendar() {
             const grid = document.getElementById('calGrid');
             const header = document.getElementById('calMonthYear');
@@ -645,9 +816,7 @@
             const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
             const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
             const todayObj = new Date(2026, 8, 20);
-            for (let i = 0; i < firstDayIndex; i++) {
-                grid.appendChild(document.createElement('div'));
-            }
+            for (let i = 0; i < firstDayIndex; i++) grid.appendChild(document.createElement('div'));
             for (let day = 1; day <= totalDays; day++) {
                 const cell = document.createElement('div');
                 cell.className = 'cal-day';
@@ -656,31 +825,24 @@
                 const formattedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 if (thisDate < todayObj) {
                     cell.classList.add('disabled');
+                } else if (day % 5 === 0) {
+                    cell.classList.add('fully-booked');
                 } else {
-                    if (day % 4 === 0) {
-                        cell.classList.add('fully-booked');
-                    } else {
-                        cell.classList.add('available');
-                        cell.onclick = () => selectDate(formattedDate, day, cell);
-                    }
+                    cell.classList.add('available');
+                    cell.onclick = () => selectDate(formattedDate, day, cell);
                 }
-                if (selectedDateStr === formattedDate) {
-                    cell.classList.add('selected');
-                }
+                if (selectedDateStr === formattedDate) cell.classList.add('selected');
                 grid.appendChild(cell);
             }
         }
-        function changeMonth(direction) {
-            currentMonth += direction;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            } else if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
+
+        function changeMonth(dir) {
+            currentMonth += dir;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             renderCalendar();
         }
+
         function selectDate(dateStr, dayNum, element) {
             document.querySelectorAll('.cal-day').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
@@ -688,24 +850,18 @@
             document.getElementById('selectedDateVal').value = dateStr;
             const timeSelect = document.getElementById('appTimeSelect');
             timeSelect.innerHTML = '<option value="">- SELECT TIME SLOT -</option>';
-            
-            const slots = getSlotsForDate(dayNum);
-            slots.forEach(slot => {
+            getSlotsForDate(dayNum).forEach(slot => {
                 const opt = document.createElement('option');
                 opt.value = slot.time.split(' ')[0];
-                if (slot.status === 'booked') {
-                    opt.disabled = true;
-                    opt.style.color = 'red';
-                    opt.textContent = `${slot.time} (Fully Booked)`;
-                } else {
-                    opt.textContent = `${slot.time} (Available Slots: ${slot.slots})`;
-                }
+                opt.disabled = slot.status === 'booked';
+                opt.textContent = slot.status === 'booked' ? `${slot.time} (Fully Booked)` : `${slot.time} (${slot.slots} Slots Available)`;
                 timeSelect.appendChild(opt);
             });
         }
-        document.addEventListener('DOMContentLoaded', () => {
-            renderCalendar();
-        });
+
+        document.addEventListener('DOMContentLoaded', () => renderCalendar());
+
+        // Full Restored DFA Office Database mapping for auto-population
         const dfaOfficeData = {
             "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City", contact: "(045) 304-0194" },
             "ANTIPOLO": { name: "DFA Regional Consular Office – Antipolo", address: "3F SM Cherry Foodarama, Marikina-Infanta Highway, Antipolo City, Rizal", contact: "(02) 8697-3000" },
@@ -751,187 +907,64 @@
             "TUGUEGARAO": { name: "DFA Regional Consular Office – TugueGarao", address: "Regional Government Center, Carig Sur, TugueGarao City", contact: "(078) 844-0000" },
             "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City", contact: "(062) 991-0000" }
         };
+
         function updateSiteInfo() {
             const selectEl = document.getElementById('siteSelect');
             const selectedSite = selectEl.value;
-            
-            const fullText = selectEl.selectedIndex > 0 ? selectEl.options[selectEl.selectedIndex].text : '';
-            document.getElementById('appointmentLocationFull').value = fullText;
-
-            const info = dfaOfficeData[selectedSite];
-            if (info) {
-                document.getElementById('officeName').value = info.name;
-                document.getElementById('officeAddress').value = info.address;
-                document.getElementById('officeContact').value = info.contact;
-            } else {
-                document.getElementById('officeName').value = "-";
-                document.getElementById('officeAddress').value = "-";
-                document.getElementById('officeContact').value = "-";
-            }
+            document.getElementById('appointmentLocationFull').value = selectEl.selectedIndex > 0 ? selectEl.options[selectEl.selectedIndex].text : '';
+            const info = dfaOfficeData[selectedSite] || { name: "-", address: "-", contact: "-" };
+            document.getElementById('officeName').value = info.name;
+            document.getElementById('officeAddress').value = info.address;
+            document.getElementById('officeContact').value = info.contact;
         }
+
         function startGroupAppointment() {
-            const terms = document.getElementById('termsAgree');
-            if (!terms.checked) {
-                alert('Please agree to the Terms and Conditions to proceed.');
-                return;
-            }
+            if (!document.getElementById('termsAgree').checked) { alert('Please accept the Terms and Conditions.'); return; }
             window.location.href = 'group-appointment.html';
         }
+
         function selectModeAndNext(mode) {
-            const terms = document.getElementById('termsAgree');
-            if (!terms.checked) {
-                alert('Please agree to the Terms and Conditions to proceed.');
-                return;
-            }
+            if (!document.getElementById('termsAgree').checked) { alert('Please accept the Terms and Conditions.'); return; }
             document.getElementById('appointmentMode').value = mode;
             document.getElementById('wizardHeader').style.display = 'grid';
             goToStep(1);
         }
+
         function resetToTerms() {
             document.getElementById('wizardHeader').style.display = 'none';
-            document.querySelectorAll('.step-pane').forEach(pane => pane.classList.remove('active'));
+            document.querySelectorAll('.step-pane').forEach(p => p.classList.remove('active'));
             document.getElementById('step0').classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        async function populateReviewData() {
-            const getValue = (name) => document.querySelector(`[name="${name}"]`) ? document.querySelector(`[name="${name}"]`).value : '';
-           
-            document.getElementById('rev-mode').textContent = document.getElementById('appointmentMode').value.toUpperCase();
-            document.getElementById('rev-site').textContent = getValue('appointment_location') || getValue('site') || '-';
-            document.getElementById('rev-date').textContent = getValue('app_date') || '-';
-            document.getElementById('rev-time').textContent = getValue('app_time') || '-';
-           
-            const fullName = `${getValue('givenname')} ${getValue('middlename')} ${getValue('lastname')}`.trim().replace(/\s+/g, ' ');
-            document.getElementById('rev-fullname').textContent = fullName || '-';
-            document.getElementById('rev-dob').textContent = getValue('dob') || '-';
-            document.getElementById('rev-email').textContent = getValue('email') || '-';
-            document.getElementById('rev-mobile').textContent = getValue('mobile') || '-';
-           
-            const userEmail = getValue('email') || localStorage.getItem('userEmail');
-            if (userEmail) {
-                localStorage.setItem('userEmail', userEmail);
-            }
-        }
-        
-        function goToStep(stepNumber) {
-            if (stepNumber === 2 && !selectedDateStr) {
-                renderCalendar();
-            }
-            document.querySelectorAll('.step-pane').forEach(pane => pane.classList.remove('active'));
-            document.getElementById('step' + stepNumber).classList.add('active');
-            
+
+        function goToStep(step) {
+            if (step === 2 && !selectedDateStr) renderCalendar();
+            document.querySelectorAll('.step-pane').forEach(p => p.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
             for (let i = 1; i <= 6; i++) {
-                const wStep = document.getElementById('wStep' + i);
-                if (wStep) {
-                    if (i === stepNumber) {
-                        wStep.classList.add('active');
-                    } else {
-                        wStep.classList.remove('active');
-                    }
-                }
+                const w = document.getElementById('wStep' + i);
+                if (w) w.classList.toggle('active', i === step);
             }
-            
-            if (stepNumber === 6) {
-                populateReviewSummary();
-                populateReviewData();
-            }
-            
+            if (step === 6) populateReviewSummary();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        
-        // Dynamic "Others" Citizenship Basis Toggle
-        document.addEventListener('change', function (e) {
-            if (e.target && e.target.id === 'citizenshipBasisSelect') {
-                const othersContainer = document.getElementById('othersBasisContainer');
-                const othersInput = othersContainer ? othersContainer.querySelector('input') : null;
-                
-                if (e.target.value === 'OTHERS') {
-                    othersContainer.style.display = 'block';
-                    if (othersInput) othersInput.required = true;
-                } else {
-                    othersContainer.style.display = 'none';
-                    if (othersInput) {
-                        othersInput.required = false;
-                        othersInput.value = '';
-                    }
-                }
-            }
-        });
-        // Populate Review Screen dynamically when entering Step 6
+
         function populateReviewSummary() {
-            const getVal = (name) => {
-                const el = document.querySelector(`[name="${name}"]`);
-                return el ? el.value : '-';
-            };
-            const siteSelect = document.querySelector('select[name="site"]');
-            const siteText = siteSelect && siteSelect.selectedIndex > 0 ? siteSelect.options[siteSelect.selectedIndex].text : '-';
-            document.getElementById('rev-site').innerText = siteText;
-            
-            const rawDate = getVal('app_date');
-            document.getElementById('rev-date').innerText = rawDate !== '-' ? rawDate : '-';
-            
-            const timeSelectEl = document.getElementById('appTimeSelect');
-            let timeText = '-';
-            if (timeSelectEl && timeSelectEl.selectedIndex > 0) {
-                let fullOptText = timeSelectEl.options[timeSelectEl.selectedIndex].text;
-                timeText = fullOptText.split('(')[0].trim();
-            } else {
-                timeText = getVal('app_time');
-            }
-            document.getElementById('rev-time').innerText = timeText;
-            
-            document.getElementById('rev-fullname').innerText = `${getVal('givenname')} ${getVal('middlename')} ${getVal('lastname')}`.trim();
+            const getVal = (name) => document.querySelector(`[name="${name}"]`)?.value || '-';
+            document.getElementById('rev-site').innerText = document.querySelector('select[name="site"]') ? document.querySelector('select[name="site"]').options[document.querySelector('select[name="site"]').selectedIndex].text : '-';
+            document.getElementById('rev-date').innerText = getVal('app_date');
+            document.getElementById('rev-time').innerText = getVal('app_time');
+            document.getElementById('rev-fullname').innerText = `${getVal('givenname')} ${getVal('middlename')} ${getVal('lastname')}`;
             document.getElementById('rev-dob').innerText = getVal('dob');
             document.getElementById('rev-civilstatus').innerText = getVal('civil_status');
-            document.getElementById('rev-gender').innerText = getVal('gender');
-            document.getElementById('rev-legitimacy').innerText = getVal('legitimacy');
-            document.getElementById('rev-birthcountry').innerText = getVal('birth_country');
             document.getElementById('rev-email').innerText = getVal('email');
             document.getElementById('rev-mobile').innerText = getVal('mobile');
-            
-            const dobVal = new Date(getVal('dob'));
-            const refDate = new Date(2026, 8, 20);
-            let age = refDate.getFullYear() - dobVal.getFullYear();
-            const m = refDate.getMonth() - dobVal.getMonth();
-            if (m < 0 || (m === 0 && refDate.getDate() < dobVal.getDate())) age--;
-            
-            const companionCard = document.getElementById('rev-companion-card');
-            if (!isNaN(age) && age < 18) {
-                companionCard.style.display = 'block';
-                document.getElementById('rev-companion-name').innerText = getVal('companion_name');
-                document.getElementById('rev-companion-rel').innerText = getVal('companion_relationship');
-                document.getElementById('rev-companion-contact').innerText = getVal('companion_contact');
-            } else {
-                companionCard.style.display = 'none';
-            }
-            
-            document.getElementById('rev-fathername').innerText = `${getVal('father_givenname')} ${getVal('father_middlename')} ${getVal('father_lastname')}`.trim();
-            document.getElementById('rev-fathercitizenship').innerText = getVal('father_citizenship');
-            document.getElementById('rev-mothername').innerText = `${getVal('mother_givenname')} ${getVal('mother_middlename')} ${getVal('mother_lastname')}`.trim();
-            document.getElementById('rev-mothercitizenship').innerText = getVal('mother_citizenship');
-            
-            const rawAppType = getVal('application_type');
-            let displayAppType = rawAppType;
-            if (rawAppType === 'LOST PASSPORT') {
-                displayAppType = 'Replacement of Lost Passport';
-            } else if (rawAppType === 'DAMAGED PASSPORT') {
-                displayAppType = 'Replacement of Damaged Passport';
-            } else if (rawAppType === 'FIRST TIME PASSPORT') {
-                displayAppType = 'First-Time Passport';
-            }
-            document.getElementById('rev-applicationtype').innerText = displayAppType;
+            document.getElementById('rev-fathername').innerText = `${getVal('father_givenname')} ${getVal('father_lastname')}`;
+            document.getElementById('rev-mothername').innerText = `${getVal('mother_givenname')} ${getVal('mother_lastname')}`;
+            document.getElementById('rev-applicationtype').innerText = getVal('application_type');
             document.getElementById('rev-address').innerText = getVal('address');
             document.getElementById('rev-cityprovince').innerText = `${getVal('address_city')}, ${getVal('address_province')}`;
-            document.getElementById('rev-emergency').innerText = getVal('emergency_contact');
-            document.getElementById('rev-emergency-num').innerText = getVal('emergency_number');
-            document.getElementById('rev-occupation').innerText = getVal('occupation');
-            
-            let citizenshipBasisText = getVal('citizenship_basis');
-            if (citizenshipBasisText === 'OTHORS') {
-                citizenshipBasisText += ` (${getVal('citizenship_basis_others')})`;
-            }
-            document.getElementById('rev-citizenshipbasis').innerText = citizenshipBasisText;
-            document.getElementById('rev-foreignpassport').innerText = getVal('foreign_passport');
+            document.getElementById('rev-emergency').innerText = `${getVal('emergency_contact')} (${getVal('emergency_number')})`;
         }
     </script>
 </body>
