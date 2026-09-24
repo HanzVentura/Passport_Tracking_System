@@ -11,7 +11,6 @@ if ($userId === null) {
 
 // Get the JSON input
 $data = json_decode(file_get_contents('php://input'), true) ?? [];
-
 $enabled = isset($data['enabled']) ? (bool)$data['enabled'] : false;
 $pin = $data['pin'] ?? '';
 
@@ -21,17 +20,14 @@ if ($enabled) {
         echo json_encode(['success' => false, 'message' => 'PIN must be exactly 6 digits.']);
         exit;
     }
-
     $plainPasscode = $pin;
 } else {
     $plainPasscode = null; // Clear passcode if 2FA is disabled
 }
 
 try {
-    // Connect to SQLite database (matching your project database path)
-    $dbPath = __DIR__ . '/../database.db';
-    $pdo = new PDO('sqlite:' . $dbPath);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Connect to MySQL database via centralized connection
+    require_once __DIR__ . '/../db.php';
 
     $stmt = $pdo->prepare(
         'UPDATE users SET two_factor_enabled = :enabled, passcode = :pin WHERE id = :user_id'
@@ -41,7 +37,7 @@ try {
         ':pin' => $plainPasscode,
         ':user_id' => $userId
     ]);
-
+    
     echo json_encode(['success' => true, 'message' => '2FA settings updated successfully!']);
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);

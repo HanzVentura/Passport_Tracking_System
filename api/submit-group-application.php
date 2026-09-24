@@ -1,10 +1,10 @@
 <?php
 session_start();
+
+// Connect to MySQL database via centralized connection
+require_once __DIR__ . '/../db.php';
+
 try {
-    $dbPath = __DIR__ . '/../database.db';
-    $db = new PDO("sqlite:$dbPath");
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-   
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $groupData = [];
         if (isset($_POST['group_data_payload']) && !empty($_POST['group_data_payload'])) {
@@ -16,7 +16,6 @@ try {
         if (!$email) {
             die("Error: Email is required.");
         }
-
         // Generate a fresh unique application ID for group bookings
         $application_id = 'PH-' . rand(100000, 999999);
         $application_type = 'Group Appointment';
@@ -30,7 +29,7 @@ try {
         // Insert new group application record with exact user selections
         $sql = "INSERT INTO applications (application_id, email, application_type, status, appointment_date, appointment_location, appointment_time, created_at)
                 VALUES (:app_id, :email, :app_type, :status, :app_date, :app_location, :app_time, CURRENT_TIMESTAMP)";
-        $stmt = $db->prepare($sql);
+        $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':app_id'       => $application_id,
             ':email'        => $email,
@@ -40,7 +39,6 @@ try {
             ':app_location' => $appointment_location,
             ':app_time'     => $appointment_time
         ]);
-
         setcookie('userEmail', $email, time() + (86400 * 30), "/");
         setcookie('currentApplicationId', $application_id, time() + (86400 * 30), "/");
        

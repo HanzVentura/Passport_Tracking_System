@@ -1,9 +1,7 @@
 <?php
 header('Content-Type: application/json');
-$dbPath = __DIR__ . '/../database.db';
+require_once __DIR__ . '/../db.php';
 try {
-    $pdo = new PDO("sqlite:$dbPath");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $email = $_GET['email'] ?? '';
     $applicationId = $_GET['applicationId'] ?? '';
     $stmt = null;
@@ -22,6 +20,14 @@ try {
     $application = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($application) {
         $appId = $application['application_id'] ?: ('PH-' . rand(100000, 999900));
+       
+        // Dynamic Estimated Completion Date calculation based on Appointment Date and Processing Type[cite: 15]
+        $appointmentDate = $application['appointment_date'] ?? date('Y-m-d');
+        $processingType = strtolower($application['processing_type'] ?? 'regular');
+       
+        // Regular processing takes ~12 working days (~16 calendar days); Expedited takes ~7 working days (~10 calendar days)[cite: 15]
+        $daysToAdd = ($processingType === 'expedited') ? 10 : 16;
+        $estimatedCompletion = date('Y-m-d', strtotime($appointmentDate . " + {$daysToAdd} days"));
         echo json_encode([
             'success' => true,
             'application' => [
@@ -29,7 +35,7 @@ try {
                 'applicationId' => $appId,
                 'application_type' => $application['application_type'] ?? 'New First-Time Application',
                 'applicationType' => $application['application_type'] ?? 'New First-Time Application',
-                'status' => $application['status'] ?? 'Pending Payment',
+                'status' => $application['status'] ?? 'Form Submitted',
                 'email' => $application['email'] ?? $email,
                 'appointmentDate' => $application['appointment_date'] ?? null,
                 'appointment_date' => $application['appointment_date'] ?? null,
@@ -37,7 +43,11 @@ try {
                 'appointment_location' => $application['appointment_location'] ?? null,
                 'appointmentTime' => $application['appointment_time'] ?? '09:00 AM',
                 'appointment_time' => $application['appointment_time'] ?? '09:00 AM',
-                'createdAt' => $application['created_at'] ?? date('Y-m-d H:i:s')
+                'processingType' => $processingType,
+                'createdAt' => $application['created_at'] ?? date('Y-m-d H:i:s'),
+                'estimatedCompletionDate' => $estimatedCompletion,
+                'missingDocumentsFlag' => (bool)($application['missing_documents_flag'] ?? false),
+                'missingDocumentsReason' => $application['missing_documents_reason'] ?? null
             ]
         ]);
     } else {

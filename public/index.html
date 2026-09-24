@@ -4,33 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Your Account / Log In</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .track-link-container {
+            text-align: center;
+            margin-top: 16px;
+        }
+        .track-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4f46e5;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: #e0e7ff;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+        }
+        .track-link:hover {
+            background: #4f46e5;
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+    </style>
 </head>
 <body>
-    <div class="split-layout" id="mainLayout">
-        
+    <!-- Added reverse-layout class here so photos start on the left and login form on the right by default -->
+    <div class="split-layout reverse-layout" id="mainLayout">
+       
         <!-- Form Side -->
         <div class="form-side">
             <div class="form-container">
-                
+               
                 <!-- === SIGN UP SECTION === -->
-                <div id="signup-section">
+                <div id="signup-section" class="hidden">
                     <h1>Create your account</h1>
                     <p class="subtitle">Prepare for a world-wide journey!</p>
-
                     <p id="error-message" class="error-text hidden">Invalid credentials!</p>
-
                     <form id="signupForm" action="#">
                         <div class="input-group">
                             <label for="fullname">Full Name</label>
                             <input type="text" id="fullname" name="fullname" required>
                         </div>
-
                         <div class="input-group">
                             <label for="email">Email address or phone number</label>
                             <input type="text" id="email" name="email" maxlength="254" required>
                         </div>
-
                         <div class="input-group">
                             <label for="password">Password</label>
                             <div class="password-container">
@@ -38,7 +61,6 @@
                                 <button type="button" class="toggle-password">Show Password</button>
                             </div>
                         </div>
-
                         <div class="input-group">
                             <label for="confirm-password">Confirm password</label>
                             <div class="password-container">
@@ -46,32 +68,31 @@
                                 <button type="button" class="toggle-password">Show Password</button>
                             </div>
                         </div>
-
                         <div class="checkbox-group">
                             <input type="checkbox" id="terms" name="terms" required>
                             <label for="terms">I agree to the Terms of Service and Privacy Policy</label>
                         </div>
-
                         <button type="submit" class="btn-signup">Sign Up</button>
                     </form>
-
-                    <p class="login-text">Already have an account? <a href="#" id="show-login">Log In</a></p>
+                    <!-- Aesthetic Track Status Link -->
+                    <div class="track-link-container">
+                        <a href="./track-status.html" class="track-link">
+                            <i class="fa-solid fa-magnifying-glass"></i> Track application status without logging in
+                        </a>
+                    </div>
+                    <p class="login-text" style="margin-top: 20px;">Already have an account? <a href="#" id="show-login">Log In</a></p>
                 </div>
-
                 <!-- === LOG IN SECTION === -->
-                <div id="login-section" class="hidden">
-                    
+                <div id="login-section">
+                   
                     <h1 class="login-h1">Log In</h1>
                     <p class="login-subtitle">Explore a world of possibilities</p>
-
                     <p id="login-error-message" class="error-text hidden">Invalid credentials!</p>
-
                     <form id="loginForm" action="#">
                         <div class="input-group login-group">
                             <label class="login-label" for="login-email">Email address or phone number</label>
                             <input type="text" id="login-email" name="login-email" maxlength="254" required class="login-input">
                         </div>
-
                         <div class="input-group login-group">
                             <label class="login-label" for="login-password">Password</label>
                             <div class="password-container">
@@ -79,7 +100,6 @@
                                 <button type="button" class="toggle-password">Show Password</button>
                             </div>
                         </div>
-
                         <!-- 2FA Passcode Field (Hidden by default until login requests 2FA) -->
                         <div id="2fa-container" style="display: none; margin-bottom: 20px;">
                             <label for="passcode" style="font-size: 13px; color: #334155; display: block; margin-bottom: 6px;">6-digit Passcode</label>
@@ -88,21 +108,24 @@
                                 <button type="button" class="toggle-password">Show Passcode</button>
                             </div>
                         </div>
-                        
+                       
                         <div class="forgot-password-container">
                             <a href="#" class="forgot-password-link">Forgot Password</a>
                         </div>
-
                         <button type="submit" class="btn-login-new">Log In</button>
                     </form>
-
-                    <p class="login-text" style="margin-top: 30px;">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
+                   
+                    <!-- Aesthetic Track Status Link -->
+                    <div class="track-link-container">
+                        <a href="./track-status.html" class="track-link">
+                            <i class="fa-solid fa-magnifying-glass"></i> Track application status without logging in
+                        </a>
+                    </div>
+                    <p class="login-text" style="margin-top: 20px;">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
                 </div>
-
             </div>
             <div class="clouds-bg"></div>
         </div>
-
         <!-- Image Carousel Side -->
         <div class="image-side">
             <div class="carousel-container" id="carousel-box">
@@ -111,10 +134,8 @@
                 <div class="slide" style="background-image: url('Images/JAPAN.jpg');"></div>
                 <div class="slide" style="background-image: url('Images/NEWYORK.jpg');"></div>
                 <div class="slide" style="background-image: url('Images/SWITZERLAND.jpg');"></div>
-
                 <button class="nav-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
                 <button class="nav-arrow next" onclick="changeSlide(1)">&#10095;</button>
-
                 <div class="carousel-dots">
                     <span class="dot active" onclick="setSlide(0)"></span>
                     <span class="dot" onclick="setSlide(1)"></span>
@@ -125,7 +146,6 @@
             </div>
         </div>
     </div>
-
     <!-- Success Screen Overlay -->
     <div class="success-overlay hidden" id="successScreen">
         <div class="success-box">
@@ -138,9 +158,8 @@
             <p>Congratulations on your first step to your<br>world-wide journey!</p>
             <button class="btn-home" onclick="location.reload()">Back to Home</button>
         </div>
-        <div class="clouds-bg"></div> 
+        <div class="clouds-bg"></div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>

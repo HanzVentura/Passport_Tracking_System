@@ -22,47 +22,46 @@
             --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
             --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
-        
+       
         .sidebar { width: 260px; flex: 0 0 260px; background: var(--card-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; }
         .user-profile-mini { display: flex; align-items: center; padding: 0 24px 20px; border-bottom: 1px solid #f1f5f9; margin-bottom: 16px; }
         .user-profile-mini i { font-size: 38px; color: var(--primary); margin-right: 12px; }
         .user-info .name { font-weight: 700; font-size: 14px; color: var(--text-main); overflow-wrap: anywhere; }
-        
+       
         .nav-links { list-style: none; }
         .nav-links li a { display: flex; align-items: center; padding: 12px 24px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: all .2s ease; }
         .nav-links li.active a, .nav-links li a:hover { background: var(--primary-light); color: var(--primary); border-right: 4px solid var(--primary); font-weight: 600; }
         .nav-links li a i { width: 16px; margin-right: 12px; text-align: center; }
-        
+       
         .sidebar-bottom { padding: 0 24px; }
         .sidebar-bottom a { display: flex; align-items: center; padding: 10px 0; color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 600; }
         .sidebar-bottom a i { margin-right: 12px; }
-        
+       
         .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow-y: auto; }
         .header { background: var(--card-bg); padding: 22px 36px; border-bottom: 1px solid var(--border-color); font-size: 18px; font-weight: 700; color: var(--text-main); letter-spacing: -0.3px; }
         .dashboard-container { padding: 35px 40px; max-width: 1350px; margin: 0 auto; width: 100%; }
-        
+       
         .welcome-banner { background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: #fff; padding: 28px 34px; border-radius: var(--radius-md); margin-bottom: 30px; box-shadow: var(--shadow-elevated); }
         .welcome-banner h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
         .welcome-banner p { font-size: 14px; opacity: .9; }
-        
+       
         .content-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 24px; align-items: start; }
-        
+       
         .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 28px; box-shadow: var(--shadow-subtle); transition: all 0.2s ease; }
         .card:hover { box-shadow: var(--shadow-elevated); border-color: #cbd5e1; }
-        
+       
         .card-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
         .card-subtitle { color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
-        
+       
         .notice { display: flex; gap: 14px; padding: 16px; margin-bottom: 24px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-sm); color: #1e40af; }
         .notice i { margin-top: 2px; font-size: 18px; color: var(--primary); }
         .notice strong { display: block; font-size: 14px; margin-bottom: 4px; }
         .notice p { font-size: 13px; line-height: 1.5; }
-        
+       
         .section-label { display: block; color: #334155; font-size: 13px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
-        
+       
         .plan-list { display: grid; gap: 12px; margin-bottom: 24px; }
         .plan-option { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; border: 2px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; transition: border-color .2s, background .2s, box-shadow .2s; }
         .plan-option:hover, .plan-option.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: var(--shadow-subtle); }
@@ -73,20 +72,20 @@
         .plan-name { color: var(--text-main); font-size: 14px; font-weight: 700; display: block; margin-bottom: 4px; }
         .plan-time { color: var(--text-muted); font-size: 12px; font-weight: 500; }
         .plan-price { color: var(--primary); font-size: 16px; font-weight: 700; white-space: nowrap; }
-        
+       
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group.full { grid-column: 1 / -1; }
         .form-group label { color: #334155; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-        
+       
         .form-control { width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); outline: none; background: #fff; color: var(--text-main); font-size: 14px; font-family: inherit; transition: all 0.2s ease; }
         .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
-        
+       
         .method-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
         .method-option { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 12px 8px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; background: #fff; }
         .method-option:has(input:checked) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
         .method-option input { accent-color: var(--primary); }
-        
+       
         .button-row { display: flex; justify-content: flex-end; align-items: center; gap: 16px; margin-top: 24px; }
         .btn-primary, .btn-secondary { border-radius: var(--radius-sm); padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s ease; }
         .btn-primary { background: var(--primary); color: #fff; border: 0; box-shadow: var(--shadow-subtle); }
@@ -94,23 +93,23 @@
         .btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; box-shadow: none; }
         .btn-secondary { background: #fff; color: #334155; border: 1px solid var(--border-color); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
         .btn-secondary:hover { background: #f1f5f9; border-color: #cbd5e1; }
-        
+       
         .summary-line { display: flex; justify-content: space-between; gap: 15px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
         .summary-line span:first-child { color: var(--text-muted); font-weight: 500; }
         .summary-line strong { color: var(--text-main); text-align: right; overflow-wrap: anywhere; font-weight: 600; }
         .total-line { border: 0; padding-top: 18px; font-size: 16px; }
         .total-line strong { color: var(--primary); font-weight: 700; }
-        
+       
         .empty-state, .success-state { text-align: center; padding: 24px 8px; }
         .empty-state i, .success-state i { color: #cbd5e1; font-size: 36px; margin-bottom: 12px; }
         .empty-state p, .success-state p { color: var(--text-muted); font-size: 13px; line-height: 1.5; }
         .success-state { display: none; }
         .success-state i { color: #10b981; }
-        
+       
         .message { display: none; margin-top: 16px; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.4; }
         .message.error { display: block; color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; }
         .message.success { display: block; color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; }
-        
+       
         @media (max-width: 900px) { .content-grid { grid-template-columns: 1fr; } }
         @media (max-width: 680px) { body { display: block; } .sidebar { width: 100%; height: auto; padding: 12px 0; } .sidebar-bottom { display: none; } .nav-links { display: grid; grid-template-columns: repeat(3, 1fr); } .nav-links li a { justify-content: center; padding: 10px 6px; font-size: 11px; gap: 4px; flex-direction: column; } .nav-links li a i { margin: 0; } .header { padding: 16px 20px; } .dashboard-container { padding: 20px 16px; } .welcome-banner { padding: 20px; } .form-row, .method-list { grid-template-columns: 1fr; } .form-group.full { grid-column: auto; } .button-row { justify-content: stretch; flex-direction: column-reverse; } .button-row a, .button-row button { width: 100%; text-align: center; } }
     </style>
@@ -133,7 +132,7 @@
         </div>
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
     </aside>
-    
+   
     <main class="main-content">
         <div class="header">PAYMENTS</div>
         <div class="dashboard-container">
@@ -179,7 +178,7 @@
                         <div class="button-row"><a class="btn-secondary" id="backToDashBtn" href="dashboard.html">Back to Dashboard</a><button class="btn-primary" id="payButton" type="submit"><i class="fa-solid fa-lock"></i> Pay Now</button></div>
                     </form>
                 </section>
-                
+               
                 <aside class="card">
                     <div class="card-title">Payment Summary</div>
                     <div class="card-subtitle">Review your application before continuing.</div>
@@ -187,7 +186,7 @@
                     <div id="summaryDetails" style="display:none;">
                         <div class="summary-line"><span>Application ID</span><strong id="summaryId">---</strong></div>
                         <div class="summary-line"><span>Applicant</span><strong id="summaryApplicant">---</strong></div>
-                        <div class="summary-line"><span>Current status</span><strong id="summaryStatus">---</strong></div>
+                        <div class="summary-line"><span>Current status</span><strong id="summaryStatus">Form Submitted</strong></div>
                         <div class="summary-line"><span>Processing</span><strong id="summaryPlan">Regular Processing</strong></div>
                         <div class="summary-line total-line"><span>Total due</span><strong id="summaryAmount">₱950.00</strong></div>
                     </div>
@@ -282,12 +281,16 @@
             document.getElementById('summaryDetails').style.display = 'block';
             document.getElementById('summaryId').textContent = applicationId;
             document.getElementById('summaryApplicant').textContent = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || 'User');
-            document.getElementById('summaryStatus').textContent = application.status;
+           
+            // Keep status strictly as Form Submitted on the payment tab before payment is completed
+            const currentStatus = application.status;
+            document.getElementById('summaryStatus').textContent = (currentStatus === 'Paid') ? 'Paid' : 'Form Submitted';
+
             if (document.getElementById('paymentEmail')) {
                 document.getElementById('paymentEmail').value = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || '');
             }
             payButton.disabled = false;
-            if (application.status === 'Paid') {
+            if (currentStatus === 'Paid') {
                 payButton.disabled = true;
                 payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Already Paid';
                 showMessage('This application has already been paid. Your appointment is locked in.', 'success');
@@ -315,7 +318,7 @@
                     displayApplication({
                         application_id: targetId,
                         applicationType: localStorage.getItem('applicationType') || 'New First-Time Application',
-                        status: 'Pending Payment'
+                        status: 'Form Submitted'
                     });
                 } else {
                     throw new Error('No active application was found. Start an application from the dashboard first.');
@@ -352,7 +355,7 @@
                 activeApplication.paymentAmount = result.amount ?? paymentAmount;
                 activeApplication.applicationType = applicationType;
                
-                document.getElementById('summaryStatus').textContent = result.status;
+                document.getElementById('summaryStatus').textContent = 'Paid';
                
                 const rawLoc = result.appointmentLocation || 'DFA NCR CENTRAL';
                 const officeInfo = dfaOfficeData[rawLoc];

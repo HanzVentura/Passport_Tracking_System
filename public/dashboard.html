@@ -161,7 +161,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 230px;
+            min-height: 250px;
             transition: all 0.2s ease;
         }
         .card:hover {
@@ -186,18 +186,6 @@
             flex: 1;
             width: 100%;
         }
-        .dashboard-card > .empty-state-content {
-            margin: 0;
-            padding: 8px 0 4px;
-        }
-        .dashboard-card .empty-state-title {
-            line-height: 1.35;
-        }
-        #activeAppFilled {
-            font-size: 13px !important;
-            line-height: 1.6 !important;
-            padding: 4px 2px;
-        }
         .application-meta-label {
             display: block;
             color: var(--text-muted);
@@ -214,20 +202,22 @@
             font-size: 14px !important;
         }
         #statusAppFilled {
-            gap: 12px;
-            padding: 4px 4px;
-            font-size: 13px !important;
-            line-height: 1.4;
+            gap: 10px;
+            padding: 2px 0;
+            font-size: 12px !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .status-step {
             display: flex;
             align-items: center;
-            min-height: 24px;
+            min-height: 22px;
             font-weight: 500;
         }
         .status-step i {
             flex: 0 0 16px;
-            margin-right: 12px !important;
+            margin-right: 10px !important;
             text-align: center;
         }
         .status-step.inactive {
@@ -235,14 +225,39 @@
         }
         .status-step.inactive i {
             color: #94a3b8 !important;
-            font-size: 14px !important;
+            font-size: 13px !important;
         }
         .status-step:not(.inactive) i {
             color: #10b981 !important;
-            font-size: 14px !important;
+            font-size: 13px !important;
+        }
+        .estimated-date-badge {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #f1f5f9;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            color: #475569;
+            font-weight: 600;
+        }
+        /* Missing Documents Action Flag Banner */
+        .action-flag-alert {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        .action-flag-alert strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 2px;
         }
         #pendingAppFilled {
-            padding: 18px !important;
+            padding: 16px !important;
             border-radius: var(--radius-sm);
             font-size: 13px !important;
             line-height: 1.6;
@@ -251,19 +266,15 @@
             color: #1e40af !important;
         }
         #pendingAppFilled strong:first-child {
-            margin-bottom: 6px !important;
-            font-size: 14px;
+            margin-bottom: 4px !important;
+            font-size: 13px;
             font-weight: 700;
         }
         #pendingAppFilled #dispComeDate {
-            margin: 6px 0 !important;
-            font-size: 14px !important;
+            margin: 4px 0 !important;
+            font-size: 13px !important;
             font-weight: 700;
             color: var(--primary);
-        }
-        #pendingAppFilled span:last-child {
-            font-size: 11px !important;
-            color: #475569 !important;
         }
         /* Empty State Interior */
         .empty-state-content {
@@ -279,11 +290,6 @@
             font-size: 34px;
             color: #cbd5e1;
             margin-bottom: 12px;
-            height: 40px;
-            width: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .empty-state-title {
             font-size: 15px;
@@ -360,7 +366,6 @@
             align-items: center;
             gap: 8px;
         }
-        /* View State Management */
         .app-view {
             display: none;
         }
@@ -402,7 +407,7 @@
                 <h1 id="greetingText">Good Day</h1>
                 <p>Track your passport application and stay updated on the status of your passport application anytime, anywhere.</p>
             </div>
-            <!-- ================= VIEW 1: DASHBOARD ================= -->
+            <!-- DASHBOARD VIEW -->
             <div id="dashboardView" class="app-view active-view">
                 <!-- Top Cards Grid -->
                 <div class="top-cards-grid">
@@ -416,19 +421,22 @@
                         </div>
                         <div id="activeAppFilled" style="display: none; font-size: 13px; line-height: 1.6;">
                             <div class="application-meta-label">Application ID</div>
-                            <div id="dispAppId" style="font-weight: 700; color: #1f2937; margin-bottom: 8px;">---</div>
+                            <div id="dispAppId" style="font-weight: 700; color: #1f2937; margin-bottom: 6px;">---</div>
                            
                             <div class="application-meta-label">Type</div>
-                            <div id="dispAppType" style="font-weight: 700; color: #1f2937; margin-bottom: 8px;">---</div>
+                            <div id="dispAppType" style="font-weight: 700; color: #1f2937; margin-bottom: 6px;">---</div>
                            
                             <div class="application-meta-label">Current Status</div>
-                            <div id="dispAppStatus" style="font-weight: 700; color: #4f46e5; margin-bottom: 8px;">Processing</div>
+                            <div id="dispAppStatus" style="font-weight: 700; color: #4f46e5; margin-bottom: 6px;">Form Submitted</div>
+
+                            <div class="application-meta-label">Online Payment</div>
+                            <div id="dispPaymentStatus" style="font-weight: 700; color: #10b981; margin-bottom: 6px;">Verified (Online)</div>
                            
                             <div class="application-meta-label">Submitted</div>
                             <div id="dispSubDate" style="font-weight: 600; color: #1f2937;">---</div>
                         </div>
                     </div>
-                    <!-- Card 2: Application Status -->
+                    <!-- Card 2: Application Status (Rubric Exact Steps) -->
                     <div class="card dashboard-card">
                         <div class="card-title">Application Status</div>
                         <div class="empty-state-content" id="statusAppDefault">
@@ -436,27 +444,32 @@
                             <div class="empty-state-title">Not Started</div>
                             <div class="empty-state-desc">Application progress will be tracked here once submitted.</div>
                         </div>
-                        <div id="statusAppFilled" style="display: none; font-size: 12px; justify-content: center; flex: 1; flex-direction: column;">
-                            <div class="status-step" data-status-step="submitted"><i class="fa-solid fa-circle-check" style="color: #10b981; font-size: 14px;"></i>Submitted</div>
-                            <div class="status-step inactive" data-status-step="payment"><i class="fa-regular fa-circle"></i>Payment</div>
-                            <div class="status-step inactive" data-status-step="review"><i class="fa-regular fa-circle"></i>Under review</div>
-                            <div class="status-step inactive" data-status-step="processing"><i class="fa-regular fa-circle"></i>Processing</div>
-                            <div class="status-step inactive" data-status-step="pickup"><i class="fa-regular fa-circle"></i>Ready to pick-up</div>
+                        <div id="statusAppFilled" style="display: none;">
+                            <div class="status-step" data-status-step="Form Submitted"><i class="fa-solid fa-circle-check"></i>Form Submitted</div>
+                            <div class="status-step inactive" data-status-step="Biometrics Received"><i class="fa-regular fa-circle"></i>Biometrics Received</div>
+                            <div class="status-step inactive" data-status-step="Under Consular Review"><i class="fa-regular fa-circle"></i>Under Consular Review</div>
+                            <div class="status-step inactive" data-status-step="In Printing"><i class="fa-regular fa-circle"></i>In Printing</div>
+                            <div class="status-step inactive" data-status-step="Dispatched"><i class="fa-regular fa-circle"></i>Dispatched</div>
+                            <div class="estimated-date-badge" id="estimatedDateDisplay">Est. Completion: ---</div>
                         </div>
                     </div>
-                    <!-- Card 3: Pending Action -->
+                    <!-- Card 3: Pending Action & Missing Document Flags -->
                     <div class="card dashboard-card">
                         <div class="card-title">Pending Action</div>
+                        <div id="missingDocsAlert" class="action-flag-alert">
+                            <strong><i class="fa-solid fa-triangle-exclamation"></i> Action Flag: Missing Documents</strong>
+                            <span id="missingDocsReasonText">Please upload required supporting certificates.</span>
+                        </div>
                         <div class="empty-state-content" id="pendingAppDefault">
                             <i class="fa-regular fa-calendar"></i>
                             <div class="empty-state-title">All Clear</div>
                             <div class="empty-state-desc">No upcoming appointments or tasks at this time.</div>
                         </div>
-                        <div id="pendingAppFilled" style="display: none; background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 8px; font-size: 12px; color: #1e40af; flex: 1; flex-direction: column; justify-content: center;">
-                            <strong style="display: block; margin-bottom: 4px;">Processing:</strong>
+                        <div id="pendingAppFilled" style="display: none; flex-direction: column; justify-content: center;">
+                            <strong style="display: block; margin-bottom: 4px;">Appointment Schedule:</strong>
                             <span>You are expected to come on</span>
                             <strong id="dispComeDate" style="display: block; margin: 4px 0; color: #1d4ed8; font-size: 13px;">---</strong>
-                            <span id="dispAppointmentLocation" style="font-size: 11px; color: #6b7280; line-height: 1.4;">Appointment location not assigned yet.</span>
+                            <span id="dispAppointmentLocation" style="font-size: 11px; color: #475569; line-height: 1.4;">Appointment location not assigned yet.</span>
                         </div>
                     </div>
                 </div>
@@ -480,7 +493,7 @@
             </div>
         </div>
     </div>
-    <!-- Exact Original Logic Preserved -->
+    <!-- Script Logic -->
     <script>
         const dfaOfficeData = {
             "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City" },
@@ -529,42 +542,32 @@
         };
        
         function formatAppointmentDate(dateValue, timeValue) {
-            if (!dateValue) {
-                return '---';
-            }
+            if (!dateValue) return '---';
             const date = new Date(`${dateValue}T00:00:00`);
             const formattedDate = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-           
             let cleanTime = timeValue || '09:00 AM';
-            if (cleanTime.includes('-')) {
-                cleanTime = cleanTime.split('-')[0].trim();
-            }
-           
+            if (cleanTime.includes('-')) cleanTime = cleanTime.split('-')[0].trim();
             return `${formattedDate} at ${cleanTime}`;
         }
        
-       function updateStatusTracker(status) {
+        function updateStatusTracker(status) {
             const normalizedStatus = (status || '').toLowerCase().trim();
-            let activeSteps = ['submitted'];
-            if (normalizedStatus === 'paid' || (normalizedStatus.includes('paid') && !normalizedStatus.includes('pending'))) {
-                activeSteps = ['submitted', 'payment'];
-            }
-            if (normalizedStatus.includes('review')) {
-                activeSteps = ['submitted', 'payment', 'review'];
-            }
-            if (normalizedStatus.includes('process') || normalizedStatus.includes('approved')) {
-                activeSteps = ['submitted', 'payment', 'review', 'processing'];
-            }
-            if (normalizedStatus.includes('pickup') || normalizedStatus.includes('ready')) {
-                activeSteps = ['submitted', 'payment', 'review', 'processing', 'pickup'];
-            }
-            document.querySelectorAll('[data-status-step]').forEach(step => {
-                const isActive = activeSteps.includes(step.dataset.statusStep);
+            const sequence = ['Form Submitted', 'Biometrics Received', 'Under Consular Review', 'In Printing', 'Dispatched'];
+            
+            let activeCount = 1;
+            if (normalizedStatus.includes('paid') || normalizedStatus.includes('biometric')) activeCount = 2;
+            if (normalizedStatus.includes('review')) activeCount = 3;
+            if (normalizedStatus.includes('print')) activeCount = 4;
+            if (normalizedStatus.includes('dispatch') || normalizedStatus.includes('ready')) activeCount = 5;
+
+            document.querySelectorAll('[data-status-step]').forEach((step, index) => {
+                const isActive = index < activeCount;
                 const icon = step.querySelector('i');
                 step.classList.toggle('inactive', !isActive);
                 icon.className = isActive ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle';
             });
         }
+
         function displaySavedApplication(application) {
             const appId = application.application_id || application.applicationId;
             document.getElementById('dispAppId').innerText = appId;
@@ -572,27 +575,32 @@
             localStorage.setItem('activeAppId', appId);
            
             document.getElementById('dispAppType').innerText = application.application_type || application.applicationType || 'New First-Time Application';
-            document.getElementById('dispAppStatus').innerText = application.status;
-            updateStatusTracker(application.status);
+            const currentStatus = application.status || 'Form Submitted';
+            document.getElementById('dispAppStatus').innerText = currentStatus;
+            updateStatusTracker(currentStatus);
+
+            if (application.estimatedCompletionDate) {
+                document.getElementById('estimatedDateDisplay').innerText = `Est. Completion: ${application.estimatedCompletionDate}`;
+            }
+
+            if (application.missingDocumentsFlag) {
+                document.getElementById('missingDocsReasonText').innerText = application.missingDocumentsReason || 'Please review missing requirements.';
+                document.getElementById('missingDocsAlert').style.display = 'block';
+            }
            
-            const isPaid = (application.status || '').toLowerCase().trim() === 'paid';
-            if (isPaid) {
+            if (currentStatus !== 'Form Submitted') {
                 document.getElementById('dispComeDate').innerText = formatAppointmentDate(application.appointmentDate || application.appointment_date, application.appointmentTime || application.appointment_time);
-               
                 const rawLoc = application.appointmentLocation || application.appointment_location || '';
-               
                 const office = dfaOfficeData[rawLoc];
                 const fullLocationDisplay = office ? `${office.name} - ${office.address}` : rawLoc;
-                document.getElementById('dispAppointmentLocation').innerText = fullLocationDisplay
-                    ? `in ${fullLocationDisplay}`
-                    : 'Appointment location not assigned yet.';
-                   
+                document.getElementById('dispAppointmentLocation').innerText = fullLocationDisplay ? `in ${fullLocationDisplay}` : 'Appointment location assigned.';
                 document.getElementById('pendingAppDefault').style.display = 'none';
                 document.getElementById('pendingAppFilled').style.display = 'flex';
             } else {
                 document.getElementById('pendingAppDefault').style.display = 'flex';
                 document.getElementById('pendingAppFilled').style.display = 'none';
             }
+
             if (application.createdAt || application.created_at) {
                 document.getElementById('dispSubDate').innerText = new Date(application.createdAt || application.created_at)
                     .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -631,9 +639,7 @@
                 const response = await fetch(fetchUrl);
                 const result = await response.json();
                 const application = result.application;
-                if (!response.ok || !application) {
-                    return;
-                }
+                if (!response.ok || !application) return;
                 displaySavedApplication(application);
             } catch (error) {
                 console.error('Unable to load saved application:', error);

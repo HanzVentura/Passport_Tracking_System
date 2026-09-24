@@ -2,15 +2,8 @@
 // Handles submitting and fetching customer support enquiries
 header('Content-Type: application/json');
 
-// Connects to the SQLite database
-$dbPath = __DIR__ . '/../database.db';
-try {
-    $pdo = new PDO("sqlite:$dbPath");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Database connection failed.']);
-    exit;
-}
+// Connect to MySQL database via centralized connection
+require_once __DIR__ . '/../db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -31,7 +24,7 @@ if ($method === 'POST') {
     try {
         $stmt = $pdo->prepare("INSERT INTO enquiries (email, application_id, subject, message) VALUES (?, ?, ?, ?)");
         $stmt->execute([$email, $applicationId, $subject, $message]);
-
+        
         http_response_code(201);
         echo json_encode([
             'success' => true,
@@ -49,13 +42,12 @@ if ($method === 'POST') {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Unable to submit enquiry.']);
     }
-} 
+}
 // Handles GET requests to list all enquiries
 else if ($method === 'GET') {
     try {
         $stmt = $pdo->query("SELECT id, email, application_id AS appId, subject, message, status, reply, created_at AS date FROM enquiries ORDER BY id DESC");
         $enquiries = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         echo json_encode(['success' => true, 'enquiries' => $enquiries]);
     } catch (PDOException $e) {
         http_response_code(500);

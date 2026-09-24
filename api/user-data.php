@@ -8,9 +8,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 try {
-    $dbPath = __DIR__ . '/../database.db';
-    $pdo = new PDO("sqlite:$dbPath");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Connect to MySQL database via centralized connection
+    require_once __DIR__ . '/../db.php';
 
     $stmt = $pdo->prepare("SELECT fullname, email, two_factor_enabled FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);

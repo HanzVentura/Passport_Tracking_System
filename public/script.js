@@ -80,7 +80,7 @@ togglePasswordButtons.forEach(button => {
 // --- FORM VALIDATION & BACKEND DATABASE INTEGRATION ---
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const phoneRegex = /^(09\d{9}|\+639\d{9})$/;
-// 1. Sign Up Submission (Saves to SQLite Database)[cite: 22]
+// 1. Sign Up Submission (Saves to Database)
 const signupForm = document.getElementById('signupForm');
 const successScreen = document.getElementById('successScreen');
 const errorMessage = document.getElementById('error-message');
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         twoFaContainer.style.display = 'none';
     }
 });
-// 2. Log In Submission (Verifies with Database & Handles Dynamic 2FA)[cite: 23]
+// 2. Log In Submission (Verifies with Database & Handles Dynamic 2FA)
 const loginForm = document.getElementById('loginForm');
 const loginErrorMessage = document.getElementById('login-error-message');
 const loginEmailInput = document.getElementById('login-email');
@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const eyeBtn = document.getElementById('toggle-two-factor-pin');
     const msg = document.getElementById('two-factor-message');
     const pinSection = document.getElementById('two-factor-pin-section');
-    
+   
     if (toggle && pinSection) {
         toggle.addEventListener('change', () => {
             if (toggle.checked) {
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+   
     if (eyeBtn && pinInput) {
         eyeBtn.addEventListener('click', () => {
             const type = pinInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -253,21 +253,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+   
     saveBtn.addEventListener('click', () => {
         const isEnabled = toggle.checked;
         const pin = pinInput.value.trim();
-        
+       
         // Validate PIN only if 2FA is turned ON
         if (isEnabled && (!pin || !/^\d{6}$/.test(pin))) {
             msg.style.color = '#dc2626';
             msg.textContent = 'Please enter a valid 6-digit PIN to enable 2FA.';
             return;
         }
-        
-        // If OFF, payload sends enabled: false and clears PIN cleanly[cite: 22]
+       
+        // If OFF, payload sends enabled: false and clears PIN cleanly
         const payloadPin = isEnabled ? pin : "";
-        
+       
         fetch('../api/update-2fa.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

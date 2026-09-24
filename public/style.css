@@ -5,24 +5,20 @@
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
-
 body {
     height: 100vh;
     overflow: hidden;
 }
-
 /* Split Screen Layout */
 .split-layout {
     display: flex;
     height: 100vh;
     width: 100vw;
 }
-
 /* This flips the layout so the photos are on the LEFT and the form is on the RIGHT during Log In */
 .split-layout.reverse-layout {
     flex-direction: row-reverse;
 }
-
 /* --- Form Side --- */
 .form-side {
     flex: 1;
@@ -32,39 +28,33 @@ body {
     background-color: #f8fbff;
     position: relative;
 }
-
 .form-container {
     width: 100%;
     max-width: 440px;
     padding: 40px;
     z-index: 10;
 }
-
 h1 {
     font-size: 28px;
     color: #111;
     margin-bottom: 5px;
 }
-
 .subtitle {
     color: #5b8db8;
     font-size: 14px;
-    margin-bottom: 15px; 
+    margin-bottom: 15px;
 }
-
 /* Error Message */
 .error-text {
-    color: #d93025; 
+    color: #d93025;
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 15px;
 }
-
 /* Inputs & Labels */
 .input-group {
     margin-bottom: 18px;
 }
-
 label {
     display: block;
     font-size: 12px;
@@ -72,7 +62,6 @@ label {
     color: #333;
     margin-bottom: 6px;
 }
-
 input[type="text"],
 input[type="password"] {
     width: 100%;
@@ -83,20 +72,16 @@ input[type="password"] {
     outline: none;
     transition: border-color 0.2s ease;
 }
-
 input[type="text"]:focus,
 input[type="password"]:focus {
     border-color: #71a9ce;
 }
-
 .password-container {
     position: relative;
 }
-
 .password-container input {
     padding-right: 125px;
 }
-
 .toggle-password {
     position: absolute;
     right: 8px;
@@ -109,26 +94,22 @@ input[type="password"]:focus {
     color: #555;
     cursor: pointer;
 }
-
 /* Checkbox Section */
 .checkbox-group {
     display: flex;
     align-items: center;
     margin: 25px 0;
 }
-
 .checkbox-group input[type="checkbox"] {
     margin-right: 10px;
     cursor: pointer;
 }
-
 .checkbox-group label {
     margin-bottom: 0;
     font-weight: normal;
     font-size: 12px;
     color: #333;
 }
-
 /* Submit Button */
 .btn-signup {
     width: 100%;
@@ -142,11 +123,9 @@ input[type="password"]:focus {
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
-
 .btn-signup:hover {
     background-color: #76bce0;
 }
-
 /* Footer Links */
 .login-text {
     text-align: center;
@@ -154,26 +133,20 @@ input[type="password"]:focus {
     font-size: 13px;
     color: #555;
 }
-
 .login-text a {
     color: #111;
     font-weight: bold;
     text-decoration: none;
 }
-
 .login-text a:hover {
     text-decoration: underline;
 }
-
-
 /* ==========================================================
    EXACT STYLES FOR THE LOG IN SCREEN
    ========================================================== */
-
 #login-section {
     width: 100%;
 }
-
 .login-h1 {
     text-align: left !important;
     font-size: 32px !important;
@@ -181,70 +154,59 @@ input[type="password"]:focus {
     font-weight: bold !important;
     margin-bottom: 5px !important;
 }
-
 .login-subtitle {
     text-align: left !important;
     color: #777 !important;
     font-size: 14px !important;
     margin-bottom: 35px !important;
 }
-
 .login-group {
     margin-bottom: 22px !important;
 }
-
 .login-label {
     text-align: left !important;
     font-size: 13px !important;
     color: #333 !important;
     margin-bottom: 8px !important;
 }
-
 /* Wide light gray/blue inputs matching your target screenshot */
 .login-input {
     width: 100% !important;
     padding: 14px 16px !important;
-    background-color: #dce7f0 !important; 
+    background-color: #dce7f0 !important;
     border: 1px solid #bdc9d6 !important;
     border-radius: 4px !important;
     font-size: 14px !important;
 }
-
 .login-input:focus {
     border-color: #89cbed !important;
 }
-
 .login-password-input {
     letter-spacing: 2px;
 }
-
 .password-container .login-password-input {
     padding-right: 125px !important;
 }
-
 /* Massive gap above the Log In button matching your target screenshot */
 #login-section .forgot-password-container {
     text-align: center;
     margin-top: 10px;
-    margin-bottom: 80px; 
+    margin-bottom: 80px;
 }
-
 #login-section .forgot-password-link {
     color: #888;
     font-size: 13px;
     font-weight: normal;
     text-decoration: none;
 }
-
 #login-section .forgot-password-link:hover {
     color: #444;
 }
-
 /* Wide Light Blue Log In Button matching your target screenshot */
 .btn-login-new {
     width: 100%;
     padding: 16px;
-    background-color: #83cdec; 
+    background-color: #83cdec;
     color: #222;
     border: none;
     border-radius: 4px;
@@ -253,40 +215,35 @@ input[type="password"]:focus {
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
-
 .btn-login-new:hover {
     background-color: #6bbde0;
 }
 /* ========================================================== */
-
 /* Decorative Clouds at Bottom */
 .clouds-bg {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 220px; 
-    background-image: url('Images/CLOUD.jpg'); 
-    background-size: 100% 100%; 
+    height: 220px;
+    background-image: url('Images/CLOUD.jpg');
+    background-size: 100% 100%;
     background-position: bottom center;
     background-repeat: no-repeat;
     z-index: 1;
 }
-
 /* --- Image Carousel Side --- */
 .image-side {
     flex: 1;
     position: relative;
-    background-color: #000; 
+    background-color: #000;
 }
-
 .carousel-container {
     width: 100%;
     height: 100%;
     position: relative;
     overflow: hidden;
 }
-
 .slide {
     position: absolute;
     top: 0;
@@ -297,15 +254,13 @@ input[type="password"]:focus {
     background-position: center;
     background-repeat: no-repeat;
     opacity: 0;
-    transition: opacity 0.8s ease-in-out; 
+    transition: opacity 0.8s ease-in-out;
     z-index: 1;
 }
-
 .slide.active {
     opacity: 1;
     z-index: 2;
 }
-
 /* Navigation Arrows */
 .nav-arrow {
     position: absolute;
@@ -321,14 +276,11 @@ input[type="password"]:focus {
     border-radius: 4px;
     transition: background-color 0.3s;
 }
-
 .nav-arrow:hover {
     background-color: rgba(0, 0, 0, 0.8);
 }
-
 .nav-arrow.prev { left: 20px; }
 .nav-arrow.next { right: 20px; }
-
 /* Navigation Dots */
 .carousel-dots {
     position: absolute;
@@ -339,7 +291,6 @@ input[type="password"]:focus {
     gap: 12px;
     z-index: 10;
 }
-
 .dot {
     width: 12px;
     height: 12px;
@@ -348,16 +299,13 @@ input[type="password"]:focus {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-
 .dot.active, .dot:hover {
     background-color: rgba(255, 255, 255, 1);
 }
-
 /* --- SUCCESS SCREEN --- */
 .hidden {
     display: none !important;
 }
-
 .success-overlay {
     position: fixed;
     top: 0;
@@ -370,7 +318,6 @@ input[type="password"]:focus {
     align-items: center;
     z-index: 100;
 }
-
 .success-box {
     background-color: #e0f2fe;
     padding: 50px;
@@ -381,7 +328,6 @@ input[type="password"]:focus {
     z-index: 10;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
-
 .check-circle {
     width: 64px;
     height: 64px;
@@ -392,20 +338,17 @@ input[type="password"]:focus {
     justify-content: center;
     margin: 0 auto 20px auto;
 }
-
 .success-box h2 {
     font-size: 24px;
     color: #111;
     margin-bottom: 10px;
 }
-
 .success-box p {
     font-size: 14px;
     color: #555;
     margin-bottom: 30px;
     line-height: 1.5;
 }
-
 .btn-home {
     width: 100%;
     padding: 14px;
@@ -418,7 +361,36 @@ input[type="password"]:focus {
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
-
 .btn-home:hover {
     background-color: #89cbed;
+}
+
+/* ==========================================================
+   RUBRIC REQUIREMENT STYLES (Estimated Completion & Missing Docs)
+   ========================================================== */
+.estimated-date-badge {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #f1f5f9;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #475569;
+    font-weight: 600;
+}
+
+.action-flag-alert {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 12px;
+    display: none;
+}
+
+.action-flag-alert strong {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 2px;
 }
