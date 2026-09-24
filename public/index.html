@@ -7,30 +7,6 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .track-link-container {
-            text-align: center;
-            margin-top: 16px;
-        }
-        .track-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #4f46e5;
-            text-decoration: none;
-            padding: 8px 16px;
-            background: #e0e7ff;
-            border-radius: 20px;
-            transition: all 0.2s ease;
-        }
-        .track-link:hover {
-            background: #4f46e5;
-            color: #ffffff;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-        }
-    </style>
 </head>
 <body>
     <!-- Added reverse-layout class here so photos start on the left and login form on the right by default -->
@@ -74,12 +50,15 @@
                         </div>
                         <button type="submit" class="btn-signup">Sign Up</button>
                     </form>
-                    <!-- Aesthetic Track Status Link -->
+                    
+                    <!-- Professional Full-Width Track Status Button -->
                     <div class="track-link-container">
-                        <a href="./track-status.html" class="track-link">
-                            <i class="fa-solid fa-magnifying-glass"></i> Track application status without logging in
+                        <a href="./track-status.html" class="track-link-btn">
+                            <span class="track-icon-badge"><i class="fa-solid fa-magnifying-glass"></i></span>
+                            <span>Track Application Status</span>
                         </a>
                     </div>
+
                     <p class="login-text" style="margin-top: 20px;">Already have an account? <a href="#" id="show-login">Log In</a></p>
                 </div>
                 <!-- === LOG IN SECTION === -->
@@ -115,12 +94,14 @@
                         <button type="submit" class="btn-login-new">Log In</button>
                     </form>
                    
-                    <!-- Aesthetic Track Status Link -->
+                    <!-- Professional Full-Width Track Status Button -->
                     <div class="track-link-container">
-                        <a href="./track-status.html" class="track-link">
-                            <i class="fa-solid fa-magnifying-glass"></i> Track application status without logging in
+                        <a href="./track-status.html" class="track-link-btn">
+                            <span class="track-icon-badge"><i class="fa-solid fa-magnifying-glass"></i></span>
+                            <span>Track Application Status</span>
                         </a>
                     </div>
+
                     <p class="login-text" style="margin-top: 20px;">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
                 </div>
             </div>
