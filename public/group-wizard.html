@@ -17,12 +17,6 @@
         .step-pane.active { display: block; }
         .alert-box { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
         .action-buttons { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
-        .mode-btn-container { display: flex; gap: 15px; margin-top: 20px; }
-        .mode-btn { flex: 1; padding: 15px; font-size: 15px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; color: #fff; transition: background 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
-        .btn-individual { background: #2563eb; }
-        .btn-individual:hover { background: #1d4ed8; }
-        .btn-group { background: #475569; }
-        .btn-group:hover { background: #334155; }
         
         /* DFA Custom Calendar Grid Styles */
         .dfa-calendar-container { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
@@ -38,19 +32,19 @@
         .cal-legend { display: flex; gap: 20px; margin-top: 15px; font-size: 12px; align-items: center; justify-content: center; border-top: 1px solid #f1f5f9; padding-top: 10px; }
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-box { width: 12px; height: 12px; border-radius: 3px; }
+        
         /* Review Step Styles */
         .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 13px; color: #334155; margin-bottom: 20px; }
-        .review-section-block { background: #f8fafc; padding: 15px; border: 1px solid #e2e8f0; border-radius: 6px; }
-        .review-section-block h4 { border-bottom: 1px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 10px; color: #0f172a; font-size: 14px; }
-        .review-item { margin-bottom: 6px; }
-        .review-item strong { display: inline-block; width: 140px; font-weight: 600; }
-    /* Clean Group Wizard Step Layout */
-.wizard-steps { display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; margin-bottom: 25px; background: #fff; padding: 16px 20px; border-radius: 10px; border: 1px solid #e2e8f0; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .wizard-step { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; font-weight: 600; color: #64748b; white-space: nowrap; background: #f8fafc; padding: 8px 10px; border-radius: 6px; border: 1px solid #f1f5f9; transition: all 0.2s ease; }
+        
+        /* Wizard Steps Layout */
+        .wizard-steps { display: grid; grid-template-columns: repeat(7, 1fr); align-items: center; margin-bottom: 25px; background: #fff; padding: 16px 20px; border-radius: 10px; border: 1px solid #e2e8f0; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .wizard-step { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; font-weight: 600; color: #64748b; white-space: nowrap; background: #f8fafc; padding: 8px 6px; border-radius: 6px; border: 1px solid #f1f5f9; transition: all 0.2s ease; }
         .wizard-step.active { color: #2563eb; background: #eff6ff; border-color: #bfdbfe; }
-        .step-badge { width: 22px; height: 22px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: 700; }
+        .step-badge { width: 20px; height: 20px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; font-weight: 700; }
         .wizard-step.active .step-badge { background: #2563eb; color: #fff; }
-        .wizard-divider { display: none; } /* Removed awkward lines for a clean, modern pill-grid layout */
+        .upload-box { display: flex; align-items: center; gap: 12px; margin-top: 8px; padding: 12px; background: #f9fafb; border: 1px dashed #cbd5e1; border-radius: 8px; }
+        .btn-upload { background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .upload-file-name { font-size: 13px; color: #6b7280; overflow-wrap: anywhere; }
     </style>
 </head>
 <body data-application-type="new">
@@ -72,18 +66,19 @@
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
     </aside>
     <main class="main-content">
-        <div class="header" id="pageHeaderTitle">GROUP PASSPORT APPLICATION WIZARD</div>
+        <div class="header" id="pageHeaderTitle" style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 20px;">GROUP PASSPORT APPLICATION WIZARD</div>
         <div class="dashboard-container">
             
             <div class="wizard-steps" id="wizardHeader">
-                <div class="wizard-step active" id="wStep1"><div class="step-badge">1</div><span>Site</span></div><div class="wizard-divider"></div>
-                <div class="wizard-step" id="wStep2"><div class="step-badge">2</div><span>Schedule</span></div><div class="wizard-divider"></div>
-                <div class="wizard-step" id="wStep3"><div class="step-badge">3</div><span>Personal</span></div><div class="wizard-divider"></div>
-                <div class="wizard-step" id="wStep4"><div class="step-badge">4</div><span>Family</span></div><div class="wizard-divider"></div>
-                <div class="wizard-step" id="wStep5"><div class="step-badge">5</div><span>Application & Contact</span></div>
-                <div class="wizard-step" id="wStep6"><div class="step-badge">6</div><span>Review</span></div>
+                <div class="wizard-step active" id="wStep1"><div class="step-badge">1</div><span>Site</span></div>
+                <div class="wizard-step" id="wStep2"><div class="step-badge">2</div><span>Schedule</span></div>
+                <div class="wizard-step" id="wStep3"><div class="step-badge">3</div><span>Personal</span></div>
+                <div class="wizard-step" id="wStep4"><div class="step-badge">4</div><span>Family</span></div>
+                <div class="wizard-step" id="wStep5"><div class="step-badge">5</div><span>Application</span></div>
+                <div class="wizard-step" id="wStep6"><div class="step-badge">6</div><span>Documents</span></div>
+                <div class="wizard-step" id="wStep7"><div class="step-badge">7</div><span>Review</span></div>
             </div>
-            <form id="passportForm" action="../api/submit-group-application.php" method="POST" novalidate>
+            <form id="passportForm" action="../api/submit-group-application.php" method="POST" enctype="multipart/form-data" novalidate>
                 <input type="hidden" name="appointment_mode" id="appointmentMode" value="group">
                 <input type="hidden" name="site" id="hiddenSite">
                 <input type="hidden" name="app_date" id="hiddenAppDate">
@@ -93,7 +88,7 @@
                 <!-- STEP 1: Site Location -->
                 <section class="step-pane active" id="step1">
                     <div class="form-section-card">
-                        <div class="section-title">Site Location</div>
+                        <div class="section-title">Site Location (Shared for Group)</div>
                         <div class="form-row">
                             <div class="form-group"><label>Region *</label><select class="form-control" name="region"><option>ASIA PACIFIC</option></select></div>
                             <div class="form-group"><label>Country *</label><select class="form-control" name="country"><option>PHILIPPINES</option></select></div>
@@ -163,14 +158,13 @@
                 <!-- STEP 2: Date & Time -->
                 <section class="step-pane" id="step2">
                     <div class="form-section-card">
-                        <div class="section-title">Date and Time</div>
+                        <div class="section-title">Date and Time (Shared for Group)</div>
                         <div class="alert-box" style="background: #fef9c3; border-color: #fef08a; color: #854d0e;">
                             Please be advised that your chosen time slot is reserved temporarily for 30 minutes.
                         </div>
                         <input type="hidden" name="app_date_selection" id="selectedDateVal">
                         
                         <div class="form-row">
-                            <!-- Custom DFA Calendar Widget -->
                             <div class="form-group">
                                 <label>Appointment Date *</label>
                                 <div class="dfa-calendar-container">
@@ -189,7 +183,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Dynamic Time Slots -->
                             <div class="form-group">
                                 <label>Time Slot *</label>
                                 <select class="form-control" name="app_time_selection" id="appTimeSelect" style="margin-top: 5px;" onchange="updateTimeSelection()" required>
@@ -200,13 +193,13 @@
                     </div>
                     <div class="action-buttons">
                         <button type="button" class="btn-secondary" onclick="goToStep(1)">Back</button>
-                        <button type="button" class="btn-primary" onclick="groupHandleNext(3)">Next</button>
+                        <button type="button" class="btn-primary" onclick="groupHandleNext(3)">Next: Start Applicant Details</button>
                     </div>
                 </section>
                 <!-- STEP 3: Personal Information -->
                 <section class="step-pane" id="step3">
                     <div class="form-section-card">
-                        <div class="section-title">Personal Information</div>
+                        <div class="section-title" id="step3Title">Personal Information</div>
                         <div class="alert-box">
                             <strong>WARNING:</strong> Ensure all details in the name and date of birth fields are correct. Editing is not permitted on site.
                         </div>
@@ -259,7 +252,6 @@
                             <div class="form-group"><label>Province *</label><input type="text" class="form-control" name="birth_province" required></div>
                             <div class="form-group"><label>City/Municipality *</label><input type="text" class="form-control" name="birth_city" required></div>
                         </div>
-                        <!-- Dynamic Minor Companion Fields (Hidden by default) -->
                         <div id="minorFieldsContainer" style="display: none; border-top: 1px dashed #cbd5e1; padding-top: 15px; margin-top: 15px;">
                             <div class="alert-box" style="background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; margin-bottom: 15px;">
                                 <strong>Notice:</strong> Applicant is a minor. Please provide travelling companion details.
@@ -267,12 +259,11 @@
                             <div class="form-row">
                                 <div class="form-group"><label>Travelling Companion's Name *</label><input type="text" class="form-control" name="companion_name"></div>
                                 <div class="form-group"><label>Relationship *</label><input type="text" class="form-control" name="companion_relationship"></div>
-                                <div class="form-group"><label>Contact Number *</label><input type="text" class="form-control" name="companion_contact"></div>
                             </div>
                         </div>
                     </div>
                     <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(2)">Back</button>
+                        <button type="button" class="btn-secondary" onclick="groupHandleBack(2)">Back</button>
                         <button type="button" class="btn-primary" onclick="groupHandleNext(4)">Next</button>
                     </div>
                 </section>
@@ -291,51 +282,14 @@
                                 <label>Country Citizenship *</label>
                                 <select class="form-control" name="father_citizenship" required>
                                     <option value="PHILIPPINES">PHILIPPINES</option>
-                                    <option value="AFGHANISTAN">AFGHANISTAN</option>
-                                    <option value="ALBANIA">ALBANIA</option>
-                                    <option value="ALGERIA">ALGERIA</option>
-                                    <option value="ANDORRA">ANDORRA</option>
-                                    <option value="ANGOLA">ANGOLA</option>
-                                    <option value="ARGENTINA">ARGENTINA</option>
-                                    <option value="ARMENIA">ARMENIA</option>
-                                    <option value="AUSTRALIA">AUSTRALIA</option>
-                                    <option value="AUSTRIA">AUSTRIA</option>
-                                    <option value="AZERBAIJAN">AZERBAIJAN</option>
-                                    <option value="BAHAMAS">BAHAMAS</option>
-                                    <option value="BAHRAIN">BAHRAIN</option>
-                                    <option value="BANGLADESH">BANGLADESH</option>
-                                    <option value="BELGIUM">BELGIUM</option>
-                                    <option value="BRAZIL">BRAZIL</option>
-                                    <option value="CANADA">CANADA</option>
-                                    <option value="CHINA">CHINA</option>
-                                    <option value="FRANCE">FRANCE</option>
-                                    <option value="GERMANY">GERMANY</option>
-                                    <option value="INDIA">INDIA</option>
-                                    <option value="INDONESIA">INDONESIA</option>
-                                    <option value="ITALY">ITALY</option>
-                                    <option value="JAPAN">JAPAN</option>
-                                    <option value="MALAYSIA">MALAYSIA</option>
-                                    <option value="MEXICO">MEXICO</option>
-                                    <option value="NETHERLANDS">NETHERLANDS</option>
-                                    <option value="NEW ZEALAND">NEW ZEALAND</option>
-                                    <option value="NIGERIA">NIGERIA</option>
-                                    <option value="NORWAY">NORWAY</option>
-                                    <option value="PAKISTAN">PAKISTAN</option>
-                                    <option value="QATAR">QATAR</option>
-                                    <option value="RUSSIA">RUSSIA</option>
-                                    <option value="SAUDI ARABIA">SAUDI ARABIA</option>
-                                    <option value="SINGAPORE">SINGAPORE</option>
-                                    <option value="SOUTH AFRICA">SOUTH AFRICA</option>
-                                    <option value="SOUTH KOREA">SOUTH KOREA</option>
-                                    <option value="SPAIN">SPAIN</option>
-                                    <option value="SWEDEN">SWEDEN</option>
-                                    <option value="SWITZERLAND">SWITZERLAND</option>
-                                    <option value="TAIWAN">TAIWAN</option>
-                                    <option value="THAILAND">THAILAND</option>
-                                    <option value="UNITED ARAB EMIRATES">UNITED ARAB EMIRATES</option>
-                                    <option value="UNITED KINGDOM">UNITED KINGDOM</option>
                                     <option value="UNITED STATES">UNITED STATES</option>
-                                    <option value="VIETNAM">VIETNAM</option>
+                                    <option value="CANADA">CANADA</option>
+                                    <option value="UNITED KINGDOM">UNITED KINGDOM</option>
+                                    <option value="AUSTRALIA">AUSTRALIA</option>
+                                    <option value="JAPAN">JAPAN</option>
+                                    <option value="SOUTH KOREA">SOUTH KOREA</option>
+                                    <option value="SINGAPORE">SINGAPORE</option>
+                                    <option value="OTHERS">OTHERS</option>
                                 </select>
                             </div>
                         </div>
@@ -350,51 +304,14 @@
                                 <label>Country Citizenship *</label>
                                 <select class="form-control" name="mother_citizenship" required>
                                     <option value="PHILIPPINES">PHILIPPINES</option>
-                                    <option value="AFGHANISTAN">AFGHANISTAN</option>
-                                    <option value="ALBANIA">ALBANIA</option>
-                                    <option value="ALGERIA">ALGERIA</option>
-                                    <option value="ANDORRA">ANDORRA</option>
-                                    <option value="ANGOLA">ANGOLA</option>
-                                    <option value="ARGENTINA">ARGENTINA</option>
-                                    <option value="ARMENIA">ARMENIA</option>
-                                    <option value="AUSTRALIA">AUSTRALIA</option>
-                                    <option value="AUSTRIA">AUSTRIA</option>
-                                    <option value="AZERBAIJAN">AZERBAIJAN</option>
-                                    <option value="BAHAMAS">BAHAMAS</option>
-                                    <option value="BAHRAIN">BAHRAIN</option>
-                                    <option value="BANGLADESH">BANGLADESH</option>
-                                    <option value="BELGIUM">BELGIUM</option>
-                                    <option value="BRAZIL">BRAZIL</option>
-                                    <option value="CANADA">CANADA</option>
-                                    <option value="CHINA">CHINA</option>
-                                    <option value="FRANCE">FRANCE</option>
-                                    <option value="GERMANY">GERMANY</option>
-                                    <option value="INDIA">INDIA</option>
-                                    <option value="INDONESIA">INDONESIA</option>
-                                    <option value="ITALY">ITALY</option>
-                                    <option value="JAPAN">JAPAN</option>
-                                    <option value="MALAYSIA">MALAYSIA</option>
-                                    <option value="MEXICO">MEXICO</option>
-                                    <option value="NETHERLANDS">NETHERLANDS</option>
-                                    <option value="NEW ZEALAND">NEW ZEALAND</option>
-                                    <option value="NIGERIA">NIGERIA</option>
-                                    <option value="NORWAY">NORWAY</option>
-                                    <option value="PAKISTAN">PAKISTAN</option>
-                                    <option value="QATAR">QATAR</option>
-                                    <option value="RUSSIA">RUSSIA</option>
-                                    <option value="SAUDI ARABIA">SAUDI ARABIA</option>
-                                    <option value="SINGAPORE">SINGAPORE</option>
-                                    <option value="SOUTH AFRICA">SOUTH AFRICA</option>
-                                    <option value="SOUTH KOREA">SOUTH KOREA</option>
-                                    <option value="SPAIN">SPAIN</option>
-                                    <option value="SWEDEN">SWEDEN</option>
-                                    <option value="SWITZERLAND">SWITZERLAND</option>
-                                    <option value="TAIWAN">TAIWAN</option>
-                                    <option value="THAILAND">THAILAND</option>
-                                    <option value="UNITED ARAB EMIRATES">UNITED ARAB EMIRATES</option>
-                                    <option value="UNITED KINGDOM">UNITED KINGDOM</option>
                                     <option value="UNITED STATES">UNITED STATES</option>
-                                    <option value="VIETNAM">VIETNAM</option>
+                                    <option value="CANADA">CANADA</option>
+                                    <option value="UNITED KINGDOM">UNITED KINGDOM</option>
+                                    <option value="AUSTRALIA">AUSTRALIA</option>
+                                    <option value="JAPAN">JAPAN</option>
+                                    <option value="SOUTH KOREA">SOUTH KOREA</option>
+                                    <option value="SINGAPORE">SINGAPORE</option>
+                                    <option value="OTHERS">OTHERS</option>
                                 </select>
                             </div>
                         </div>
@@ -413,7 +330,7 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Application Type *</label>
-                                <select class="form-control" name="application_type" required>
+                                <select class="form-control" name="application_type" id="applicationTypeSelect" required>
                                     <option value="">- SELECT APPLICATION TYPE -</option>
                                     <option value="FIRST TIME PASSPORT">First-Time Passport</option>
                                     <option value="PASSPORT RENEWAL">Passport Renewal</option>
@@ -435,7 +352,6 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group"><label>Foreign Passport Holder *</label><select class="form-control" name="foreign_passport" required><option>No</option><option>Yes</option></select></div>
-                            <!-- Dynamic Others Basis Field (Hidden by default, appears when OTHERS is selected) -->
                             <div class="form-group" id="othersBasisContainer" style="display: none;">
                                 <label>Others *</label>
                                 <input type="text" class="form-control" name="citizenship_basis_others" placeholder="PLEASE SPECIFY">
@@ -459,16 +375,57 @@
                     </div>
                     <div class="action-buttons">
                         <button type="button" class="btn-secondary" onclick="goToStep(4)">Back</button>
-                        <button type="button" class="btn-primary" onclick="groupHandleNext(6)">Next</button>
+                        <button type="button" class="btn-primary" onclick="groupHandleNext(6)">Next: Documents</button>
                     </div>
                 </section>
-                <!-- STEP 6: Review -->
+                <!-- STEP 6: Document Pre-Verification & Upload -->
                 <section class="step-pane" id="step6">
+                    <div class="form-section-card">
+                        <div class="section-title"><i class="fa-solid fa-cloud-arrow-up" style="color:#2563eb;"></i> Document Pre-Verification & Upload</div>
+                        <div class="alert-box" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
+                            <i class="fa-solid fa-circle-info" style="margin-top:2px;"></i>
+                            <div id="docRequirementsNotice">Upload clear scanned copies or photos of your supporting documents for automated pre-screening before your appointment.</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Valid Government-Issued ID *</label>
+                            <div class="upload-box">
+                                <label class="btn-upload" for="validIdFile"><i class="fa-solid fa-upload"></i> Browse ID</label>
+                                <input type="file" id="validIdFile" name="valid_id_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
+                                <span class="upload-file-name" id="validIdFileName">No file chosen</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Digital Passport Photo *</label>
+                            <div class="upload-box">
+                                <label class="btn-upload" for="passportPhotoFile"><i class="fa-solid fa-camera"></i> Browse Photo</label>
+                                <input type="file" id="passportPhotoFile" name="passport_photo_file" accept=".jpg,.jpeg,.png" style="display: none;" required>
+                                <span class="upload-file-name" id="passportPhotoFileName">No file chosen</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="dynamicDocGroup">
+                            <label id="dynamicDocLabel">Supporting Document *</label>
+                            <div class="upload-box">
+                                <label class="btn-upload" for="specificDocFile"><i class="fa-solid fa-file"></i> Browse Document</label>
+                                <input type="file" id="specificDocFile" name="specific_doc_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
+                                <span class="upload-file-name" id="specificDocFileName">No file chosen</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button type="button" class="btn-secondary" onclick="goToStep(5)">Back</button>
+                        <button type="button" class="btn-primary" onclick="groupHandleNext(7)">Review Details</button>
+                    </div>
+                </section>
+                <!-- STEP 7: Review -->
+                <section class="step-pane" id="step7">
                     <div class="form-section-card">
                         <div class="section-title">Information Review</div>
                         
                         <div class="review-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <!-- This will be dynamically populated by populateReviewSummary() -->
+                            <!-- Dynamically populated -->
                         </div>
                         <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 25px;">
                             <input type="checkbox" id="finalAgree" required style="width: 18px; height: 18px;">
@@ -477,7 +434,7 @@
                     </div>
                     
                     <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(5)">Back</button>
+                        <button type="button" class="btn-secondary" onclick="goToStep(6)">Back</button>
                         <button type="submit" class="btn-primary" style="background: #28a745;">Save & Submit Group</button>
                     </div>
                 </section>
@@ -487,17 +444,53 @@
     <script src="script.js"></script>
     <script src="passport-application.js"></script>
     <script>
-        // Minor Applicant Age Verification Logic
+        function bindFileInput(inputId, nameId) {
+            const input = document.getElementById(inputId);
+            const span = document.getElementById(nameId);
+            if (input && span) {
+                input.addEventListener('change', (e) => {
+                    span.textContent = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+                    span.style.color = e.target.files[0] ? '#10b981' : '#6b7280';
+                });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            bindFileInput('validIdFile', 'validIdFileName');
+            bindFileInput('passportPhotoFile', 'passportPhotoFileName');
+            bindFileInput('specificDocFile', 'specificDocFileName');
+        });
+
+        function updateDocumentRequirements() {
+            const appType = document.getElementById('applicationTypeSelect').value;
+            const labelEl = document.getElementById('dynamicDocLabel');
+            const noticeEl = document.getElementById('docRequirementsNotice');
+            if (appType === 'FIRST TIME PASSPORT') {
+                labelEl.textContent = 'PSA Birth Certificate (Original & Copy) *';
+                noticeEl.textContent = 'First-time applicants are required to upload a PSA Birth Certificate along with valid government ID and digital photo.';
+            } else if (appType === 'PASSPORT RENEWAL') {
+                labelEl.textContent = 'Current / Old Philippine Passport *';
+                noticeEl.textContent = 'Passport renewal applicants must upload their current or most recently issued passport.';
+            } else if (appType === 'LOST PASSPORT') {
+                labelEl.textContent = 'Notarized Affidavit of Loss & Police Report *';
+                noticeEl.textContent = 'For lost passports, please upload your notarized Affidavit of Loss and official Police Report.';
+            } else if (appType === 'DAMAGED PASSPORT') {
+                labelEl.textContent = 'Damaged Passport & Affidavit of Mutilation *';
+                noticeEl.textContent = 'For damaged passports, please upload a clear photo of the damaged passport and your Affidavit of Mutilation.';
+            } else {
+                labelEl.textContent = 'Supporting Document *';
+                noticeEl.textContent = 'Please select an application type in Step 5 to view specific required documents.';
+            }
+        }
+        document.getElementById('applicationTypeSelect')?.addEventListener('change', updateDocumentRequirements);
+
         document.addEventListener('input', function (e) {
             if (e.target && e.target.name === 'dob') {
                 const dobVal = new Date(e.target.value);
                 if (!isNaN(dobVal.getTime())) {
-                    const today = new Date(2026, 8, 20); // September 20, 2026
+                    const today = new Date(2026, 8, 20);
                     let age = today.getFullYear() - dobVal.getFullYear();
                     const m = today.getMonth() - dobVal.getMonth();
-                    if (m < 0 || (m === 0 && today.getDate() < dobVal.getDate())) {
-                        age--;
-                    }
+                    if (m < 0 || (m === 0 && today.getDate() < dobVal.getDate())) age--;
                     const minorContainer = document.getElementById('minorFieldsContainer');
                     if (minorContainer) {
                         if (age < 18) {
@@ -511,55 +504,18 @@
                 }
             }
         });
-        // DFA Calendar Logic with Dynamic Time Slots per Date
+
         let currentYear = 2026;
-        let currentMonth = 8; // September (0-indexed)
+        let currentMonth = 8;
         let selectedDateStr = '';
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
         function getSlotsForDate(dayNum) {
-            const seed = (dayNum * 7) % 5;
-            switch(seed) {
-                case 0:
-                    return [
-                        { time: "08:00 AM - 09:00 AM", status: "available", slots: 3 },
-                        { time: "09:00 AM - 10:00 AM", status: "booked" },
-                        { time: "10:00 AM - 11:00 AM", status: "available", slots: 5 },
-                        { time: "11:00 AM - 12:00 PM", status: "booked" },
-                        { time: "13:00 PM - 14:00 PM", status: "available", slots: 1 },
-                        { time: "14:00 PM - 15:00 PM", status: "available", slots: 9 },
-                        { time: "15:00 PM - 16:00 PM", status: "booked" }
-                    ];
-                case 1:
-                    return [
-                        { time: "08:00 AM - 09:00 AM", status: "booked" },
-                        { time: "09:00 AM - 10:00 AM", status: "available", slots: 12 },
-                        { time: "10:00 AM - 11:00 AM", status: "available", slots: 4 },
-                        { time: "11:00 AM - 12:00 PM", status: "available", slots: 2 },
-                        { time: "13:00 PM - 14:00 PM", status: "booked" },
-                        { time: "14:00 PM - 15:00 PM", status: "booked" },
-                        { time: "15:00 PM - 16:00 PM", status: "available", slots: 6 }
-                    ];
-                case 2:
-                    return [
-                        { time: "08:00 AM - 09:00 AM", status: "available", slots: 8 },
-                        { time: "09:00 AM - 10:00 AM", status: "available", slots: 2 },
-                        { time: "10:00 AM - 11:00 AM", status: "booked" },
-                        { time: "11:00 AM - 12:00 PM", status: "booked" },
-                        { time: "13:00 PM - 14:00 PM", status: "available", slots: 11 },
-                        { time: "14:00 PM - 15:00 PM", status: "available", slots: 3 },
-                        { time: "15:00 PM - 16:00 PM", status: "available", slots: 1 }
-                    ];
-                default:
-                    return [
-                        { time: "08:00 AM - 09:00 AM", status: "available", slots: 5 },
-                        { time: "09:00 AM - 10:00 AM", status: "booked" },
-                        { time: "10:00 AM - 11:00 AM", status: "booked" },
-                        { time: "11:00 AM - 12:00 PM", status: "available", slots: 7 },
-                        { time: "13:00 PM - 14:00 PM", status: "available", slots: 4 },
-                        { time: "14:00 PM - 15:00 PM", status: "booked" },
-                        { time: "15:00 PM - 16:00 PM", status: "available", slots: 15 }
-                    ];
-            }
+            return [
+                { time: "08:00 AM - 09:00 AM", status: "available", slots: 5 },
+                { time: "09:00 AM - 10:00 AM", status: "booked" },
+                { time: "10:00 AM - 11:00 AM", status: "available", slots: 3 }
+            ];
         }
         function renderCalendar() {
             const grid = document.getElementById('calGrid');
@@ -570,9 +526,7 @@
             const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
             const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
             const todayObj = new Date(2026, 8, 20);
-            for (let i = 0; i < firstDayIndex; i++) {
-                grid.appendChild(document.createElement('div'));
-            }
+            for (let i = 0; i < firstDayIndex; i++) grid.appendChild(document.createElement('div'));
             for (let day = 1; day <= totalDays; day++) {
                 const cell = document.createElement('div');
                 cell.className = 'cal-day';
@@ -581,29 +535,20 @@
                 const formattedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 if (thisDate < todayObj) {
                     cell.classList.add('disabled');
+                } else if (day % 4 === 0) {
+                    cell.classList.add('fully-booked');
                 } else {
-                    if (day % 4 === 0) {
-                        cell.classList.add('fully-booked');
-                    } else {
-                        cell.classList.add('available');
-                        cell.onclick = () => selectDate(formattedDate, day, cell);
-                    }
+                    cell.classList.add('available');
+                    cell.onclick = () => selectDate(formattedDate, day, cell);
                 }
-                if (selectedDateStr === formattedDate) {
-                    cell.classList.add('selected');
-                }
+                if (selectedDateStr === formattedDate) cell.classList.add('selected');
                 grid.appendChild(cell);
             }
         }
         function changeMonth(direction) {
             currentMonth += direction;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            } else if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             renderCalendar();
         }
         function selectDate(dateStr, dayNum, element) {
@@ -613,74 +558,27 @@
             document.getElementById('selectedDateVal').value = dateStr;
             const timeSelect = document.getElementById('appTimeSelect');
             timeSelect.innerHTML = '<option value="">- SELECT TIME SLOT -</option>';
-            
-            const slots = getSlotsForDate(dayNum);
-            slots.forEach(slot => {
+            getSlotsForDate(dayNum).forEach(slot => {
                 const opt = document.createElement('option');
                 opt.value = slot.time;
-                if (slot.status === 'booked') {
-                    opt.disabled = true;
-                    opt.style.color = 'red';
-                    opt.textContent = `${slot.time} (Fully Booked)`;
-                } else {
-                    opt.textContent = `${slot.time} (Available Slots: ${slot.slots})`;
-                }
+                opt.disabled = slot.status === 'booked';
+                opt.textContent = slot.status === 'booked' ? `${slot.time} (Fully Booked)` : `${slot.time} (${slot.slots} Slots)`;
                 timeSelect.appendChild(opt);
             });
-            // Update applicant_1 storage immediately when schedule is selected
             let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
             if (!groupData['applicant_1']) groupData['applicant_1'] = {};
             groupData['applicant_1']['site_selection'] = document.getElementById('siteSelect')?.value || '';
             groupData['applicant_1']['app_date_selection'] = dateStr;
             localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
         }
-        
-        // NEW FIX: Updates localStorage the exact moment a user selects a time from the dropdown
         function updateTimeSelection() {
-            const timeVal = document.getElementById('appTimeSelect').value;
             let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
             if (!groupData['applicant_1']) groupData['applicant_1'] = {};
-            groupData['applicant_1']['app_time_selection'] = timeVal;
+            groupData['applicant_1']['app_time_selection'] = document.getElementById('appTimeSelect').value;
             localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
         }
-        document.addEventListener('DOMContentLoaded', () => {
-            renderCalendar();
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
-            if (groupData['applicant_1']) {
-                if (groupData['applicant_1']['site_selection']) {
-                    const siteEl = document.getElementById('siteSelect');
-                    if (siteEl) {
-                        siteEl.value = groupData['applicant_1']['site_selection'];
-                        updateSiteInfo();
-                    }
-                }
-                if (groupData['applicant_1']['app_date_selection']) {
-                    selectedDateStr = groupData['applicant_1']['app_date_selection'];
-                    document.getElementById('selectedDateVal').value = selectedDateStr;
-                    const dayNum = parseInt(selectedDateStr.split('-')[2]) || 1;
-                    const timeSelect = document.getElementById('appTimeSelect');
-                    if (timeSelect) {
-                        timeSelect.innerHTML = '<option value="">- SELECT TIME SLOT -</option>';
-                        const slots = getSlotsForDate(dayNum);
-                        slots.forEach(slot => {
-                            const opt = document.createElement('option');
-                            opt.value = slot.time;
-                            if (slot.status === 'booked') {
-                                opt.disabled = true;
-                                opt.style.color = 'red';
-                                opt.textContent = `${slot.time} (Fully Booked)`;
-                            } else {
-                                opt.textContent = `${slot.time} (Available Slots: ${slot.slots})`;
-                            }
-                            timeSelect.appendChild(opt);
-                        });
-                        if (groupData['applicant_1']['app_time_selection']) {
-                            timeSelect.value = groupData['applicant_1']['app_time_selection'];
-                        }
-                    }
-                }
-            }
-        });
+        document.addEventListener('DOMContentLoaded', () => renderCalendar());
+
         const dfaOfficeData = {
             "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City", contact: "(045) 304-0194" },
             "ANTIPOLO": { name: "DFA Regional Consular Office – Antipolo", address: "3F SM Cherry Foodarama, Marikina-Infanta Highway, Antipolo City, Rizal", contact: "(02) 8697-3000" },
@@ -733,172 +631,125 @@
                 document.getElementById('officeName').value = info.name;
                 document.getElementById('officeAddress').value = info.address;
                 document.getElementById('officeContact').value = info.contact;
-            } else {
-                document.getElementById('officeName').value = "-";
-                document.getElementById('officeAddress').value = "-";
-                document.getElementById('officeContact').value = "-";
             }
-            // Save site selection into applicant_1 storage immediately
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
-            if (!groupData['applicant_1']) groupData['applicant_1'] = {};
-            groupData['applicant_1']['site_selection'] = selectedSite;
-            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
         }
         function goToStep(stepNumber) {
-            if (stepNumber === 2 && !selectedDateStr) {
-                renderCalendar();
-            }
             document.querySelectorAll('.step-pane').forEach(pane => pane.classList.remove('active'));
             document.getElementById('step' + stepNumber).classList.add('active');
-            
-            for (let i = 1; i <= 6; i++) {
+            for (let i = 1; i <= 7; i++) {
                 const wStep = document.getElementById('wStep' + i);
-                if (wStep) {
-                    if (i === stepNumber) {
-                        wStep.classList.add('active');
-                    } else {
-                        wStep.classList.remove('active');
-                    }
-                }
+                if (wStep) wStep.classList.toggle('active', i === stepNumber);
             }
-            if (stepNumber === 6) {
-                populateReviewSummary();
-            }
+            if (stepNumber === 7) populateReviewSummary();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        
-        // Dynamic "Others" Citizenship Basis Toggle
-        document.addEventListener('change', function (e) {
-            if (e.target && e.target.id === 'citizenshipBasisSelect') {
-                const othersContainer = document.getElementById('othersBasisContainer');
-                const othersInput = othersContainer ? othersContainer.querySelector('input') : null;
-                if (e.target.value === 'OTHERS') {
-                    othersContainer.style.display = 'block';
-                    if (othersInput) othersInput.required = true;
-                } else {
-                    othersContainer.style.display = 'none';
-                    if (othersInput) {
-                        othersInput.required = false;
-                        othersInput.value = '';
-                    }
-                }
-            }
-        });
-        
-        // NEW FIX: Updates the review layout to explicitly format the full office location 
-        // and pull dynamic dates, rather than just raw shortcodes or placeholders.
         function populateReviewSummary() {
             let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
-            let app1 = groupData['applicant_1'] || {};
-            
-            // Map the short site code to the full descriptive name
-            const rawSite = app1.site_selection || '';
-            const siteText = dfaOfficeData[rawSite] ? dfaOfficeData[rawSite].name : (rawSite || '-');
-            // Fetch the live dynamic date and time
-            const appDate = app1.app_date_selection || '-';
-            const appTime = app1.app_time_selection || '-';
-            const combinedDateTime = appDate !== '-' ? `${appDate} (${appTime})` : '-';
             const reviewGrid = document.querySelector('.review-grid');
             if (!reviewGrid) return;
-            
             let htmlContent = '';
-            
             for (let i = 1; i <= totalApplicants; i++) {
                 let app = groupData[`applicant_${i}`] || {};
-                let fullName = `${app.givenname || ''} ${app.middlename || ''} ${app.lastname || ''}`.trim() || '-';
-                
+                let fullName = `${app.givenname || ''} ${app.lastname || ''}`.trim() || '-';
                 htmlContent += `
-                    <div class="summary-card" style="background: #ffffff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; grid-column: span 2; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                        <h4 style="font-size: 16px; color: #2563eb; margin-bottom: 15px; border-bottom: 2px solid #2563eb; padding-bottom: 8px;">Applicant ${i} Details</h4>
-                        <div style="font-size: 13px; line-height: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; color: #334155;">
+                    <div class="summary-card" style="background: #ffffff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; grid-column: span 2; margin-bottom: 15px;">
+                        <h4 style="font-size: 15px; color: #2563eb; margin-bottom: 10px; border-bottom: 2px solid #2563eb; padding-bottom: 6px;">Applicant ${i}: ${fullName}</h4>
+                        <div style="font-size: 13px; line-height: 1.8; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; color: #334155;">
                             <div>
-                                <div><strong>Full Name:</strong> ${fullName}</div>
                                 <div><strong>Application Type:</strong> ${app.application_type || '-'}</div>
                                 <div><strong>Email:</strong> ${app.email || '-'}</div>
-                                <div><strong>Appointment Date:</strong> ${combinedDateTime}</div>
+                                <div><strong>Mobile:</strong> ${app.mobile || '-'}</div>
                             </div>
                             <div>
-                                <div><strong>Date of Birth:</strong> ${app.dob || '-'}</div>
-                                <div><strong>Mobile:</strong> ${app.mobile || '-'}</div>
-                                <div><strong>Site Location:</strong> ${siteText}</div>
+                                <div><strong>DOB:</strong> ${app.dob || '-'}</div>
+                                <div><strong>Site:</strong> ${app.site_selection || '-'}</div>
+                                <div><strong>Date/Time:</strong> ${app.app_date_selection || '-'} (${app.app_time_selection || '-'})</div>
                             </div>
                         </div>
                     </div>
                 `;
             }
-            
             reviewGrid.innerHTML = htmlContent;
         }
     </script>
-    <!-- Group Wizard Multi-Applicant Loop Controller -->
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         let currentStep = parseInt(urlParams.get('step')) || 1;
         let currentApplicant = parseInt(urlParams.get('applicant')) || 1;
         const totalApplicants = parseInt(localStorage.getItem('groupCount')) || 2;
+        
         document.addEventListener('DOMContentLoaded', () => {
-            if (currentApplicant > 1 && currentStep < 3) {
-                currentStep = 3;
-            }
+            if (currentApplicant > 1 && currentStep < 3) currentStep = 3;
             goToStep(currentStep);
-            const dashboardContainer = document.querySelector('.dashboard-container');
-            if (dashboardContainer && !document.getElementById('groupApplicantBadge')) {
-                const badgeDiv = document.createElement('div');
-                badgeDiv.id = 'groupApplicantBadge';
-                badgeDiv.style.cssText = 'background: #eff6ff; color: #1d4ed8; padding: 10px 15px; border-radius: 8px; font-weight: 600; font-size: 14px; margin-bottom: 20px; border: 1px solid #bfdbfe;';
-                badgeDiv.textContent = `Group Booking: Filling out details for Applicant ${currentApplicant} of ${totalApplicants}`;
-                dashboardContainer.insertBefore(badgeDiv, dashboardContainer.firstChild);
-            }
+            updateApplicantBadge();
         });
+        
+        function updateApplicantBadge() {
+            const badgeDiv = document.getElementById('groupApplicantBadge') || document.createElement('div');
+            badgeDiv.id = 'groupApplicantBadge';
+            badgeDiv.style.cssText = 'background: #eff6ff; color: #1d4ed8; padding: 10px 15px; border-radius: 8px; font-weight: 600; font-size: 14px; margin-bottom: 20px; border: 1px solid #bfdbfe;';
+            badgeDiv.textContent = `Group Booking: Filling out details for Applicant ${currentApplicant} of ${totalApplicants}`;
+            const container = document.querySelector('.dashboard-container');
+            if (container && !document.getElementById('groupApplicantBadge')) {
+                container.insertBefore(badgeDiv, container.firstChild);
+            }
+        }
+
         function groupHandleNext(targetStep) {
             saveCurrentApplicantData();
-            if (targetStep > 5) {
+            if (targetStep > 6) {
                 if (currentApplicant < totalApplicants) {
                     currentApplicant++;
-                    currentStep = 3; 
+                    currentStep = 3; // Loop back to Personal Information (Step 3) for the next applicant
                     window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
                     return;
                 } else {
-                    currentStep = 6;
+                    currentStep = 7; // Go to Review step once all applicants are done
                 }
             } else {
                 currentStep = targetStep;
             }
             goToStep(currentStep);
         }
+
         function groupHandleBack(targetStep) {
             if (targetStep < 3 && currentApplicant > 1) {
                 currentApplicant--;
-                currentStep = 5;
+                currentStep = 6;
                 window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
                 return;
             }
             goToStep(targetStep);
         }
+
         function saveCurrentApplicantData() {
             const formData = new FormData(document.getElementById('passportForm'));
             let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
             
-            if (!groupData['applicant_1']) groupData['applicant_1'] = {};
-            groupData['applicant_1']['site_selection'] = document.getElementById('siteSelect')?.value || groupData['applicant_1']['site_selection'] || '';
-            groupData['applicant_1']['app_date_selection'] = document.getElementById('selectedDateVal')?.value || groupData['applicant_1']['app_date_selection'] || '';
-            groupData['applicant_1']['app_time_selection'] = document.getElementById('appTimeSelect')?.value || groupData['applicant_1']['app_time_selection'] || '';
+            let sharedSite = document.getElementById('siteSelect')?.value || '';
+            let sharedDate = document.getElementById('selectedDateVal')?.value || '';
+            let sharedTime = document.getElementById('appTimeSelect')?.value || '';
+
             let appData = groupData[`applicant_${currentApplicant}`] || {};
             formData.forEach((value, key) => {
                 appData[key] = value;
             });
+            // Ensure shared group site/schedule apply to every looped applicant record
+            appData['site_selection'] = sharedSite || appData['site_selection'];
+            appData['app_date_selection'] = sharedDate || appData['app_date_selection'];
+            appData['app_time_selection'] = sharedTime || appData['app_time_selection'];
+
             groupData[`applicant_${currentApplicant}`] = appData;
             localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
         }
-        // Inject shared site & schedule into hidden inputs right before form submission
+
         document.getElementById('passportForm').addEventListener('submit', function(e) {
             saveCurrentApplicantData();
             let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
             let app1 = groupData['applicant_1'] || {};
-            
-            document.getElementById('hiddenSite').value = app1.site_selection || document.getElementById('siteSelect')?.value || '';
-            document.getElementById('hiddenAppDate').value = app1.app_date_selection || document.getElementById('selectedDateVal')?.value || '';
-            document.getElementById('hiddenAppTime').value = app1.app_time_selection || document.getElementById('appTimeSelect')?.value || '';
+            document.getElementById('hiddenSite').value = app1.site_selection || '';
+            document.getElementById('hiddenAppDate').value = app1.app_date_selection || '';
+            document.getElementById('hiddenAppTime').value = app1.app_time_selection || '';
             document.getElementById('groupDataPayload').value = JSON.stringify(groupData);
         });
     </script>

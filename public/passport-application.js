@@ -1,7 +1,7 @@
 const applicationType = document.body.dataset.applicationType || 'new';
 const applicationLabels = {
     new: {
-        title: 'NEW PASSPORT APPLICATION',
+        title: 'PASSPORT APPLICATION',
         category: 'New First-Time Application',
         description: 'To proceed with your New Passport application, please specify the exact service you require.',
         identityDescription: 'Please upload at least one (1) valid primary government-issued ID.',
