@@ -567,6 +567,19 @@
             return `${formattedDate} at ${cleanTime}`;
         }
        
+        function calculateEstimatedCompletion(appointmentDateValue, processingType) {
+            const start = appointmentDateValue ? new Date(`${appointmentDateValue}T00:00:00`) : new Date();
+            const daysToAdd = (processingType && processingType.toLowerCase().includes('expedited')) ? 7 : 12;
+            let added = 0;
+            while (added < daysToAdd) {
+                start.setDate(start.getDate() + 1);
+                const dayOfWeek = start.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Exclude weekends
+                    added++;
+                }
+            }
+            return start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
         function updateStatusTracker(status) {
             const normalizedStatus = (status || '').toLowerCase().trim();
             const sequence = ['Form Submitted', 'Biometrics Received', 'Under Consular Review', 'In Printing', 'Dispatched'];
@@ -595,8 +608,16 @@
             updateStatusTracker(currentStatus);
             const paymentStatus = application.payment_status || application.paymentStatus || 'Unpaid';
             document.getElementById('dispPaymentStatus').innerText = paymentStatus === 'Paid' ? 'Verified (Online)' : 'Unpaid';
-            if (application.estimatedCompletionDate) {
-                document.getElementById('estimatedDateDisplay').innerText = `Est. Completion: ${application.estimatedCompletionDate}`;
+           
+            const estDisplay = document.getElementById('estimatedDateDisplay');
+            const processingType = application.processing_type || application.processingType || 'Regular Processing';
+            const appointmentDateVal = application.appointmentDate || application.appointment_date;
+
+            if (currentStatus === 'Form Submitted') {
+                estDisplay.innerText = 'Est. Completion: Available after biometrics';
+            } else {
+                const computedDate = calculateEstimatedCompletion(appointmentDateVal, processingType);
+                estDisplay.innerText = `Est. Completion: ${computedDate}`;
             }
             if (application.missingDocumentsFlag) {
                 document.getElementById('missingDocsReasonText').innerText = application.missingDocumentsReason || 'Please review missing requirements.';
@@ -604,8 +625,8 @@
             }
            
             // Show appointment reminder in Pending Action while status is Form Submitted or Appointment Rescheduled
-            if ((currentStatus === 'Form Submitted' || currentStatus === 'Appointment Rescheduled') && (application.appointmentDate || application.appointment_date)) {
-                document.getElementById('dispComeDate').innerText = formatAppointmentDate(application.appointmentDate || application.appointment_date, application.appointmentTime || application.appointment_time);
+            if ((currentStatus === 'Form Submitted' || currentStatus === 'Appointment Rescheduled') && appointmentDateVal) {
+                document.getElementById('dispComeDate').innerText = formatAppointmentDate(appointmentDateVal, application.appointmentTime || application.appointment_time);
                 const rawLoc = application.appointmentLocation || application.appointment_location || '';
                 const office = dfaOfficeData[rawLoc];
                 const fullLocationDisplay = office ? `${office.name} - ${office.address}` : rawLoc;

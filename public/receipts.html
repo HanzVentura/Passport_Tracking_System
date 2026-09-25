@@ -97,7 +97,17 @@
                 <div class="card-subtitle">Your paid passport application transactions appear here.</div>
                 <div class="table-wrap">
                     <table class="transaction-table">
-                        <thead><tr><th>Application</th><th>Application ID</th><th>Transaction Date</th><th>Amount</th><th>Status</th><th>Receipt</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Application</th>
+                                <th>Application ID</th>
+                                <th>Processing Option</th>
+                                <th>Transaction Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Receipt</th>
+                            </tr>
+                        </thead>
                         <tbody id="receiptRows"></tbody>
                     </table>
                 </div>
@@ -127,24 +137,30 @@
         }
         function renderReceipt(application) {
             if (!application) return;
-            
+           
             const paymentStatus = (application.payment_status || application.paymentStatus || '').toLowerCase();
             const appStatus = (application.status || '').toLowerCase();
-            
+           
             // Check if application is paid
             if (paymentStatus !== 'paid' && appStatus !== 'paid' && appStatus !== 'biometrics received') {
                 return;
             }
-
             const applicationType = application.applicationType
                 || application.application_type
                 || localStorage.getItem('applicationType')
                 || 'Passport Application';
             const appId = application.applicationId || application.application_id;
             
+            let rawProcessing = application.processing_type || application.processingType || 'regular';
+            let processingType = 'Regular Processing';
+            if (rawProcessing.toLowerCase().includes('expedited') || rawProcessing.toLowerCase().includes('rush')) {
+                processingType = 'Expedited / Rush Processing';
+            }
+           
             receiptRows.innerHTML = `<tr>
                 <td><strong>${applicationType}</strong></td>
                 <td>${appId}</td>
+                <td><span style="font-weight: 600; color: #4f46e5;">${processingType}</span></td>
                 <td>${formatDate(application.updated_at || application.updatedAt || application.created_at)}</td>
                 <td>${formatAmount(application)}</td>
                 <td><span class="status-badge"><i class="fa-solid fa-check"></i>Paid</span></td>
@@ -174,7 +190,6 @@
                 } else {
                     fetchUrl += `?email=${encodeURIComponent(userEmail)}`;
                 }
-
                 const response = await fetch(fetchUrl);
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.message || 'Unable to load receipts.');

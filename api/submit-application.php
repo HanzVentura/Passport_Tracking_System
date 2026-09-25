@@ -2,7 +2,6 @@
 session_start();
 // Connect to MySQL database via centralized connection
 require_once __DIR__ . '/../db.php';
-
 try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = !empty($_POST['email']) ? $_POST['email'] : '';
@@ -19,13 +18,11 @@ try {
         $appointment_location = !empty($_POST['site']) ? $_POST['site'] : (!empty($_POST['site_selection']) ? $_POST['site_selection'] : '');
         $appointment_date = !empty($_POST['app_date']) ? $_POST['app_date'] : '';
         $appointment_time = !empty($_POST['app_time']) ? $_POST['app_time'] : '';
-
         // Handle File Uploads Pre-Verification
         $uploadDir = __DIR__ . '/../uploads/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
-
         $validIdPath = '';
         if (!empty($_FILES['valid_id_file']['name'])) {
             $fileName = time() . '_id_' . basename($_FILES['valid_id_file']['name']);
@@ -34,7 +31,6 @@ try {
                 $validIdPath = 'uploads/' . $fileName;
             }
         }
-
         $passportPhotoPath = '';
         if (!empty($_FILES['passport_photo_file']['name'])) {
             $fileName = time() . '_photo_' . basename($_FILES['passport_photo_file']['name']);
@@ -43,7 +39,6 @@ try {
                 $passportPhotoPath = 'uploads/' . $fileName;
             }
         }
-
         $specificDocPath = '';
         if (!empty($_FILES['specific_doc_file']['name'])) {
             $fileName = time() . '_doc_' . basename($_FILES['specific_doc_file']['name']);

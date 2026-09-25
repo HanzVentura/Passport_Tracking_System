@@ -6,7 +6,7 @@ try {
     $email = $input['email'] ?? '';
     $applicationId = $input['applicationId'] ?? $input['application_id'] ?? '';
     $amount = $input['amount'] ?? 950;
-    $processingType = $input['processingType'] ?? 'regular';
+    $processingType = $input['processingType'] ?? 'Regular Processing';
     $paymentMethod = $input['paymentMethod'] ?? 'GCash';
    
     if (!$applicationId && !$email) {
@@ -37,7 +37,7 @@ try {
     $appointmentDate = !empty($existingApp['appointment_date']) ? $existingApp['appointment_date'] : date('Y-m-d');
     $appointmentLocation = !empty($existingApp['appointment_location']) ? $existingApp['appointment_location'] : 'ANGELES';
    
-    // Update the record with payment status 'Paid' but keep status as 'Form Submitted' until physical biometrics verification
+    // Update the record with payment status 'Paid', processing type, and persist appointment date
     $update = $pdo->prepare("UPDATE applications SET status = 'Form Submitted', payment_status = 'Paid', processing_type = ?, amount = ?, payment_method = ?, appointment_date = ?, appointment_location = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
     $update->execute([$processingType, $amount, $paymentMethod, $appointmentDate, $appointmentLocation, $targetAppId]);
    

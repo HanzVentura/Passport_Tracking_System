@@ -80,6 +80,7 @@
        
         .form-control { width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); outline: none; background: #fff; color: var(--text-main); font-size: 14px; font-family: inherit; transition: all 0.2s ease; }
         .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        .form-control:disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; }
        
         .method-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
         .method-option { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 12px 8px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; background: #fff; }
@@ -150,13 +151,13 @@
                     </div>
                     <span class="section-label">Select processing option</span>
                     <div class="plan-list">
-                        <label class="plan-option selected">
-                            <input type="radio" name="processingType" value="regular" data-amount="950" checked>
+                        <label class="plan-option selected" id="planRegular">
+                            <input type="radio" name="processingType" value="Regular Processing" data-amount="950" checked>
                             <span class="plan-copy"><i class="fa-solid fa-circle-check"></i><span><span class="plan-name">Regular Processing</span><span class="plan-time">12 working days</span></span></span>
                             <span class="plan-price">₱950.00</span>
                         </label>
-                        <label class="plan-option">
-                            <input type="radio" name="processingType" value="expedited" data-amount="1200">
+                        <label class="plan-option" id="planExpedited">
+                            <input type="radio" name="processingType" value="Expedited / Rush Processing" data-amount="1200">
                             <span class="plan-copy"><i class="fa-regular fa-circle-check"></i><span><span class="plan-name">Expedited / Rush Processing</span><span class="plan-time">7 working days</span></span></span>
                             <span class="plan-price">₱1,200.00</span>
                         </label>
@@ -263,7 +264,7 @@
                 option.classList.toggle('selected', isSelected);
                 option.querySelector('i').className = isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle-check';
             });
-            document.getElementById('summaryPlan').textContent = selected.value === 'expedited' ? 'Expedited / Rush Processing' : 'Regular Processing';
+            document.getElementById('summaryPlan').textContent = selected.value;
             document.getElementById('summaryAmount').textContent = `₱${Number(selected.dataset.amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
         }
         function displayApplication(application) {
@@ -285,17 +286,38 @@
             const paymentStatus = application.payment_status || application.paymentStatus;
             const currentStatus = application.status;
             const isAlreadyPaid = (paymentStatus === 'Paid' || currentStatus === 'Paid' || currentStatus === 'Biometrics Received');
-
             document.getElementById('summaryStatus').textContent = isAlreadyPaid ? 'Paid' : 'Form Submitted';
+            
+            // If already paid, reflect the saved processing option in the radio selection
+            const savedProcessing = application.processing_type || application.processingType;
+            if (savedProcessing) {
+                document.querySelectorAll('input[name="processingType"]').forEach(input => {
+                    if (input.value.toLowerCase() === savedProcessing.toLowerCase() || savedProcessing.toLowerCase().includes(input.value.toLowerCase())) {
+                        input.checked = true;
+                    }
+                });
+                updateSelectedPlan();
+            }
+
             if (document.getElementById('paymentEmail')) {
                 document.getElementById('paymentEmail').value = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || '');
             }
-            
+           
             payButton.disabled = false;
             if (isAlreadyPaid) {
                 payButton.disabled = true;
                 payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Already Paid';
                 showMessage('This application has already been paid. Your appointment is locked in.', 'success');
+                
+                // Disable all form inputs so user cannot change selections after payment
+                document.querySelectorAll('input[name="processingType"]').forEach(inp => inp.disabled = true);
+                document.querySelectorAll('input[name="paymentMethod"]').forEach(inp => inp.disabled = true);
+                document.getElementById('accountName').disabled = true;
+                document.getElementById('accountReference').disabled = true;
+                document.getElementById('paymentEmail').disabled = true;
+                document.getElementById('paymentNote').disabled = true;
+                document.querySelectorAll('.plan-option').forEach(opt => opt.style.cursor = 'not-allowed');
+                document.querySelectorAll('.method-option').forEach(opt => opt.style.cursor = 'not-allowed');
             }
         }
         async function loadPage() {
