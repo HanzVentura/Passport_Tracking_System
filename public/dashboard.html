@@ -473,7 +473,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Start Application Section -->
                 <div class="selection-section-title">Start Application</div>
                 <a class="action-banner-card" href="new-passport.html">
@@ -491,8 +490,7 @@
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
                 </a>
-
-                <!-- Manage Appointment Section (New Addition) -->
+                <!-- Manage Appointment Section -->
                 <div class="selection-section-title">Manage Appointment</div>
                 <a class="action-banner-card" href="reschedule.html">
                     <div class="action-banner-left">
@@ -574,7 +572,7 @@
             const sequence = ['Form Submitted', 'Biometrics Received', 'Under Consular Review', 'In Printing', 'Dispatched'];
            
             let activeCount = 1;
-            if (normalizedStatus.includes('paid') || normalizedStatus.includes('biometric')) activeCount = 2;
+            if (normalizedStatus.includes('biometric')) activeCount = 2;
             if (normalizedStatus.includes('review')) activeCount = 3;
             if (normalizedStatus.includes('print')) activeCount = 4;
             if (normalizedStatus.includes('dispatch') || normalizedStatus.includes('ready')) activeCount = 5;
@@ -595,6 +593,8 @@
             const currentStatus = application.status || 'Form Submitted';
             document.getElementById('dispAppStatus').innerText = currentStatus;
             updateStatusTracker(currentStatus);
+            const paymentStatus = application.payment_status || application.paymentStatus || 'Unpaid';
+            document.getElementById('dispPaymentStatus').innerText = paymentStatus === 'Paid' ? 'Verified (Online)' : 'Unpaid';
             if (application.estimatedCompletionDate) {
                 document.getElementById('estimatedDateDisplay').innerText = `Est. Completion: ${application.estimatedCompletionDate}`;
             }
@@ -603,7 +603,8 @@
                 document.getElementById('missingDocsAlert').style.display = 'block';
             }
            
-            if (currentStatus !== 'Form Submitted') {
+            // Show appointment reminder in Pending Action while status is Form Submitted or Appointment Rescheduled
+            if ((currentStatus === 'Form Submitted' || currentStatus === 'Appointment Rescheduled') && (application.appointmentDate || application.appointment_date)) {
                 document.getElementById('dispComeDate').innerText = formatAppointmentDate(application.appointmentDate || application.appointment_date, application.appointmentTime || application.appointment_time);
                 const rawLoc = application.appointmentLocation || application.appointment_location || '';
                 const office = dfaOfficeData[rawLoc];
@@ -612,6 +613,7 @@
                 document.getElementById('pendingAppDefault').style.display = 'none';
                 document.getElementById('pendingAppFilled').style.display = 'flex';
             } else {
+                // Once admin checks off Biometrics Received or advances status, pending action returns to All Clear
                 document.getElementById('pendingAppDefault').style.display = 'flex';
                 document.getElementById('pendingAppFilled').style.display = 'none';
             }

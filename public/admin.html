@@ -12,7 +12,6 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
         body {
             background-color: #f4f7f6;
             color: #333;
@@ -20,7 +19,6 @@
             height: 100vh;
             overflow-x: hidden;
         }
-
         /* Admin Sidebar */
         .sidebar {
             width: 260px;
@@ -31,7 +29,6 @@
             justify-content: space-between;
             padding: 20px 0;
         }
-
         .user-profile-mini {
             display: flex;
             align-items: center;
@@ -39,30 +36,25 @@
             border-bottom: 1px solid #334155;
             margin-bottom: 20px;
         }
-
         .user-profile-mini i {
             font-size: 36px;
             color: #38bdf8;
             margin-right: 12px;
         }
-
         .user-info .name {
             font-weight: 600;
             font-size: 13px;
             color: #f8fafc;
         }
-
         .user-info .role {
             font-size: 11px;
             color: #38bdf8;
             text-transform: uppercase;
             font-weight: 700;
         }
-
         .nav-links {
             list-style: none;
         }
-
         .nav-links li a {
             display: flex;
             align-items: center;
@@ -71,23 +63,20 @@
             text-decoration: none;
             font-size: 14px;
             transition: all 0.2s ease;
+            cursor: pointer;
         }
-
         .nav-links li.active a, .nav-links li a:hover {
             background-color: #334155;
             color: #fff;
             border-left: 4px solid #38bdf8;
         }
-
         .nav-links li a i {
             margin-right: 12px;
             font-size: 16px;
         }
-
         .sidebar-bottom {
             padding: 0 20px;
         }
-
         .sidebar-bottom a {
             display: flex;
             align-items: center;
@@ -97,11 +86,9 @@
             font-size: 14px;
             font-weight: 500;
         }
-
         .sidebar-bottom a i {
             margin-right: 12px;
         }
-
         /* Main Content */
         .main-content {
             flex: 1;
@@ -109,7 +96,6 @@
             flex-direction: column;
             overflow-y: auto;
         }
-
         .header {
             background-color: #ffffff;
             padding: 20px 30px;
@@ -121,14 +107,12 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .content-container {
             padding: 30px;
-            max-width: 1300px;
+            max-width: 1400px;
             margin: 0 auto;
             width: 100%;
         }
-
         .admin-card {
             background: #ffffff;
             border: 1px solid #e5e7eb;
@@ -137,32 +121,27 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             margin-bottom: 30px;
         }
-
         .section-title {
             font-size: 18px;
             font-weight: 700;
             color: #1f2937;
             margin-bottom: 6px;
         }
-
         .section-subtitle {
             font-size: 13px;
             color: #6b7280;
             margin-bottom: 24px;
         }
-
         /* Table Styling */
         .table-container {
             overflow-x: auto;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
             font-size: 13px;
         }
-
         th {
             background-color: #f9fafb;
             color: #374151;
@@ -170,14 +149,12 @@
             padding: 12px 16px;
             border-bottom: 1px solid #e5e7eb;
         }
-
         td {
             padding: 14px 16px;
             border-bottom: 1px solid #e5e7eb;
             color: #4b5563;
             vertical-align: middle;
         }
-
         .badge-pending {
             background-color: #fef3c7;
             color: #d97706;
@@ -186,7 +163,6 @@
             font-size: 11px;
             font-weight: 600;
         }
-
         .badge-resolved {
             background-color: #d1fae5;
             color: #059669;
@@ -195,12 +171,18 @@
             font-size: 11px;
             font-weight: 600;
         }
-
+        .badge-status {
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
         .reply-input-group {
             display: flex;
             gap: 8px;
         }
-
         .reply-input {
             padding: 6px 10px;
             border: 1px solid #d1d5db;
@@ -209,26 +191,35 @@
             flex: 1;
             outline: none;
         }
-
-        .btn-reply {
+        .btn-reply, .btn-action {
             background-color: #3b82f6;
             color: white;
             border: none;
             padding: 6px 12px;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
+            white-space: nowrap;
         }
-
-        .btn-reply:hover {
+        .btn-reply:hover, .btn-action:hover {
             background-color: #2563eb;
+        }
+        .action-buttons-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .admin-tab-content {
+            display: none;
+        }
+        .admin-tab-content.active-tab {
+            display: block;
         }
     </style>
 </head>
 <body>
-
     <div class="sidebar">
         <div>
             <div class="user-profile-mini">
@@ -239,7 +230,8 @@
                 </div>
             </div>
             <ul class="nav-links">
-                <li class="active"><a href="admin.html"><i class="fa-solid fa-folder-open"></i> Manage Enquiries</a></li>
+                <li id="navEnquiries" class="active"><a onclick="switchTab('enquiries')"><i class="fa-solid fa-folder-open"></i> Manage Enquiries</a></li>
+                <li id="navApplications"><a onclick="switchTab('applications')"><i class="fa-solid fa-id-card"></i> Application Status</a></li>
                 <li><a href="#" onclick="alert('User oversight management module coming soon.')"><i class="fa-solid fa-users"></i> Users Oversight</a></li>
                 <li><a href="#" onclick="alert('System audit logs module coming soon.')"><i class="fa-solid fa-chart-line"></i> Audit Logs</a></li>
             </ul>
@@ -248,40 +240,83 @@
             <a href="index.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
         </div>
     </div>
-
     <div class="main-content">
         <div class="header">
             <span>ADMINISTRATION OVERSIGHT PORTAL</span>
             <span style="font-size: 13px; font-weight: 500; color: #6b7280;">Logged in as: hanzchristian.ventura@neu.edu.ph</span>
         </div>
-        
+       
         <div class="content-container">
-            <div class="admin-card">
-                <div class="section-title">Client Enquiries & Support Management</div>
-                <div class="section-subtitle">Review incoming member enquiries linked to active application IDs and provide official administrative responses.</div>
-                
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>App ID</th>
-                                <th>Subject / Topic</th>
-                                <th>User Message</th>
-                                <th>Date Submitted</th>
-                                <th>Status</th>
-                                <th>Admin Response & Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminTableBody">
+            <!-- Tab 1: Manage Enquiries -->
+            <div id="tabEnquiries" class="admin-tab-content active-tab">
+                <div class="admin-card">
+                    <div class="section-title">Client Enquiries & Support Management</div>
+                    <div class="section-subtitle">Review incoming member enquiries linked to active application IDs and provide official administrative responses.</div>
+                   
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>App ID</th>
+                                    <th>Subject / Topic</th>
+                                    <th>User Message</th>
+                                    <th>Date Submitted</th>
+                                    <th>Status</th>
+                                    <th>Admin Response & Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminTableBody">
+                                <tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">Loading enquiries...</td></tr>
                             </tbody>
-                    </table>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Application Status Approval -->
+            <div id="tabApplications" class="admin-tab-content">
+                <div class="admin-card">
+                    <div class="section-title">Application Status Review & Approval</div>
+                    <div class="section-subtitle">Monitor user passport applications and advance their status pipeline following consular attendance and processing steps.</div>
+                   
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>App ID</th>
+                                    <th>Applicant Email</th>
+                                    <th>Type</th>
+                                    <th>Payment</th>
+                                    <th>Current Status</th>
+                                    <th>Actions / Advance Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminApplicationsBody">
+                                <tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">Loading applications...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script>
         let adminEnquiries = [];
+        let adminApplications = [];
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.admin-tab-content').forEach(tab => tab.classList.remove('active-tab'));
+            document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
+
+            if (tabName === 'enquiries') {
+                document.getElementById('tabEnquiries').classList.add('active-tab');
+                document.getElementById('navEnquiries').classList.add('active');
+            } else if (tabName === 'applications') {
+                document.getElementById('tabApplications').classList.add('active-tab');
+                document.getElementById('navApplications').classList.add('active');
+                loadAdminApplications();
+            }
+        }
 
         window.addEventListener('DOMContentLoaded', async () => {
             await loadAdminEnquiries();
@@ -298,17 +333,15 @@
                 tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">Unable to load enquiries.</td></tr>`;
                 return;
             }
-
             if (adminEnquiries.length === 0) {
                 tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">No user enquiries submitted at this time.</td></tr>`;
                 return;
             }
-
             tableBody.innerHTML = '';
             adminEnquiries.forEach((item, index) => {
                 const row = document.createElement('tr');
                 const isResolved = item.status === 'Resolved';
-                
+               
                 row.innerHTML = `
                     <td><strong>${item.appId}</strong></td>
                     <td>${item.subject}</td>
@@ -316,8 +349,8 @@
                     <td>${item.date}</td>
                     <td><span class="${isResolved ? 'badge-resolved' : 'badge-pending'}">${item.status}</span></td>
                     <td>
-                        ${isResolved ? 
-                            `<span style="color: #4b5563; font-size: 12px;">${item.reply || ''}</span>` : 
+                        ${isResolved ?
+                            `<span style="color: #4b5563; font-size: 12px;">${item.reply || ''}</span>` :
                             `<div class="reply-input-group">
                                 <input type="text" class="reply-input" id="replyText-${index}" placeholder="Type official response...">
                                 <button type="button" class="btn-reply" onclick="sendReply(${index})">Send</button>
@@ -329,30 +362,87 @@
             });
         }
 
+        async function loadAdminApplications() {
+            const appBody = document.getElementById('adminApplicationsBody');
+            try {
+                const response = await fetch('../api/applications.php?action=list_all');
+                const result = await response.json();
+                adminApplications = result.applications || [];
+            } catch (error) {
+                console.error('Unable to load applications:', error);
+                adminApplications = [];
+            }
+
+            if (adminApplications.length === 0) {
+                appBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">No passport applications found in system.</td></tr>`;
+                return;
+            }
+
+            appBody.innerHTML = '';
+            adminApplications.forEach((app) => {
+                const appId = app.application_id || app.applicationId;
+                const email = app.email || 'N/A';
+                const type = app.application_type || app.applicationType || 'New First-Time Application';
+                const payStatus = app.payment_status || app.paymentStatus || 'Unpaid';
+                const currentStatus = app.status || 'Form Submitted';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${appId}</strong></td>
+                    <td>${email}</td>
+                    <td>${type}</td>
+                    <td><span style="font-weight:600; color:${payStatus === 'Paid' ? '#059669':'#d97706'}">${payStatus}</span></td>
+                    <td><span class="badge-status">${currentStatus}</span></td>
+                    <td>
+                        <div class="action-buttons-group">
+                            <button type="button" class="btn-action" style="background:#0284c7;" onclick="updateAppStatus('${appId}', 'Biometrics Received')">Biometrics Received</button>
+                            <button type="button" class="btn-action" style="background:#7c3aed;" onclick="updateAppStatus('${appId}', 'Under Consular Review')">Consular Review</button>
+                            <button type="button" class="btn-action" style="background:#d97706;" onclick="updateAppStatus('${appId}', 'In Printing')">In Printing</button>
+                            <button type="button" class="btn-action" style="background:#059669;" onclick="updateAppStatus('${appId}', 'Dispatched')">Dispatched</button>
+                        </div>
+                    </td>
+                `;
+                appBody.appendChild(row);
+            });
+        }
+
+        async function updateAppStatus(applicationId, newStatus) {
+            try {
+                const response = await fetch('../api/applications.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'update_status', applicationId, status: newStatus })
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.message || 'Failed to update status.');
+                
+                alert(`Application ${applicationId} status updated successfully to: ${newStatus}`);
+                loadAdminApplications();
+            } catch (error) {
+                alert('Error updating status: ' + error.message);
+            }
+        }
+
         async function sendReply(index) {
             const replyText = document.getElementById(`replyText-${index}`).value.trim();
             if (!replyText) {
                 alert("Please type a valid reply message.");
                 return;
             }
-
             const enquiry = adminEnquiries[index];
             if (!enquiry) {
                 alert("Unable to find this enquiry. Please refresh the page.");
                 return;
             }
-
             try {
                 const response = await fetch('../api/enquiries.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ enquiryId: enquiry.id, reply: replyText })
                 });
-
                 if (!response.ok) {
                     throw new Error('Reply submission failed.');
                 }
-
                 await loadAdminEnquiries();
                 alert("Response sent successfully! The user's status has been updated to Resolved.");
             } catch (error) {

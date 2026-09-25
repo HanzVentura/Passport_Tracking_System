@@ -130,7 +130,10 @@ async function completePayment() {
                 email: userEmail,
                 applicationId: randomId,
                 applicationType: labels.category,
-                status: 'Pending Payment'
+                status: 'Form Submitted',
+                appointmentDate: localStorage.getItem('selectedAppointmentDate') || '2027-01-01',
+                appointmentTime: localStorage.getItem('selectedAppointmentTime') || '15:00',
+                appointmentLocation: localStorage.getItem('selectedSite') || 'CANDON'
             })
         });
         const result = await response.json();

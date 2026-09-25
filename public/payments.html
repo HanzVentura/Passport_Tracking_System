@@ -282,15 +282,17 @@
             document.getElementById('summaryId').textContent = applicationId;
             document.getElementById('summaryApplicant').textContent = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || 'User');
            
-            // Keep status strictly as Form Submitted on the payment tab before payment is completed
+            const paymentStatus = application.payment_status || application.paymentStatus;
             const currentStatus = application.status;
-            document.getElementById('summaryStatus').textContent = (currentStatus === 'Paid') ? 'Paid' : 'Form Submitted';
+            const isAlreadyPaid = (paymentStatus === 'Paid' || currentStatus === 'Paid' || currentStatus === 'Biometrics Received');
 
+            document.getElementById('summaryStatus').textContent = isAlreadyPaid ? 'Paid' : 'Form Submitted';
             if (document.getElementById('paymentEmail')) {
                 document.getElementById('paymentEmail').value = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || '');
             }
+            
             payButton.disabled = false;
-            if (currentStatus === 'Paid') {
+            if (isAlreadyPaid) {
                 payButton.disabled = true;
                 payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Already Paid';
                 showMessage('This application has already been paid. Your appointment is locked in.', 'success');
@@ -362,7 +364,7 @@
                 const fullLocationText = officeInfo ? `${officeInfo.name} - ${officeInfo.address}` : rawLoc;
                 document.getElementById('successMessage').textContent = `${result.message} Appointment date: ${new Date(`${result.appointmentDate}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} at ${fullLocationText}.`;
                 document.getElementById('successState').style.display = 'block';
-                payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Payment Complete';
+                payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Already Paid';
                 showMessage('Payment successful.', 'success');
             } catch (error) {
                 showMessage(error.message, 'error');
