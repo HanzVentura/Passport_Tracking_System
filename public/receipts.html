@@ -81,6 +81,7 @@
                 <li><a href="payments.html"><i class="fa-solid fa-wallet"></i> Payments</a></li>
                 <li class="active"><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
                 <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
+                <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
                 <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
                 <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
@@ -141,7 +142,6 @@
             const paymentStatus = (application.payment_status || application.paymentStatus || '').toLowerCase();
             const appStatus = (application.status || '').toLowerCase();
            
-            // Check if application is paid
             if (paymentStatus !== 'paid' && appStatus !== 'paid' && appStatus !== 'biometrics received') {
                 return;
             }
@@ -150,7 +150,7 @@
                 || localStorage.getItem('applicationType')
                 || 'Passport Application';
             const appId = application.applicationId || application.application_id;
-            
+           
             let rawProcessing = application.processing_type || application.processingType || 'regular';
             let processingType = 'Regular Processing';
             if (rawProcessing.toLowerCase().includes('expedited') || rawProcessing.toLowerCase().includes('rush')) {

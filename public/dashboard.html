@@ -416,6 +416,7 @@
                 <li><a href="payments.html"><i class="fa-solid fa-wallet"></i> Payments</a></li>
                 <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
                 <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
+                <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
                 <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
                 <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
@@ -606,7 +607,6 @@
             }
             return start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
         }
-
         function updateStatusTracker(status) {
             const normalizedStatus = (status || '').toLowerCase().trim();
             let activeCount = 1;
@@ -614,7 +614,7 @@
             if (normalizedStatus.includes('review')) activeCount = 3;
             if (normalizedStatus.includes('print')) activeCount = 4;
             if (normalizedStatus.includes('dispatch') || normalizedStatus.includes('ready')) activeCount = 5;
-            
+           
             document.querySelectorAll('[data-status-step]').forEach((step, index) => {
                 const isActive = index < activeCount;
                 const icon = step.querySelector('i');
@@ -622,7 +622,6 @@
                 icon.className = isActive ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle';
             });
         }
-
         function displaySavedApplication(application) {
             currentAppData = application;
             const appId = application.application_id || application.applicationId;
@@ -634,21 +633,20 @@
             const currentStatus = application.status || 'Form Submitted';
             document.getElementById('dispAppStatus').innerText = currentStatus;
             updateStatusTracker(currentStatus);
-            
+           
             const paymentStatus = application.payment_status || application.paymentStatus || 'Unpaid';
             document.getElementById('dispPaymentStatus').innerText = paymentStatus === 'Paid' ? 'Verified (Online)' : 'Unpaid';
            
             const estDisplay = document.getElementById('estimatedDateDisplay');
             const processingType = application.processing_type || application.processingType || 'Regular Processing';
             const appointmentDateVal = application.appointmentDate || application.appointment_date;
-            
+           
             if (currentStatus === 'Form Submitted') {
                 estDisplay.innerText = 'Est. Completion: Available after biometrics';
             } else {
                 const computedDate = calculateEstimatedCompletion(appointmentDateVal, processingType);
                 estDisplay.innerText = `Est. Completion: ${computedDate}`;
             }
-
             if (application.missingDocumentsFlag) {
                 document.getElementById('missingDocsReasonText').innerText = application.missingDocumentsReason || 'Please review missing requirements.';
                 document.getElementById('missingDocsAlert').style.display = 'block';
@@ -656,11 +654,10 @@
            
             const pendingContainer = document.getElementById('pendingAppFilled');
             const pendingDefault = document.getElementById('pendingAppDefault');
-
             if (currentStatus === 'Dispatched') {
                 pendingDefault.style.display = 'none';
                 pendingContainer.style.display = 'flex';
-                
+               
                 const receivingOpt = application.receiving_option || application.receivingOption;
                 if (receivingOpt === 'Delivery') {
                     pendingContainer.innerHTML = `
@@ -679,11 +676,11 @@
             } else if ((currentStatus === 'Form Submitted' || currentStatus === 'Appointment Rescheduled') && appointmentDateVal) {
                 pendingDefault.style.display = 'none';
                 pendingContainer.style.display = 'flex';
-                
+               
                 const rawLoc = application.appointmentLocation || application.appointment_location || '';
                 const office = dfaOfficeData[rawLoc];
                 const fullLocationDisplay = office ? `${office.name} - ${office.address}` : rawLoc;
-                
+               
                 pendingContainer.innerHTML = `
                     <strong style="display: block; margin-bottom: 4px;">Appointment Schedule:</strong>
                     <span>You are expected to come on</span>
@@ -694,7 +691,6 @@
                 pendingDefault.style.display = 'flex';
                 pendingContainer.style.display = 'none';
             }
-
             if (application.createdAt || application.created_at) {
                 document.getElementById('dispSubDate').innerText = new Date(application.createdAt || application.created_at)
                     .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -705,7 +701,6 @@
             document.getElementById('statusAppFilled').style.display = 'flex';
             document.getElementById('cardActiveApp').classList.add('clickable-card');
         }
-
         function downloadApplicationSummary() {
             if (!currentAppData) return;
             const app = currentAppData;
@@ -720,7 +715,7 @@
             const rawLoc = app.appointmentLocation || app.appointment_location || 'DFA Consular Office';
             const office = dfaOfficeData[rawLoc];
             const appLoc = office ? `${office.name} - ${office.address}` : rawLoc;
-            
+           
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
                 <html>

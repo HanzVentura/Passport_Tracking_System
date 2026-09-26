@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Assistance - Passport Tracking System</title>
+    <!-- FontAwesome & Google Plus Jakarta Sans Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 0;
+        }
+        .sidebar-top {
+            display: flex;
+            flex-direction: column;
+        }
+        .user-profile-mini {
+            display: flex;
+            align-items: center;
+            padding: 0 24px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 16px;
+        }
+        .user-profile-mini i {
+            font-size: 38px;
+            color: var(--primary);
+            margin-right: 12px;
+        }
+        .user-info .name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+        .nav-links {
+            list-style: none;
+        }
+        .nav-links li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .nav-links li.active a, .nav-links li a:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-right: 4px solid var(--primary);
+            font-weight: 600;
+        }
+        .nav-links li a i {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        .sidebar-bottom {
+            padding: 0 24px;
+        }
+        .sidebar-bottom a {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            color: #ef4444;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .sidebar-bottom a i {
+            margin-right: 12px;
+        }
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .header {
+            background-color: var(--card-bg);
+            padding: 22px 36px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.3px;
+        }
+        .content-container {
+            padding: 35px 40px;
+            max-width: 1350px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .section-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .form-control {
+            padding: 11px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            background-color: #fff;
+            font-family: inherit;
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 110px;
+        }
+        .btn-primary {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: var(--shadow-subtle);
+        }
+        .btn-primary:hover {
+            background-color: #dc2626;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 14px 16px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+        .badge-pending {
+            background-color: #fef2f2;
+            color: #dc2626;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-top">
+            <div class="user-profile-mini">
+                <i class="fa-solid fa-circle-user"></i>
+                <div class="user-info">
+                    <div class="name" id="user-name">Loading...</div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-wallet"></i> Payments</a></li>
+                <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
+                <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
+                <li class="active"><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
+                <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-bottom">
+            <a href="index.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+        </div>
+    </div>
+   
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="header">EMERGENCY ASSISTANCE</div>
+       
+        <div class="content-container">
+            <div class="card" style="border-left: 4px solid #ef4444;">
+                <div class="section-title" style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Request Urgent Consular Help</div>
+                <div class="section-subtitle">Use this form only for urgent travel emergencies, medical repatriation, or lost passports abroad requiring immediate consular intervention.</div>
+               
+                <form onsubmit="handleEmergencySubmit(event)">
+                    <div class="form-group">
+                        <label>Emergency Type</label>
+                        <select class="form-control" id="emergencyType">
+                            <option>Medical Emergency / Hospitalization Abroad</option>
+                            <option>Lost/Stolen Passport Abroad (Urgent Flight)</option>
+                            <option>Natural Disaster / Civil Unrest</option>
+                            <option>Other Urgent Consular Assistance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Consular Office or Location</label>
+                        <input type="text" class="form-control" id="office" placeholder="e.g. DFA NCR Central / Embassy Location" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Detailed Explanation</label>
+                        <textarea class="form-control" id="details" placeholder="Describe your emergency and flight/travel urgency details..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> File Emergency Request</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="section-title">Active Emergency Reports</div>
+                <div class="section-subtitle">Track the status of your urgent requests submitted to consular officers.</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>App ID</th>
+                            <th>Subject</th>
+                            <th>Details & Location</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="emergencyTableBody">
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading emergency reports...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function handleEmergencySubmit(event) {
+            event.preventDefault();
+            const userEmail = localStorage.getItem('userEmail');
+            const emergencyType = document.getElementById('emergencyType').value;
+            const office = document.getElementById('office').value;
+            const details = document.getElementById('details').value;
+            if (!details) return;
+
+            try {
+                const response = await fetch('../api/enquiries.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: userEmail,
+                        applicationId: 'EMG-' + Math.floor(100000 + Math.random() * 900000),
+                        subject: `[EMERGENCY] ${emergencyType}`,
+                        message: `Office: ${office}\nDetails: ${details}`
+                    })
+                });
+                if (!response.ok) throw new Error('Submission failed.');
+                await loadEmergencyReports(userEmail);
+                alert("Emergency report successfully filed! Consular officers will contact you shortly.");
+                document.getElementById('details').value = '';
+                document.getElementById('office').value = '';
+            } catch (error) {
+                alert("Error filing emergency report: " + error.message);
+            }
+        }
+
+        async function loadEmergencyReports(userEmail) {
+            const tableBody = document.getElementById('emergencyTableBody');
+            try {
+                const response = await fetch('../api/enquiries.php');
+                const result = await response.json();
+                let reports = (result.enquiries || []).filter(item => item.subject && item.subject.includes('[EMERGENCY]'));
+                if (userEmail) {
+                    reports = reports.filter(item => item.email === userEmail);
+                }
+                if (reports.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No emergency reports filed yet.</td></tr>`;
+                    return;
+                }
+                tableBody.innerHTML = '';
+                reports.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${item.appId}</strong></td>
+                        <td>${item.subject.replace('[EMERGENCY] ', '')}</td>
+                        <td style="max-width: 250px; white-space: pre-wrap;">${item.message}</td>
+                        <td>${item.date}</td>
+                        <td><span class="badge-pending">${item.status || 'Under Review'}</span></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Unable to load emergency reports.</td></tr>`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const userEmail = localStorage.getItem('userEmail');
+            if (userEmail) loadEmergencyReports(userEmail);
+        });
+    </script>
+</body>
+</html>

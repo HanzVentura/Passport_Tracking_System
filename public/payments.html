@@ -127,6 +127,7 @@
                 <li class="active"><a href="payments.html"><i class="fa-solid fa-wallet"></i>Payments</a></li>
                 <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i>Receipts</a></li>
                 <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i>Enquiries</a></li>
+                <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
                 <li><a href="#"><i class="fa-solid fa-user"></i>Profile</a></li>
                 <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
@@ -162,7 +163,6 @@
                             <span class="plan-price">₱1,200.00</span>
                         </label>
                     </div>
-
                     <!-- Delivery vs In-Person Receiving Section -->
                     <span class="section-label">Receiving Option</span>
                     <div class="plan-list" style="margin-bottom: 20px;">
@@ -177,7 +177,6 @@
                             <span class="plan-price" id="deliveryPriceDisplay">₱150.00</span>
                         </label>
                     </div>
-
                     <div id="deliveryAddressSection" style="display: none; margin-bottom: 24px; padding: 18px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
                         <div class="form-group full" style="margin-bottom: 0;">
                             <label for="deliveryAddress">Complete Delivery Address</label>
@@ -185,7 +184,6 @@
                             <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px;">Fare is calculated automatically after you finish typing.</small>
                         </div>
                     </div>
-
                     <form id="paymentForm">
                         <span class="section-label">Payment method</span>
                         <div class="method-list">
@@ -269,7 +267,6 @@
             "TUGUEGARAO": { name: "DFA Regional Consular Office – TugueGarao", address: "Regional Government Center, Carig Sur, TugueGarao City", contact: "(078) 844-0000" },
             "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City", contact: "(062) 991-0000" }
         };
-
         const urlParams = new URLSearchParams(window.location.search);
         const storedApplicationId = urlParams.get('id')
             || urlParams.get('application_id')
@@ -277,67 +274,55 @@
             || localStorage.getItem('activeAppId');
         let activeApplication = null;
         let typingTimer = null; // Debounce timer
-
         const form = document.getElementById('paymentForm');
         const message = document.getElementById('formMessage');
         const payButton = document.getElementById('payButton');
-
         function showMessage(text, type) {
             message.textContent = text;
             message.className = `message ${type}`;
         }
-
         function calculateDeliveryFee(addressText) {
             if (!addressText || addressText.trim().length < 5) return 150; // Base fare
-            // Use word count or stable length tiers instead of per-letter
             const words = addressText.trim().split(/\s+/).length;
             return 150 + (words * 15);
         }
-
         function updateSelectedPlan() {
             const selectedPlan = document.querySelector('input[name="processingType"]:checked');
             const receivingOption = document.querySelector('input[name="receivingOption"]:checked').value;
             const addressVal = document.getElementById('deliveryAddress').value;
-            
+           
             document.querySelectorAll('input[name="processingType"]').forEach(inp => {
                 const parent = inp.closest('.plan-option');
                 const isSelected = inp.checked;
                 parent.classList.toggle('selected', isSelected);
                 parent.querySelector('i').className = isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle-check';
             });
-
             document.querySelectorAll('input[name="receivingOption"]').forEach(inp => {
                 const parent = inp.closest('.plan-option');
                 const isSelected = inp.checked;
                 parent.classList.toggle('selected', isSelected);
                 parent.querySelector('i').className = isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle-check';
             });
-
             const baseAmount = Number(selectedPlan.dataset.amount);
             let deliveryFee = 0;
-
             const deliverySection = document.getElementById('deliveryAddressSection');
             const summaryDeliveryLine = document.getElementById('summaryDeliveryLine');
             const summaryDeliveryText = document.getElementById('summaryDeliveryText');
-
             if (receivingOption === 'Delivery') {
                 deliverySection.style.display = 'block';
                 deliveryFee = calculateDeliveryFee(addressVal);
                 document.getElementById('deliveryPriceDisplay').textContent = `₱${deliveryFee.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
-                
+               
                 summaryDeliveryLine.style.display = 'flex';
                 summaryDeliveryText.textContent = `Courier Delivery (₱${deliveryFee.toLocaleString('en-PH', { minimumFractionDigits: 2 })})`;
             } else {
                 deliverySection.style.display = 'none';
                 summaryDeliveryLine.style.display = 'none';
             }
-
             const totalDue = baseAmount + deliveryFee;
-
             document.getElementById('summaryPlan').textContent = selectedPlan.value;
             document.getElementById('summaryAmount').textContent = `₱${totalDue.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
         }
-
         function displayApplication(application) {
             const applicationId = storedApplicationId || application.application_id || application.applicationId;
             if (!applicationId) {
@@ -367,14 +352,11 @@
                     }
                 });
             }
-
             if (application.delivery_address || application.deliveryAddress) {
                 document.querySelector('input[name="receivingOption"][value="Delivery"]').checked = true;
                 document.getElementById('deliveryAddress').value = application.delivery_address || application.deliveryAddress;
             }
-
             updateSelectedPlan();
-
             if (document.getElementById('paymentEmail')) {
                 document.getElementById('paymentEmail').value = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || '');
             }
@@ -390,7 +372,6 @@
                 document.querySelectorAll('.method-option').forEach(opt => opt.style.cursor = 'not-allowed');
             }
         }
-
         async function loadPage() {
             try {
                 const userResponse = await fetch('../api/user-data.php');
@@ -423,27 +404,24 @@
                 payButton.disabled = true;
             }
         }
-
         document.querySelectorAll('input[name="processingType"], input[name="receivingOption"]').forEach(input => input.addEventListener('change', updateSelectedPlan));
-        
-        // Debounce input event so it waits 2 seconds after typing stops before updating
+       
         document.getElementById('deliveryAddress').addEventListener('input', () => {
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => {
                 updateSelectedPlan();
-            }, 2000); // 2000ms = 2 seconds
+            }, 2000);
         });
        
         form.addEventListener('submit', async event => {
             event.preventDefault();
             if (!activeApplication) return showMessage('No active application is available for payment.', 'error');
-            
+           
             const receivingOption = document.querySelector('input[name="receivingOption"]:checked').value;
             const deliveryAddressVal = document.getElementById('deliveryAddress').value.trim();
             if (receivingOption === 'Delivery' && !deliveryAddressVal) {
                 return showMessage('Please provide your complete delivery address for courier delivery.', 'error');
             }
-
             payButton.disabled = true;
             payButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
            
@@ -451,21 +429,19 @@
             const baseAmount = Number(selectedPlan.dataset.amount);
             const deliveryFee = receivingOption === 'Delivery' ? calculateDeliveryFee(deliveryAddressVal) : 0;
             const totalPaymentAmount = baseAmount + deliveryFee;
-
             const applicationType = activeApplication.applicationType
                 || localStorage.getItem('applicationType')
                 || 'New First-Time Application';
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
             const currentEmail = typeof userEmail !== 'undefined' ? userEmail : localStorage.getItem('userEmail');
-
             try {
                 const response = await fetch('../api/payments.php', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        email: currentEmail, 
-                        applicationId: activeApplication.applicationId, 
-                        processingType: selectedPlan.value, 
-                        amount: totalPaymentAmount, 
+                    body: JSON.stringify({
+                        email: currentEmail,
+                        applicationId: activeApplication.applicationId,
+                        processingType: selectedPlan.value,
+                        amount: totalPaymentAmount,
                         paymentMethod,
                         receivingOption: receivingOption,
                         deliveryAddress: receivingOption === 'Delivery' ? deliveryAddressVal : null,
@@ -494,7 +470,6 @@
                 payButton.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Now';
             }
         });
-
         loadPage();
     </script>
 </body>
