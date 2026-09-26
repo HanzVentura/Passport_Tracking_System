@@ -181,19 +181,25 @@
         }
         .reply-input-group {
             display: flex;
+            flex-direction: column;
             gap: 8px;
+            min-width: 260px;
         }
-        .reply-input {
-            padding: 6px 10px;
+        .reply-textarea {
+            padding: 8px 10px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
             font-size: 12px;
-            flex: 1;
+            width: 100%;
+            min-height: 70px;
+            resize: vertical;
             outline: none;
         }
-        .btn-reply, .btn-action {
-            background-color: #3b82f6;
-            color: white;
+        .reply-btn-row {
+            display: flex;
+            gap: 6px;
+        }
+        .btn-reply, .btn-action, .btn-solve {
             border: none;
             padding: 6px 12px;
             border-radius: 6px;
@@ -203,7 +209,25 @@
             transition: background 0.2s;
             white-space: nowrap;
         }
-        .btn-reply:hover, .btn-action:hover {
+        .btn-reply {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-reply:hover {
+            background-color: #2563eb;
+        }
+        .btn-solve {
+            background-color: #059669;
+            color: white;
+        }
+        .btn-solve:hover {
+            background-color: #047857;
+        }
+        .btn-action {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-action:hover {
             background-color: #2563eb;
         }
         .action-buttons-group {
@@ -216,6 +240,18 @@
         }
         .admin-tab-content.active-tab {
             display: block;
+        }
+        .history-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 120px;
+            overflow-y: auto;
+            font-size: 11px;
+            color: #334155;
+            margin-bottom: 8px;
+            white-space: pre-wrap;
         }
     </style>
 </head>
@@ -251,7 +287,7 @@
             <div id="tabEnquiries" class="admin-tab-content active-tab">
                 <div class="admin-card">
                     <div class="section-title">Client Enquiries & Support Management</div>
-                    <div class="section-subtitle">Review incoming member enquiries linked to active application IDs and provide official administrative responses.</div>
+                    <div class="section-subtitle">Review incoming member enquiries linked to active application IDs, chat back and forth freely, and click Mark as Solved when finalized.</div>
                    
                     <div class="table-container">
                         <table>
@@ -262,7 +298,7 @@
                                     <th>User Message</th>
                                     <th>Date Submitted</th>
                                     <th>Status</th>
-                                    <th>Admin Response & Action</th>
+                                    <th>Admin Response History & Action</th>
                                 </tr>
                             </thead>
                             <tbody id="adminTableBody">
@@ -272,7 +308,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Tab 2: Application Status Approval -->
             <div id="tabApplications" class="admin-tab-content">
                 <div class="admin-card">
@@ -303,11 +338,9 @@
     <script>
         let adminEnquiries = [];
         let adminApplications = [];
-
         function switchTab(tabName) {
             document.querySelectorAll('.admin-tab-content').forEach(tab => tab.classList.remove('active-tab'));
             document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
-
             if (tabName === 'enquiries') {
                 document.getElementById('tabEnquiries').classList.add('active-tab');
                 document.getElementById('navEnquiries').classList.add('active');
@@ -317,11 +350,9 @@
                 loadAdminApplications();
             }
         }
-
         window.addEventListener('DOMContentLoaded', async () => {
             await loadAdminEnquiries();
         });
-
         async function loadAdminEnquiries() {
             const tableBody = document.getElementById('adminTableBody');
             try {
@@ -341,19 +372,24 @@
             adminEnquiries.forEach((item, index) => {
                 const row = document.createElement('tr');
                 const isResolved = item.status === 'Resolved';
+                const hasHistory = item.reply && item.reply !== 'Awaiting administrator response...';
                
                 row.innerHTML = `
                     <td><strong>${item.appId}</strong></td>
                     <td>${item.subject}</td>
-                    <td style="max-width: 280px; white-space: pre-wrap;">${item.message || ''}</td>
+                    <td style="max-width: 230px; white-space: pre-wrap;">${item.message || ''}</td>
                     <td>${item.date}</td>
-                    <td><span class="${isResolved ? 'badge-resolved' : 'badge-pending'}">${item.status}</span></td>
+                    <td><span class="${isResolved ? 'badge-resolved' : 'badge-pending'}">${item.status || 'Open'}</span></td>
                     <td>
+                        ${hasHistory ? `<div class="history-box"><strong>Conversation Log:</strong><br>${item.reply}</div>` : ''}
                         ${isResolved ?
-                            `<span style="color: #4b5563; font-size: 12px;">${item.reply || ''}</span>` :
+                            `<div style="color: #059669; font-weight: 600; font-size: 11px; margin-top: 4px;"><i class="fa-solid fa-check-circle"></i> Ticket Closed (Solved)</div>` :
                             `<div class="reply-input-group">
-                                <input type="text" class="reply-input" id="replyText-${index}" placeholder="Type official response...">
-                                <button type="button" class="btn-reply" onclick="sendReply(${index})">Send</button>
+                                <textarea class="reply-textarea" id="replyText-${index}" placeholder="Type next response..."></textarea>
+                                <div class="reply-btn-row">
+                                    <button type="button" class="btn-reply" onclick="sendReply(${index}, false)"><i class="fa-solid fa-paper-plane"></i> Send Reply</button>
+                                    <button type="button" class="btn-solve" onclick="sendReply(${index}, true)"><i class="fa-solid fa-check"></i> Mark as Solved</button>
+                                </div>
                             </div>`
                         }
                     </td>
@@ -361,7 +397,6 @@
                 tableBody.appendChild(row);
             });
         }
-
         async function loadAdminApplications() {
             const appBody = document.getElementById('adminApplicationsBody');
             try {
@@ -372,12 +407,10 @@
                 console.error('Unable to load applications:', error);
                 adminApplications = [];
             }
-
             if (adminApplications.length === 0) {
                 appBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">No passport applications found in system.</td></tr>`;
                 return;
             }
-
             appBody.innerHTML = '';
             adminApplications.forEach((app) => {
                 const appId = app.application_id || app.applicationId;
@@ -385,7 +418,6 @@
                 const type = app.application_type || app.applicationType || 'New First-Time Application';
                 const payStatus = app.payment_status || app.paymentStatus || 'Unpaid';
                 const currentStatus = app.status || 'Form Submitted';
-
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><strong>${appId}</strong></td>
@@ -405,7 +437,6 @@
                 appBody.appendChild(row);
             });
         }
-
         async function updateAppStatus(applicationId, newStatus) {
             try {
                 const response = await fetch('../api/applications.php', {
@@ -415,15 +446,14 @@
                 });
                 const result = await response.json();
                 if (!response.ok || !result.success) throw new Error(result.message || 'Failed to update status.');
-                
+               
                 alert(`Application ${applicationId} status updated successfully to: ${newStatus}`);
                 loadAdminApplications();
             } catch (error) {
                 alert('Error updating status: ' + error.message);
             }
         }
-
-        async function sendReply(index) {
+        async function sendReply(index, markAsSolved) {
             const replyText = document.getElementById(`replyText-${index}`).value.trim();
             if (!replyText) {
                 alert("Please type a valid reply message.");
@@ -434,20 +464,22 @@
                 alert("Unable to find this enquiry. Please refresh the page.");
                 return;
             }
+            const newStatus = markAsSolved ? 'Resolved' : 'Open';
             try {
                 const response = await fetch('../api/enquiries.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ enquiryId: enquiry.id, reply: replyText })
+                    body: JSON.stringify({ enquiryId: enquiry.id, reply: replyText, status: newStatus })
                 });
-                if (!response.ok) {
-                    throw new Error('Reply submission failed.');
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Reply submission failed.');
                 }
                 await loadAdminEnquiries();
-                alert("Response sent successfully! The user's status has been updated to Resolved.");
+                alert(markAsSolved ? "Response sent and case marked as Solved!" : "Response sent successfully and added to history. The ticket remains Open for ongoing discussion.");
             } catch (error) {
                 console.error('Unable to save reply:', error);
-                alert("Unable to save the reply. Please try again.");
+                alert("Unable to save the reply: " + error.message);
             }
         }
     </script>

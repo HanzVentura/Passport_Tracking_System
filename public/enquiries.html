@@ -22,7 +22,6 @@
             --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
             --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
         }
-
         * {
             margin: 0;
             padding: 0;
@@ -276,6 +275,48 @@
             font-weight: 700;
             display: inline-block;
         }
+        .chat-history-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 140px;
+            overflow-y: auto;
+            font-size: 12px;
+            color: #334155;
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+        }
+        .member-reply-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .member-reply-textarea {
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 12px;
+            width: 100%;
+            min-height: 60px;
+            resize: vertical;
+            outline: none;
+        }
+        .btn-member-reply {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+        .btn-member-reply:hover {
+            background-color: var(--primary-hover);
+        }
     </style>
 </head>
 <body>
@@ -301,7 +342,7 @@
             <a href="index.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
         </div>
     </div>
-    
+   
     <!-- Main Content Area -->
     <div class="main-content">
         <div class="header">ENQUIRIES & SUPPORT</div>
@@ -316,7 +357,7 @@
                     <i class="fa-solid fa-triangle-exclamation" style="font-size: 18px;"></i>
                     <span><strong>No Active Application Found:</strong> You must submit a passport application from your dashboard before you can submit an enquiry.</span>
                 </div>
-                
+               
                 <form onsubmit="handleEnquirySubmit(event)" id="enquiryForm">
                     <div class="form-row">
                         <div class="form-group">
@@ -341,11 +382,10 @@
                     <button type="submit" class="btn-primary" id="submitBtn">Submit Enquiry</button>
                 </form>
             </div>
-
             <!-- View Submitted Enquiries Card -->
             <div class="enquiry-card">
-                <div class="section-title">Submitted Enquiries & Admin Replies</div>
-                <div class="section-subtitle">View the real-time status of your enquiries and responses from the administrator.</div>
+                <div class="section-title">Submitted Enquiries & Conversation History</div>
+                <div class="section-subtitle">View your ongoing conversation with administrators. You can reply back as long as the ticket remains Open.</div>
                
                 <div class="table-container">
                     <table>
@@ -353,10 +393,10 @@
                             <tr>
                                 <th>App ID</th>
                                 <th>Subject</th>
-                                <th>Your Message</th>
+                                <th>Initial Message</th>
                                 <th>Date Submitted</th>
                                 <th>Status</th>
-                                <th>Admin Reply</th>
+                                <th>Conversation Log & Follow-up Reply</th>
                             </tr>
                         </thead>
                         <tbody id="enquiryTableBody">
@@ -367,7 +407,6 @@
             </div>
         </div>
     </div>
-
     <script>
         window.addEventListener('DOMContentLoaded', async () => {
             const userEmail = localStorage.getItem('userEmail');
@@ -445,6 +484,28 @@
                 alert("Unable to submit your enquiry. Please try again.");
             }
         }
+        async function sendMemberReply(enquiryId, index) {
+            const replyText = document.getElementById(`memberReplyText-${index}`).value.trim();
+            const userEmail = localStorage.getItem('userEmail');
+            if (!replyText) {
+                alert("Please type a reply message.");
+                return;
+            }
+            try {
+                const response = await fetch('../api/enquiries.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enquiryId: enquiryId, reply: `Member (${userEmail}):\n${replyText}` })
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.message || 'Failed to send reply.');
+               
+                await loadEnquiries(userEmail);
+                alert("Reply sent successfully!");
+            } catch (error) {
+                alert("Error sending reply: " + error.message);
+            }
+        }
         async function loadEnquiries(userEmail) {
             const tableBody = document.getElementById('enquiryTableBody');
             try {
@@ -459,16 +520,28 @@
                     return;
                 }
                 tableBody.innerHTML = '';
-                enquiries.forEach(item => {
+                enquiries.forEach((item, index) => {
                     const row = document.createElement('tr');
-                    const statusClass = item.status === 'Resolved' ? 'badge-resolved' : 'badge-pending';
+                    const isResolved = item.status === 'Resolved';
+                    const statusClass = isResolved ? 'badge-resolved' : 'badge-pending';
+                    const replyContent = item.reply && item.reply !== 'Awaiting administrator response...' ? item.reply : 'Awaiting administrator response...';
+                   
                     row.innerHTML = `
                         <td><strong>${item.appId}</strong></td>
                         <td>${item.subject}</td>
-                        <td style="max-width: 280px; white-space: pre-wrap;">${item.message || ''}</td>
+                        <td style="max-width: 220px; white-space: pre-wrap;">${item.message || ''}</td>
                         <td>${item.date}</td>
-                        <td><span class="${statusClass}">${item.status}</span></td>
-                        <td style="color: var(--text-muted); font-style: italic;">${item.reply || 'Awaiting administrator response...'}</td>
+                        <td><span class="${statusClass}">${item.status || 'Open'}</span></td>
+                        <td>
+                            <div class="chat-history-box">${replyContent}</div>
+                            ${isResolved ?
+                                `<div style="color: #166534; font-weight: 600; font-size: 11px;"><i class="fa-solid fa-check-circle"></i> Ticket Closed (Solved)</div>` :
+                                `<div class="member-reply-group">
+                                    <textarea class="member-reply-textarea" id="memberReplyText-${index}" placeholder="Type follow-up reply..."></textarea>
+                                    <button type="button" class="btn-member-reply" onclick="sendMemberReply(${item.id},${index})"><i class="fa-solid fa-paper-plane"></i> Reply</button>
+                                </div>`
+                            }
+                        </td>
                     `;
                     tableBody.appendChild(row);
                 });
