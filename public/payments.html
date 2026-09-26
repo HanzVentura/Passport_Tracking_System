@@ -162,6 +162,30 @@
                             <span class="plan-price">₱1,200.00</span>
                         </label>
                     </div>
+
+                    <!-- Delivery vs In-Person Receiving Section -->
+                    <span class="section-label">Receiving Option</span>
+                    <div class="plan-list" style="margin-bottom: 20px;">
+                        <label class="plan-option selected" id="planInPerson">
+                            <input type="radio" name="receivingOption" value="In-Person" checked>
+                            <span class="plan-copy"><i class="fa-solid fa-circle-check"></i><span><span class="plan-name">In-Person Claiming</span><span class="plan-time">Pick up at consular office (Free)</span></span></span>
+                            <span class="plan-price">₱0.00</span>
+                        </label>
+                        <label class="plan-option" id="planDelivery">
+                            <input type="radio" name="receivingOption" value="Delivery">
+                            <span class="plan-copy"><i class="fa-regular fa-circle-check"></i><span><span class="plan-name">Courier Delivery</span><span class="plan-time">Delivered straight to your address</span></span></span>
+                            <span class="plan-price" id="deliveryPriceDisplay">₱150.00</span>
+                        </label>
+                    </div>
+
+                    <div id="deliveryAddressSection" style="display: none; margin-bottom: 24px; padding: 18px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                        <div class="form-group full" style="margin-bottom: 0;">
+                            <label for="deliveryAddress">Complete Delivery Address</label>
+                            <input class="form-control" id="deliveryAddress" type="text" placeholder="House/Unit No., Street, Barangay, City/Municipality, Province">
+                            <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px;">Fare is calculated automatically after you finish typing.</small>
+                        </div>
+                    </div>
+
                     <form id="paymentForm">
                         <span class="section-label">Payment method</span>
                         <div class="method-list">
@@ -189,6 +213,7 @@
                         <div class="summary-line"><span>Applicant</span><strong id="summaryApplicant">---</strong></div>
                         <div class="summary-line"><span>Current status</span><strong id="summaryStatus">Form Submitted</strong></div>
                         <div class="summary-line"><span>Processing</span><strong id="summaryPlan">Regular Processing</strong></div>
+                        <div class="summary-line" id="summaryDeliveryLine" style="display:none;"><span>Receiving / Delivery</span><strong id="summaryDeliveryText">Courier Delivery (₱150.00)</strong></div>
                         <div class="summary-line total-line"><span>Total due</span><strong id="summaryAmount">₱950.00</strong></div>
                     </div>
                     <div id="successState" class="success-state"><i class="fa-solid fa-circle-check"></i><p id="successMessage"></p><a class="btn-primary" href="dashboard.html" style="display:inline-block;margin-top:16px;text-decoration:none;">View Dashboard</a></div>
@@ -244,29 +269,75 @@
             "TUGUEGARAO": { name: "DFA Regional Consular Office – TugueGarao", address: "Regional Government Center, Carig Sur, TugueGarao City", contact: "(078) 844-0000" },
             "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City", contact: "(062) 991-0000" }
         };
+
         const urlParams = new URLSearchParams(window.location.search);
         const storedApplicationId = urlParams.get('id')
             || urlParams.get('application_id')
             || localStorage.getItem('currentApplicationId')
             || localStorage.getItem('activeAppId');
         let activeApplication = null;
+        let typingTimer = null; // Debounce timer
+
         const form = document.getElementById('paymentForm');
         const message = document.getElementById('formMessage');
         const payButton = document.getElementById('payButton');
+
         function showMessage(text, type) {
             message.textContent = text;
             message.className = `message ${type}`;
         }
-        function updateSelectedPlan() {
-            const selected = document.querySelector('input[name="processingType"]:checked');
-            document.querySelectorAll('.plan-option').forEach(option => {
-                const isSelected = option.querySelector('input').checked;
-                option.classList.toggle('selected', isSelected);
-                option.querySelector('i').className = isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle-check';
-            });
-            document.getElementById('summaryPlan').textContent = selected.value;
-            document.getElementById('summaryAmount').textContent = `₱${Number(selected.dataset.amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+
+        function calculateDeliveryFee(addressText) {
+            if (!addressText || addressText.trim().length < 5) return 150; // Base fare
+            // Use word count or stable length tiers instead of per-letter
+            const words = addressText.trim().split(/\s+/).length;
+            return 150 + (words * 15);
         }
+
+        function updateSelectedPlan() {
+            const selectedPlan = document.querySelector('input[name="processingType"]:checked');
+            const receivingOption = document.querySelector('input[name="receivingOption"]:checked').value;
+            const addressVal = document.getElementById('deliveryAddress').value;
+            
+            document.querySelectorAll('input[name="processingType"]').forEach(inp => {
+                const parent = inp.closest('.plan-option');
+                const isSelected = inp.checked;
+                parent.classList.toggle('selected', isSelected);
+                parent.querySelector('i').className = isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle-check';
+            });
+
+            document.querySelectorAll('input[name="receivingOption"]').forEach(inp => {
+                const parent = inp.closest('.plan-option');
+                const isSelected = inp.checked;
+                parent.classList.toggle('selected', isSelected);
+                parent.querySelector('i').className = isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle-check';
+            });
+
+            const baseAmount = Number(selectedPlan.dataset.amount);
+            let deliveryFee = 0;
+
+            const deliverySection = document.getElementById('deliveryAddressSection');
+            const summaryDeliveryLine = document.getElementById('summaryDeliveryLine');
+            const summaryDeliveryText = document.getElementById('summaryDeliveryText');
+
+            if (receivingOption === 'Delivery') {
+                deliverySection.style.display = 'block';
+                deliveryFee = calculateDeliveryFee(addressVal);
+                document.getElementById('deliveryPriceDisplay').textContent = `₱${deliveryFee.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+                
+                summaryDeliveryLine.style.display = 'flex';
+                summaryDeliveryText.textContent = `Courier Delivery (₱${deliveryFee.toLocaleString('en-PH', { minimumFractionDigits: 2 })})`;
+            } else {
+                deliverySection.style.display = 'none';
+                summaryDeliveryLine.style.display = 'none';
+            }
+
+            const totalDue = baseAmount + deliveryFee;
+
+            document.getElementById('summaryPlan').textContent = selectedPlan.value;
+            document.getElementById('summaryAmount').textContent = `₱${totalDue.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+        }
+
         function displayApplication(application) {
             const applicationId = storedApplicationId || application.application_id || application.applicationId;
             if (!applicationId) {
@@ -287,8 +358,7 @@
             const currentStatus = application.status;
             const isAlreadyPaid = (paymentStatus === 'Paid' || currentStatus === 'Paid' || currentStatus === 'Biometrics Received');
             document.getElementById('summaryStatus').textContent = isAlreadyPaid ? 'Paid' : 'Form Submitted';
-            
-            // If already paid, reflect the saved processing option in the radio selection
+           
             const savedProcessing = application.processing_type || application.processingType;
             if (savedProcessing) {
                 document.querySelectorAll('input[name="processingType"]').forEach(input => {
@@ -296,8 +366,14 @@
                         input.checked = true;
                     }
                 });
-                updateSelectedPlan();
             }
+
+            if (application.delivery_address || application.deliveryAddress) {
+                document.querySelector('input[name="receivingOption"][value="Delivery"]').checked = true;
+                document.getElementById('deliveryAddress').value = application.delivery_address || application.deliveryAddress;
+            }
+
+            updateSelectedPlan();
 
             if (document.getElementById('paymentEmail')) {
                 document.getElementById('paymentEmail').value = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || '');
@@ -308,18 +384,13 @@
                 payButton.disabled = true;
                 payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Already Paid';
                 showMessage('This application has already been paid. Your appointment is locked in.', 'success');
-                
-                // Disable all form inputs so user cannot change selections after payment
-                document.querySelectorAll('input[name="processingType"]').forEach(inp => inp.disabled = true);
-                document.querySelectorAll('input[name="paymentMethod"]').forEach(inp => inp.disabled = true);
-                document.getElementById('accountName').disabled = true;
-                document.getElementById('accountReference').disabled = true;
-                document.getElementById('paymentEmail').disabled = true;
-                document.getElementById('paymentNote').disabled = true;
+               
+                document.querySelectorAll('input').forEach(inp => inp.disabled = true);
                 document.querySelectorAll('.plan-option').forEach(opt => opt.style.cursor = 'not-allowed');
                 document.querySelectorAll('.method-option').forEach(opt => opt.style.cursor = 'not-allowed');
             }
         }
+
         async function loadPage() {
             try {
                 const userResponse = await fetch('../api/user-data.php');
@@ -352,31 +423,60 @@
                 payButton.disabled = true;
             }
         }
-        document.querySelectorAll('input[name="processingType"]').forEach(input => input.addEventListener('change', updateSelectedPlan));
+
+        document.querySelectorAll('input[name="processingType"], input[name="receivingOption"]').forEach(input => input.addEventListener('change', updateSelectedPlan));
+        
+        // Debounce input event so it waits 2 seconds after typing stops before updating
+        document.getElementById('deliveryAddress').addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                updateSelectedPlan();
+            }, 2000); // 2000ms = 2 seconds
+        });
        
         form.addEventListener('submit', async event => {
             event.preventDefault();
             if (!activeApplication) return showMessage('No active application is available for payment.', 'error');
+            
+            const receivingOption = document.querySelector('input[name="receivingOption"]:checked').value;
+            const deliveryAddressVal = document.getElementById('deliveryAddress').value.trim();
+            if (receivingOption === 'Delivery' && !deliveryAddressVal) {
+                return showMessage('Please provide your complete delivery address for courier delivery.', 'error');
+            }
+
             payButton.disabled = true;
             payButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
            
             const selectedPlan = document.querySelector('input[name="processingType"]:checked');
-            const paymentAmount = Number(selectedPlan.dataset.amount);
+            const baseAmount = Number(selectedPlan.dataset.amount);
+            const deliveryFee = receivingOption === 'Delivery' ? calculateDeliveryFee(deliveryAddressVal) : 0;
+            const totalPaymentAmount = baseAmount + deliveryFee;
+
             const applicationType = activeApplication.applicationType
                 || localStorage.getItem('applicationType')
                 || 'New First-Time Application';
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
             const currentEmail = typeof userEmail !== 'undefined' ? userEmail : localStorage.getItem('userEmail');
+
             try {
                 const response = await fetch('../api/payments.php', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentEmail, applicationId: activeApplication.applicationId, processingType: selectedPlan.value, amount: paymentAmount, paymentMethod })
+                    body: JSON.stringify({ 
+                        email: currentEmail, 
+                        applicationId: activeApplication.applicationId, 
+                        processingType: selectedPlan.value, 
+                        amount: totalPaymentAmount, 
+                        paymentMethod,
+                        receivingOption: receivingOption,
+                        deliveryAddress: receivingOption === 'Delivery' ? deliveryAddressVal : null,
+                        deliveryFee: deliveryFee
+                    })
                 });
                 const result = await response.json();
                 if (!response.ok || !result.success) throw new Error(result.message || 'Unable to process payment.');
                
                 activeApplication.status = result.status;
-                activeApplication.paymentAmount = result.amount ?? paymentAmount;
+                activeApplication.paymentAmount = result.amount ?? totalPaymentAmount;
                 activeApplication.applicationType = applicationType;
                
                 document.getElementById('summaryStatus').textContent = 'Paid';
@@ -394,6 +494,7 @@
                 payButton.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Now';
             }
         });
+
         loadPage();
     </script>
 </body>

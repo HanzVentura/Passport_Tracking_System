@@ -168,6 +168,32 @@
             box-shadow: var(--shadow-elevated);
             border-color: #cbd5e1;
         }
+       
+        /* Clickable Active Application Card */
+        #cardActiveApp.clickable-card {
+            cursor: pointer;
+            position: relative;
+        }
+        #cardActiveApp.clickable-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        #cardActiveApp.clickable-card::after {
+            content: 'Click to Download Summary';
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--primary);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        #cardActiveApp.clickable-card:hover::after {
+            opacity: 1;
+        }
         .card-title {
             font-size: 13px;
             font-weight: 700;
@@ -412,28 +438,30 @@
             <div id="dashboardView" class="app-view active-view">
                 <!-- Top Cards Grid -->
                 <div class="top-cards-grid">
-                    <!-- Card 1: Active Application -->
-                    <div class="card dashboard-card" id="cardActiveApp">
-                        <div class="card-title">Active Application</div>
-                        <div class="empty-state-content" id="activeAppDefault">
-                            <i class="fa-regular fa-file-lines"></i>
-                            <div class="empty-state-title">No Active Application</div>
-                            <div class="empty-state-desc">Select an application below to begin your process.</div>
-                        </div>
-                        <div id="activeAppFilled" style="display: none; font-size: 13px; line-height: 1.6;">
-                            <div class="application-meta-label">Application ID</div>
-                            <div id="dispAppId" style="font-weight: 700; color: #1f2937; margin-bottom: 6px;">---</div>
-                           
-                            <div class="application-meta-label">Type</div>
-                            <div id="dispAppType" style="font-weight: 700; color: #1f2937; margin-bottom: 6px;">---</div>
-                           
-                            <div class="application-meta-label">Current Status</div>
-                            <div id="dispAppStatus" style="font-weight: 700; color: #4f46e5; margin-bottom: 6px;">Form Submitted</div>
-                            <div class="application-meta-label">Online Payment</div>
-                            <div id="dispPaymentStatus" style="font-weight: 700; color: #10b981; margin-bottom: 6px;">Verified (Online)</div>
-                           
-                            <div class="application-meta-label">Submitted</div>
-                            <div id="dispSubDate" style="font-weight: 600; color: #1f2937;">---</div>
+                    <!-- Card 1: Active Application (Clickable for Download) -->
+                    <div class="card dashboard-card" id="cardActiveApp" onclick="downloadApplicationSummary()">
+                        <div>
+                            <div class="card-title">Active Application</div>
+                            <div class="empty-state-content" id="activeAppDefault">
+                                <i class="fa-regular fa-file-lines"></i>
+                                <div class="empty-state-title">No Active Application</div>
+                                <div class="empty-state-desc">Select an application below to begin your process.</div>
+                            </div>
+                            <div id="activeAppFilled" style="display: none; font-size: 13px; line-height: 1.6;">
+                                <div class="application-meta-label">Application ID</div>
+                                <div id="dispAppId" style="font-weight: 700; color: #1f2937; margin-bottom: 6px;">---</div>
+                               
+                                <div class="application-meta-label">Type</div>
+                                <div id="dispAppType" style="font-weight: 700; color: #1f2937; margin-bottom: 6px;">---</div>
+                               
+                                <div class="application-meta-label">Current Status</div>
+                                <div id="dispAppStatus" style="font-weight: 700; color: #4f46e5; margin-bottom: 6px;">Form Submitted</div>
+                                <div class="application-meta-label">Online Payment</div>
+                                <div id="dispPaymentStatus" style="font-weight: 700; color: #10b981; margin-bottom: 6px;">Verified (Online)</div>
+                               
+                                <div class="application-meta-label">Submitted</div>
+                                <div id="dispSubDate" style="font-weight: 600; color: #1f2937;">---</div>
+                            </div>
                         </div>
                     </div>
                     <!-- Card 2: Application Status -->
@@ -466,10 +494,7 @@
                             <div class="empty-state-desc">No upcoming appointments or tasks at this time.</div>
                         </div>
                         <div id="pendingAppFilled" style="display: none; flex-direction: column; justify-content: center;">
-                            <strong style="display: block; margin-bottom: 4px;">Appointment Schedule:</strong>
-                            <span>You are expected to come on</span>
-                            <strong id="dispComeDate" style="display: block; margin: 4px 0; color: #1d4ed8; font-size: 13px;">---</strong>
-                            <span id="dispAppointmentLocation" style="font-size: 11px; color: #475569; line-height: 1.4;">Appointment location not assigned yet.</span>
+                            <!-- Dynamically populated based on status and receiving option -->
                         </div>
                     </div>
                 </div>
@@ -512,6 +537,7 @@
     </div>
     <!-- Script Logic -->
     <script>
+        let currentAppData = null;
         const dfaOfficeData = {
             "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City" },
             "ANTIPOLO": { name: "DFA Regional Consular Office – Antipolo", address: "3F SM Cherry Foodarama, Marikina-Infanta Highway, Antipolo City, Rizal" },
@@ -574,21 +600,21 @@
             while (added < daysToAdd) {
                 start.setDate(start.getDate() + 1);
                 const dayOfWeek = start.getDay();
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Exclude weekends
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
                     added++;
                 }
             }
             return start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
         }
+
         function updateStatusTracker(status) {
             const normalizedStatus = (status || '').toLowerCase().trim();
-            const sequence = ['Form Submitted', 'Biometrics Received', 'Under Consular Review', 'In Printing', 'Dispatched'];
-           
             let activeCount = 1;
             if (normalizedStatus.includes('biometric')) activeCount = 2;
             if (normalizedStatus.includes('review')) activeCount = 3;
             if (normalizedStatus.includes('print')) activeCount = 4;
             if (normalizedStatus.includes('dispatch') || normalizedStatus.includes('ready')) activeCount = 5;
+            
             document.querySelectorAll('[data-status-step]').forEach((step, index) => {
                 const isActive = index < activeCount;
                 const icon = step.querySelector('i');
@@ -596,7 +622,9 @@
                 icon.className = isActive ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle';
             });
         }
+
         function displaySavedApplication(application) {
+            currentAppData = application;
             const appId = application.application_id || application.applicationId;
             document.getElementById('dispAppId').innerText = appId;
             localStorage.setItem('currentApplicationId', appId);
@@ -606,38 +634,67 @@
             const currentStatus = application.status || 'Form Submitted';
             document.getElementById('dispAppStatus').innerText = currentStatus;
             updateStatusTracker(currentStatus);
+            
             const paymentStatus = application.payment_status || application.paymentStatus || 'Unpaid';
             document.getElementById('dispPaymentStatus').innerText = paymentStatus === 'Paid' ? 'Verified (Online)' : 'Unpaid';
            
             const estDisplay = document.getElementById('estimatedDateDisplay');
             const processingType = application.processing_type || application.processingType || 'Regular Processing';
             const appointmentDateVal = application.appointmentDate || application.appointment_date;
-
+            
             if (currentStatus === 'Form Submitted') {
                 estDisplay.innerText = 'Est. Completion: Available after biometrics';
             } else {
                 const computedDate = calculateEstimatedCompletion(appointmentDateVal, processingType);
                 estDisplay.innerText = `Est. Completion: ${computedDate}`;
             }
+
             if (application.missingDocumentsFlag) {
                 document.getElementById('missingDocsReasonText').innerText = application.missingDocumentsReason || 'Please review missing requirements.';
                 document.getElementById('missingDocsAlert').style.display = 'block';
             }
            
-            // Show appointment reminder in Pending Action while status is Form Submitted or Appointment Rescheduled
-            if ((currentStatus === 'Form Submitted' || currentStatus === 'Appointment Rescheduled') && appointmentDateVal) {
-                document.getElementById('dispComeDate').innerText = formatAppointmentDate(appointmentDateVal, application.appointmentTime || application.appointment_time);
+            const pendingContainer = document.getElementById('pendingAppFilled');
+            const pendingDefault = document.getElementById('pendingAppDefault');
+
+            if (currentStatus === 'Dispatched') {
+                pendingDefault.style.display = 'none';
+                pendingContainer.style.display = 'flex';
+                
+                const receivingOpt = application.receiving_option || application.receivingOption;
+                if (receivingOpt === 'Delivery') {
+                    pendingContainer.innerHTML = `
+                        <strong style="margin-bottom: 4px;">Courier Dispatch Notice:</strong>
+                        <span style="font-size: 12px; margin-bottom: 8px;">Your passport has been successfully dispatched to your registered delivery address.</span>
+                        <a href="delivery-tracker.html?id=${appId}" style="display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; width: fit-content; margin-top: 4px;">
+                            <i class="fa-solid fa-truck-fast"></i> Click Here to Track Delivery
+                        </a>
+                    `;
+                } else {
+                    pendingContainer.innerHTML = `
+                        <strong style="margin-bottom: 4px;">Ready for In-Person Pickup:</strong>
+                        <span style="font-size: 12px; line-height: 1.5;">You can now claim your passport at your designated consular office during regular working days (Monday to Friday, 8:00 AM to 5:00 PM). Please bring a valid ID and your official receipt.</span>
+                    `;
+                }
+            } else if ((currentStatus === 'Form Submitted' || currentStatus === 'Appointment Rescheduled') && appointmentDateVal) {
+                pendingDefault.style.display = 'none';
+                pendingContainer.style.display = 'flex';
+                
                 const rawLoc = application.appointmentLocation || application.appointment_location || '';
                 const office = dfaOfficeData[rawLoc];
                 const fullLocationDisplay = office ? `${office.name} - ${office.address}` : rawLoc;
-                document.getElementById('dispAppointmentLocation').innerText = fullLocationDisplay ? `in ${fullLocationDisplay}` : 'Appointment location assigned.';
-                document.getElementById('pendingAppDefault').style.display = 'none';
-                document.getElementById('pendingAppFilled').style.display = 'flex';
+                
+                pendingContainer.innerHTML = `
+                    <strong style="display: block; margin-bottom: 4px;">Appointment Schedule:</strong>
+                    <span>You are expected to come on</span>
+                    <strong id="dispComeDate" style="display: block; margin: 4px 0; color: #1d4ed8; font-size: 13px;">${formatAppointmentDate(appointmentDateVal, application.appointmentTime || application.appointment_time)}</strong>
+                    <span id="dispAppointmentLocation" style="font-size: 11px; color: #475569; line-height: 1.4;">in ${fullLocationDisplay || 'Appointment location assigned.'}</span>
+                `;
             } else {
-                // Once admin checks off Biometrics Received or advances status, pending action returns to All Clear
-                document.getElementById('pendingAppDefault').style.display = 'flex';
-                document.getElementById('pendingAppFilled').style.display = 'none';
+                pendingDefault.style.display = 'flex';
+                pendingContainer.style.display = 'none';
             }
+
             if (application.createdAt || application.created_at) {
                 document.getElementById('dispSubDate').innerText = new Date(application.createdAt || application.created_at)
                     .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -646,6 +703,66 @@
             document.getElementById('activeAppFilled').style.display = 'block';
             document.getElementById('statusAppDefault').style.display = 'none';
             document.getElementById('statusAppFilled').style.display = 'flex';
+            document.getElementById('cardActiveApp').classList.add('clickable-card');
+        }
+
+        function downloadApplicationSummary() {
+            if (!currentAppData) return;
+            const app = currentAppData;
+            const appId = app.application_id || app.applicationId || 'N/A';
+            const appType = app.application_type || app.applicationType || 'New First-Time Application';
+            const status = app.status || 'Form Submitted';
+            const payment = app.payment_status || app.paymentStatus || 'Verified (Online)';
+            const subDate = app.createdAt || app.created_at ? new Date(app.createdAt || app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A';
+            const rawAppDate = app.appointmentDate || app.appointment_date;
+            const appDate = rawAppDate ? new Date(`${rawAppDate}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not Scheduled';
+            const appTime = app.appointmentTime || app.appointment_time || 'N/A';
+            const rawLoc = app.appointmentLocation || app.appointment_location || 'DFA Consular Office';
+            const office = dfaOfficeData[rawLoc];
+            const appLoc = office ? `${office.name} - ${office.address}` : rawLoc;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Passport Application Summary - ${appId}</title>
+                    <style>
+                        body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; padding: 40px; color: #0f172a; }
+                        .header { text-align: center; border-bottom: 2px solid #4f46e5; padding-bottom: 20px; margin-bottom: 30px; }
+                        .header h1 { color: #4f46e5; font-size: 24px; margin-bottom: 5px; }
+                        .header p { color: #64748b; font-size: 14px; }
+                        .details-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        .details-table th, .details-table td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 14px; }
+                        .details-table th { width: 35%; color: #64748b; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; }
+                        .details-table td { font-weight: 700; color: #0f172a; }
+                        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Passport Tracking System</h1>
+                        <p>Official Application Summary Report</p>
+                    </div>
+                    <table class="details-table">
+                        <tr><th>Application ID</th><td>${appId}</td></tr>
+                        <tr><th>Application Type</th><td>${appType}</td></tr>
+                        <tr><th>Current Status</th><td>${status}</td></tr>
+                        <tr><th>Online Payment</th><td>${payment}</td></tr>
+                        <tr><th>Submitted Date</th><td>${subDate}</td></tr>
+                        <tr><th>Appointment Date</th><td>${appDate}</td></tr>
+                        <tr><th>Appointment Time</th><td>${appTime}</td></tr>
+                        <tr><th>Appointment Location</th><td>${appLoc}</td></tr>
+                    </table>
+                    <div class="footer">
+                        <p>Generated securely via Passport Tracking System Dashboard.</p>
+                    </div>
+                    <script>
+                        window.onload = function() { window.print(); }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
        
         window.addEventListener('DOMContentLoaded', async () => {

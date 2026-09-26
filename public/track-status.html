@@ -23,52 +23,67 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
-        
+       
         .top-nav { background: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 18px 40px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-weight: 700; font-size: 18px; color: var(--text-main); display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .logo i { color: var(--primary); }
         .back-link { font-size: 14px; font-weight: 600; color: var(--primary); text-decoration: none; }
         .back-link:hover { text-decoration: underline; }
-
-        .container { max-width: 1350px; margin: 0 auto; width: 100%; padding: 40px; flex: 1; }
-        
+        .container { max-width: 1100px; margin: 0 auto; width: 100%; padding: 40px; flex: 1; }
+       
         .hero-banner { background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: #fff; padding: 32px 36px; border-radius: var(--radius-md); margin-bottom: 30px; box-shadow: var(--shadow-elevated); text-align: center; }
         .hero-banner h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
         .hero-banner p { font-size: 14px; opacity: 0.9; margin-bottom: 20px; }
-
         .search-box { display: flex; max-width: 600px; margin: 0 auto; gap: 10px; background: #fff; padding: 6px; border-radius: var(--radius-sm); box-shadow: var(--shadow-subtle); }
         .search-box input { flex: 1; border: 0; outline: none; padding: 10px 14px; font-size: 14px; color: var(--text-main); }
         .search-box button { background: var(--primary); color: #fff; border: 0; padding: 10px 20px; font-weight: 600; font-size: 14px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
         .search-box button:hover { background: var(--primary-hover); }
-
-        .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start; margin-top: 30px; }
+        .results-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; align-items: start; margin-top: 30px; }
         .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 28px; box-shadow: var(--shadow-subtle); }
         .card-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 20px; }
-        
+       
+        /* Clickable Active Application Card */
+        #cardActiveApp.clickable-card {
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        #cardActiveApp.clickable-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-elevated);
+            transform: translateY(-2px);
+        }
+        #cardActiveApp.clickable-card::after {
+            content: 'Click to Download Summary';
+            position: absolute;
+            bottom: 14px;
+            right: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--primary);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        #cardActiveApp.clickable-card:hover::after {
+            opacity: 1;
+        }
         .info-group { margin-bottom: 16px; }
         .info-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block; }
         .info-value { font-size: 15px; font-weight: 700; color: var(--text-main); overflow-wrap: anywhere; }
-
         .timeline-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
         .timeline-item { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; color: var(--text-muted); }
         .timeline-item.completed { color: var(--text-main); }
         .timeline-item i { font-size: 18px; color: #cbd5e1; }
         .timeline-item.completed i { color: #10b981; }
-
         .est-box { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; font-weight: 600; text-align: center; color: var(--text-main); }
-
-        .action-card { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 20px; color: #1e40af; }
-        .action-card strong { display: block; font-size: 14px; margin-bottom: 6px; }
-        .action-card p { font-size: 13px; line-height: 1.5; }
-
         .placeholder-state { text-align: center; padding: 60px 20px; color: var(--text-muted); grid-column: 1 / -1; }
         .placeholder-state i { font-size: 48px; color: #cbd5e1; margin-bottom: 14px; }
         .placeholder-state p { font-size: 14px; }
-
         .message { margin-top: 12px; font-size: 13px; text-align: center; font-weight: 600; }
         .message.error { color: #dc2626; }
-
-        @media (max-width: 1024px) { .results-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .results-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -76,21 +91,19 @@
         <a href="index.html" class="logo"><i class="fa-solid fa-passport"></i> Passport Tracking System</a>
         <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Login</a>
     </header>
-
     <div class="container">
         <div class="hero-banner">
             <h1>Public Application Tracker</h1>
-            <p>Check your active passport application status instantly using your Application ID.</p>
+            <p>Check your active passport application status instantly using your Application ID[cite: 12].</p>
             <form id="searchForm" class="search-box">
                 <input type="text" id="appIdInput" placeholder="Enter Application ID (e.g. PH-771065)" required>
                 <button type="submit">Track Status</button>
             </form>
             <div id="formMessage" class="message"></div>
         </div>
-
         <div id="resultsContainer" style="display:none;" class="results-grid">
-            <!-- Card 1: Active Application -->
-            <section class="card">
+            <!-- Card 1: Active Application (Clickable for Download) -->
+            <section class="card clickable-card" id="cardActiveApp" onclick="downloadApplicationSummary()" title="Click to download application summary">
                 <div class="card-title">Active Application</div>
                 <div class="info-group">
                     <span class="info-label">Application ID</span>
@@ -113,81 +126,143 @@
                     <span class="info-value" id="resDate">---</span>
                 </div>
             </section>
-
-            <!-- Card 2: Application Status (5-Step Timeline) -->
+            <!-- Card 2: Application Status or Dynamic Pending Action / Instructions -->
             <section class="card">
-                <div class="card-title">Application Status</div>
-                <div class="timeline-list">
-                    <div class="timeline-item" id="step1"><i class="fa-solid fa-circle-check"></i> Form Submitted</div>
-                    <div class="timeline-item" id="step2"><i class="fa-solid fa-circle-check"></i> Biometrics Received</div>
-                    <div class="timeline-item" id="step3"><i class="fa-solid fa-circle-check"></i> Under Consular Review</div>
-                    <div class="timeline-item" id="step4"><i class="fa-solid fa-circle-check"></i> In Printing</div>
-                    <div class="timeline-item" id="step5"><i class="fa-solid fa-circle-check"></i> Dispatched</div>
+                <div class="card-title" id="statusCardTitle">Application Status</div>
+                <div id="timelineContainer">
+                    <div class="timeline-list">
+                        <div class="timeline-item" id="step1"><i class="fa-solid fa-circle-check"></i> Form Submitted</div>
+                        <div class="timeline-item" id="step2"><i class="fa-solid fa-circle-check"></i> Biometrics Received</div>
+                        <div class="timeline-item" id="step3"><i class="fa-solid fa-circle-check"></i> Under Consular Review</div>
+                        <div class="timeline-item" id="step4"><i class="fa-solid fa-circle-check"></i> In Printing</div>
+                        <div class="timeline-item" id="step5"><i class="fa-solid fa-circle-check"></i> Dispatched</div>
+                    </div>
+                    <div class="est-box" id="resEstDate">Est. Completion: ---</div>
                 </div>
-                <div class="est-box" id="resEstDate">Est. Completion: ---</div>
-            </section>
-
-            <!-- Card 3: Pending Action / Appointment Schedule -->
-            <section class="card">
-                <div class="card-title">Pending Action</div>
-                <div class="action-card" id="actionCard">
-                    <strong id="actionHeader">Appointment Schedule:</strong>
-                    <p id="actionText">Loading appointment details...</p>
+                <div id="postDispatchContainer" style="display: none; font-size: 13px; line-height: 1.6; color: var(--text-main);">
+                    <!-- Dynamically populated post-dispatch instructions -->
                 </div>
             </section>
         </div>
-
         <div id="placeholderState" class="placeholder-state">
             <i class="fa-regular fa-folder-open"></i>
-            <p>Enter your Application ID above to view your detailed progress and appointment status.</p>
+            <p>Enter your Application ID above to view your detailed progress status[cite: 12].</p>
         </div>
     </div>
-
     <script>
+        let currentAppData = null;
         const steps = ['Form Submitted', 'Biometrics Received', 'Under Consular Review', 'In Printing', 'Dispatched'];
-
+       
+        const dfaOfficeData = {
+            "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City" },
+            "ANTIPOLO": { name: "DFA Regional Consular Office – Antipolo", address: "3F SM Cherry Foodarama, Marikina-Infanta Highway, Antipolo City, Rizal" },
+            "ANTIQUE": { name: "DFA Regional Consular Office – Antique", address: "CityMall Antique, National Road, San Jose de Buenavista, Antique" },
+            "BACOLOD": { name: "DFA Regional Consular Office – Bacolod", address: "3rd Level Robinsons Place Bacolod, Brgy. Mandalangan, Bacolod City" },
+            "BAGUIO": { name: "DFA Regional Consular Office – Baguio", address: "SM City Baguio Upper Basement, Luneta Hill, Upper Session Road, Baguio City" },
+            "BALANGA": { name: "DFA Regional Consular Office – Balanga", address: "The Bunker Building, Capitol Compound, Balanga City, Bataan" },
+            "BUTUAN": { name: "DFA Regional Consular Office – Butuan", address: "3rd Level Robinsons Place Butuan, J.C. Aquino Ave., Butuan City" },
+            "CAGAYAN DE ORO": { name: "DFA Regional Consular Office – Cagayan de Oro", address: "3F Centrio Mall, cor. Corrales and Recto Sts., Cagayan de Oro City" },
+            "CALASIAO": { name: "DFA Regional Consular Office – Calasiao", address: "2F Robinsons Place-Pangasinan, Brgy. San Miguel, Calasiao, Pangasinan" },
+            "CANDON": { name: "DFA Regional Consular Office – Candon", address: "Candon City Arena, Candon City, Ilocos Sur" },
+            "CEBU": { name: "DFA Regional Consular Office – Cebu", address: "4th Level Pacific Mall-Metro Mandaue, UN Ave. cor. MC Briones St., Mandaue City" },
+            "CLARIN": { name: "DFA Regional Consular Office – Clarin", address: "Clarin Town Center, Clarin, Misamis Occidental" },
+            "DFA MANILA": { name: "DFA Manila (ASEANA)", address: "ASEANA Business Park, Bradco Avenue corner Macapagal Boulevard, Parañaque City" },
+            "DFA NCR CENTRAL": { name: "DFA NCR Central", address: "Lingkod Pinoy Center, Robinsons Galleria, West Lane EDSA cor. Ortigas Ave., Quezon City" },
+            "DFA NCR EAST": { name: "DFA NCR East (Megamall)", address: "7F Building C, SM Megamall, EDSA cor. J. Vargas Ave., Mandaluyong City" },
+            "DFA NCR NORTH": { name: "DFA NCR North (Novaliches)", address: "Quirino Highway, Novaliches, Quezon City (across SM City Fairview)" },
+            "DFA NCR NORTHEAST": { name: "DFA NCR Northeast (Ali Mall)", address: "Level 2, Ali Mall Government Center, Cubao, Quezon City" },
+            "DFA NCR SOUTH": { name: "DFA NCR South (Alabang)", address: "4th Floor, Metro Alabang Town Center, Muntinlupa City" },
+            "DFA NCR WEST": { name: "DFA NCR West (SM Manila)", address: "5th Floor, SM City Manila, Concepcion St., Manila" },
+            "DASMARIÑAS": { name: "DFA Regional Consular Office – Dasmariñas", address: "SM City Dasmariñas, Governor's Drive, Brgy. Sampaloc 1, Dasmariñas City, Cavite" },
+            "DAVAO": { name: "DFA Regional Consular Office – Davao", address: "3F SM City-Davao Quimpo Boulevard, Ecoland Subdivision, Davao City" },
+            "DUMAGUETE": { name: "DFA Regional Consular Office – Dumaguete", address: "2F Robinsons Place South Road, Calidangan, Dumaguete City" },
+            "GENERAL SANTOS": { name: "DFA Regional Consular Office – General Santos", address: "GF Robinsons Place GenSan, Jose Catolico Sr. Ave., General Santos City" },
+            "ILOCOS NORTE": { name: "DFA Regional Consular Office – Ilocos Norte", address: "Robinsons Place Ilocos Norte, Brgy. San Francisco, San Nicolas, Ilocos Norte" },
+            "ILOILO": { name: "DFA Regional Consular Office – Iloilo", address: "3F Robinsons Place Iloilo Quezon Wing, Iloilo City" },
+            "KIDAPAWAN": { name: "DFA Regional Consular Office – Kidapawan", address: "People's Palace, City Hall, Kidapawan City" },
+            "LA UNION": { name: "DFA Regional Consular Office – La Union", address: "2nd Floor Manna Mall, Marcos Highway corner Diversion Road, San Fernando, La Union" },
+            "LEGAZPI": { name: "DFA Regional Consular Office – Legazpi", address: "3F Pacific Mall-Legazpi, Landco Business Park, Legazpi City" },
+            "LIPA": { name: "DFA Regional Consular Office – Lipa", address: "2F Robinsons Place-Lipa, JP Laurel Highway, Lipa City, Batangas" },
+            "LUCENA": { name: "DFA Regional Consular Office – Lucena", address: "3F Pacific Mall-Lucena, M.L. Tagarao St., Lucena City" },
+            "MALOLOS": { name: "DFA Regional Consular Office – Malolos", address: "3F Malolos Central Transport Terminal and Commercial Hub by Xentro Mall, Malolos City" },
+            "OLONGAPO": { name: "DFA Regional Consular Office – Olongapo", address: "SM City Olongapo Central, Gordon Ave., Olongapo City" },
+            "PAGADIAN": { name: "DFA Regional Consular Office – Pagadian", address: "C3 Mall, Pagadian City, Zamboanga del Sur" },
+            "PAMPANGA": { name: "DFA Regional Consular Office – Pampanga Starmills", address: "2F Robinsons StarMills, City of San Fernando, Pampanga" },
+            "PANIQUI, TARLAC": { name: "DFA Regional Consular Office – Paniqui", address: "Waltermart Paniqui, Tarlac" },
+            "PUERTO PRINCESA": { name: "DFA Regional Consular Office – Puerto Princesa", address: "2nd Level Robinsons Place Palawan, National Highway, Puerto Princesa City" },
+            "SAN PABLO": { name: "DFA Regional Consular Office – San Pablo", address: "2F SM City San Pablo, Maharlika Highway, San Pablo City, Laguna" },
+            "SANTIAGO, ISABELA": { name: "DFA Regional Consular Office – Santiago", address: "Robinsons Place Santiago, Maharlika Highway, Santiago City, Isabela" },
+            "TACLOBAN": { name: "DFA Regional Consular Office – Tacloban", address: "3rd Level, Robinsons North Tacloban, Brgy. Abucay, Tacloban City" },
+            "TAGBILARAN": { name: "DFA Regional Consular Office – Tagbilaran", address: "Alturas Mall, Tagbilaran City, Bohol" },
+            "TAGUM": { name: "DFA Regional Consular Office – Tagum", address: "Robinsons Place Tagum, Tagum City, Davao del Norte" },
+            "TUGUEGARAO": { name: "DFA Regional Consular Office – TugueGarao", address: "Regional Government Center, Carig Sur, TugueGarao City" },
+            "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City" }
+        };
+       
         document.getElementById('searchForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const appId = document.getElementById('appIdInput').value.trim();
             const msgEl = document.getElementById('formMessage');
             msgEl.textContent = '';
-            
+           
             if (!appId) return;
-
             try {
                 const response = await fetch(`../api/get-application.php?applicationId=${encodeURIComponent(appId)}`);
                 const result = await response.json();
-
                 if (response.ok && result.success && result.application) {
-                    const app = result.application;
-                    
-                    document.getElementById('resAppId').textContent = app.applicationId || appId;
-                    document.getElementById('resType').textContent = app.applicationType || 'New First-Time Application';
+                    currentAppData = result.application;
+                    const app = currentAppData;
+                   
+                    document.getElementById('resAppId').textContent = app.application_id || app.applicationId || appId;
+                    document.getElementById('resType').textContent = app.application_type || app.applicationType || 'New First-Time Application';
                     document.getElementById('resStatus').textContent = app.status || 'Form Submitted';
-                    document.getElementById('resDate').textContent = app.createdAt ? new Date(app.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '---';
+                    document.getElementById('resDate').textContent = (app.createdAt || app.created_at) ? new Date(app.createdAt || app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '---';
                     document.getElementById('resEstDate').textContent = `Est. Completion: ${app.estimatedCompletionDate || '---'}`;
-
+                   
                     // Update Timeline steps
                     const currentStatusIdx = steps.indexOf(app.status);
                     steps.forEach((stepName, idx) => {
                         const stepEl = document.getElementById(`step${idx + 1}`);
-                        if (currentStatusIdx !== -1 && idx <= currentStatusIdx) {
-                            stepEl.classList.add('completed');
-                            stepEl.querySelector('i').className = 'fa-solid fa-circle-check';
-                        } else {
-                            stepEl.classList.remove('completed');
-                            stepEl.querySelector('i').className = 'fa-regular fa-circle';
+                        if (stepEl) {
+                            if (currentStatusIdx !== -1 && idx <= currentStatusIdx) {
+                                stepEl.classList.add('completed');
+                                stepEl.querySelector('i').className = 'fa-solid fa-circle-check';
+                            } else {
+                                stepEl.classList.remove('completed');
+                                stepEl.querySelector('i').className = 'fa-regular fa-circle';
+                            }
                         }
                     });
 
-                    // Update Appointment / Pending Action card
-                    if (app.appointmentDate) {
-                        const formattedDate = new Date(`${app.appointmentDate}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                        document.getElementById('actionHeader').textContent = 'Appointment Schedule:';
-                        document.getElementById('actionText').innerHTML = `You are expected to come on<br><strong>${formattedDate} at ${app.appointmentTime || '09:00 AM'}</strong><br>at ${app.appointmentLocation || 'DFA Consular Office'}`;
+                    // Dynamic Post-Dispatch Handling for Public Tracker
+                    const timelineContainer = document.getElementById('timelineContainer');
+                    const postDispatchContainer = document.getElementById('postDispatchContainer');
+                    const cardTitle = document.getElementById('statusCardTitle');
+
+                    if (app.status === 'Dispatched') {
+                        cardTitle.textContent = 'Post-Dispatch Instructions';
+                        timelineContainer.style.display = 'none';
+                        postDispatchContainer.style.display = 'block';
+
+                        const receivingOpt = app.receiving_option || app.receivingOption;
+                        if (receivingOpt === 'Delivery') {
+                            postDispatchContainer.innerHTML = `
+                                <strong style="display: block; margin-bottom: 6px; color: var(--primary);">Courier Dispatch Notice:</strong>
+                                <p style="margin-bottom: 12px; color: var(--text-muted);">Your passport has been successfully dispatched via courier to your registered delivery address.</p>
+                                <a href="delivery-tracker.html?id=${app.application_id || appId}" style="display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none;">
+                                    <i class="fa-solid fa-truck-fast"></i> Click Here to Track Delivery
+                                </a>
+                            `;
+                        } else {
+                            postDispatchContainer.innerHTML = `
+                                <strong style="display: block; margin-bottom: 6px; color: var(--primary);">Ready for In-Person Pickup:</strong>
+                                <p style="color: var(--text-muted); line-height: 1.5;">You can now claim your passport at your designated consular office during regular working days (Monday to Friday, 8:00 AM to 5:00 PM). Please bring a valid ID and your official receipt.</p>
+                            `;
+                        }
                     } else {
-                        document.getElementById('actionHeader').textContent = 'Pending Payment / Scheduling:';
-                        document.getElementById('actionText').textContent = 'Please complete your online payment to lock in your appointment schedule.';
+                        cardTitle.textContent = 'Application Status';
+                        timelineContainer.style.display = 'block';
+                        postDispatchContainer.style.display = 'none';
                     }
 
                     document.getElementById('placeholderState').style.display = 'none';
@@ -201,6 +276,67 @@
                 msgEl.className = 'message error';
             }
         });
+
+        function downloadApplicationSummary() {
+            if (!currentAppData) return;
+            const app = currentAppData;
+            const appId = app.application_id || app.applicationId || 'N/A';
+            const appType = app.application_type || app.applicationType || 'New First-Time Application';
+            const status = app.status || 'Form Submitted';
+            const payment = 'Verified (Online)';
+            const subDate = (app.createdAt || app.created_at) ? new Date(app.createdAt || app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A';
+            const rawAppDate = app.appointmentDate || app.appointment_date;
+            const appDate = rawAppDate ? new Date(`${rawAppDate}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not Scheduled';
+            const appTime = app.appointmentTime || app.appointment_time || 'N/A';
+           
+            const rawLoc = app.appointmentLocation || app.appointment_location || 'DFA Consular Office';
+            const office = dfaOfficeData[rawLoc];
+            const appLoc = office ? `${office.name} - ${office.address}` : rawLoc;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Passport Application Summary - ${appId}</title>
+                    <style>
+                        body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; padding: 40px; color: #0f172a; }
+                        .header { text-align: center; border-bottom: 2px solid #4f46e5; padding-bottom: 20px; margin-bottom: 30px; }
+                        .header h1 { color: #4f46e5; font-size: 24px; margin-bottom: 5px; }
+                        .header p { color: #64748b; font-size: 14px; }
+                        .details-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        .details-table th, .details-table td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 14px; }
+                        .details-table th { width: 35%; color: #64748b; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; }
+                        .details-table td { font-weight: 700; color: #0f172a; }
+                        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Passport Tracking System</h1>
+                        <p>Official Application Summary Report</p>
+                    </div>
+                    <table class="details-table">
+                        <tr><th>Application ID</th><td>${appId}</td></tr>
+                        <tr><th>Application Type</th><td>${appType}</td></tr>
+                        <tr><th>Current Status</th><td>${status}</td></tr>
+                        <tr><th>Online Payment</th><td>${payment}</td></tr>
+                        <tr><th>Submitted Date</th><td>${subDate}</td></tr>
+                        <tr><th>Appointment Date</th><td>${appDate}</td></tr>
+                        <tr><th>Appointment Time</th><td>${appTime}</td></tr>
+                        <tr><th>Appointment Location</th><td>${appLoc}</td></tr>
+                    </table>
+                    <div class="footer">
+                        <p>Generated securely via Passport Tracking System Public Tracker.</p>
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
     </script>
 </body>
 </html>

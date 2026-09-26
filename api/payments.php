@@ -8,6 +8,9 @@ try {
     $amount = $input['amount'] ?? 950;
     $processingType = $input['processingType'] ?? 'Regular Processing';
     $paymentMethod = $input['paymentMethod'] ?? 'GCash';
+    $receivingOption = $input['receivingOption'] ?? 'In-Person';
+    $deliveryAddress = $input['deliveryAddress'] ?? null;
+    $deliveryFee = $input['deliveryFee'] ?? 0;
    
     if (!$applicationId && !$email) {
         http_response_code(400);
@@ -37,9 +40,9 @@ try {
     $appointmentDate = !empty($existingApp['appointment_date']) ? $existingApp['appointment_date'] : date('Y-m-d');
     $appointmentLocation = !empty($existingApp['appointment_location']) ? $existingApp['appointment_location'] : 'ANGELES';
    
-    // Update the record with payment status 'Paid', processing type, and persist appointment date
-    $update = $pdo->prepare("UPDATE applications SET status = 'Form Submitted', payment_status = 'Paid', processing_type = ?, amount = ?, payment_method = ?, appointment_date = ?, appointment_location = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
-    $update->execute([$processingType, $amount, $paymentMethod, $appointmentDate, $appointmentLocation, $targetAppId]);
+    // Update the record with payment status 'Paid', processing type, receiving option, delivery details, and amount
+    $update = $pdo->prepare("UPDATE applications SET status = 'Form Submitted', payment_status = 'Paid', processing_type = ?, amount = ?, payment_method = ?, receiving_option = ?, delivery_address = ?, appointment_date = ?, appointment_location = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
+    $update->execute([$processingType, $amount, $paymentMethod, $receivingOption, $deliveryAddress, $appointmentDate, $appointmentLocation, $targetAppId]);
    
     echo json_encode([
         'success' => true,
@@ -48,6 +51,8 @@ try {
         'payment_status' => 'Paid',
         'amount' => $amount,
         'processingType' => $processingType,
+        'receivingOption' => $receivingOption,
+        'deliveryAddress' => $deliveryAddress,
         'appointmentDate' => $appointmentDate,
         'appointmentLocation' => $appointmentLocation,
         'message' => 'Online payment verified and recorded successfully.'
