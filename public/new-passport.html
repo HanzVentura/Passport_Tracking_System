@@ -29,10 +29,56 @@
             color: var(--text-main);
             margin: 0;
             padding: 0;
+            display: flex;
+            min-height: 100vh;
         }
+        .sidebar {
+            width: 260px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 0;
+        }
+        .sidebar-top { display: flex; flex-direction: column; }
+        .user-profile-mini {
+            display: flex;
+            align-items: center;
+            padding: 0 24px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 16px;
+        }
+        .user-profile-mini i { font-size: 38px; color: var(--primary); margin-right: 12px; }
+        .user-info .name { font-weight: 700; font-size: 14px; color: var(--text-main); }
+        .nav-links { list-style: none; }
+        .nav-links li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .nav-links li.active a, .nav-links li a:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-right: 4px solid var(--primary);
+            font-weight: 600;
+        }
+        .nav-links li a i { margin-right: 12px; font-size: 16px; }
+        .sidebar-bottom { padding: 0 24px; }
+        .sidebar-bottom a { display: flex; align-items: center; padding: 10px 0; color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 600; }
+        .sidebar-bottom a i { margin-right: 12px; }
+        .main-container { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         .main-content {
             padding: 30px 40px;
             box-sizing: border-box;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
         }
         .header-banner {
             background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
@@ -310,464 +356,480 @@
         </div>
         <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
     </aside>
-    <main class="main-content">
-        <div class="header-banner">
-            <div>
-                <h1 id="pageHeaderTitle">PASSPORT APPLICATION</h1>
-                <p>Complete your booking details securely, accurately, and step-by-step.</p>
+    <div class="main-container">
+        <main class="main-content">
+            <div class="header-banner">
+                <div>
+                    <h1 id="pageHeaderTitle">PASSPORT APPLICATION</h1>
+                    <p>Complete your booking details securely, accurately, and step-by-step.</p>
+                </div>
+                <i class="fa-solid fa-passport" style="font-size: 40px; opacity: 0.8;"></i>
             </div>
-            <i class="fa-solid fa-passport" style="font-size: 40px; opacity: 0.8;"></i>
-        </div>
-       
-        <div class="dashboard-container">
-            <div class="wizard-steps" id="wizardHeader" style="display: none;">
-                <div class="wizard-step active" id="wStep1"><div class="step-badge">1</div><span>Site</span></div>
-                <div class="wizard-step" id="wStep2"><div class="step-badge">2</div><span>Schedule</span></div>
-                <div class="wizard-step" id="wStep3"><div class="step-badge">3</div><span>Personal</span></div>
-                <div class="wizard-step" id="wStep4"><div class="step-badge">4</div><span>Family</span></div>
-                <div class="wizard-step" id="wStep5"><div class="step-badge">5</div><span>Application</span></div>
-                <div class="wizard-step" id="wStep6"><div class="step-badge">6</div><span>Documents</span></div>
-                <div class="wizard-step" id="wStep7"><div class="step-badge">7</div><span>Review</span></div>
-            </div>
-            <form id="passportForm" action="../api/submit-application.php" method="POST" enctype="multipart/form-data" novalidate>
-                <input type="hidden" name="appointment_mode" id="appointmentMode" value="individual">
-                <input type="hidden" name="appointment_location" id="appointmentLocationFull">
-               
-                <!-- STEP 0: Terms & Mode Selection -->
-                <section class="step-pane active" id="step0">
-                    <div class="form-section-card">
-                        <div class="section-title"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Terms and Conditions</div>
-                        <div class="alert-box info">
-                            <i class="fa-solid fa-circle-info" style="margin-top: 2px; font-size: 15px;"></i>
-                            <div><strong>Email Reminder:</strong> Applicants are strongly advised to use official Google or Yahoo email accounts when booking appointments to prevent technical delivery issues.</div>
-                        </div>
-                        <div style="background: #f8fafc; padding: 22px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px; line-height: 1.7; margin-bottom: 22px; color: #334155;">
-                            <p style="margin-top:0; margin-bottom: 12px;">This appointment platform distributes available slots strictly on a first-come, first-served basis.</p>
-                            <p style="margin-bottom: 12px;">All applicants bear full responsibility for inputting, checking, and validating every detail supplied. Submitting inaccurate or false details can lead to the outright forfeiture of your application.</p>
-                            <p style="margin-bottom: 0;"><strong>ePayment Services:</strong> All paid fees are strictly non-refundable and will be forfeited upon failure to attend your scheduled slot or application rejection due to incorrect/fraudulent paperwork.</p>
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 25px;">
-                            <input type="checkbox" id="termsAgree" required style="width: 18px; height: 18px; margin-top: 3px; accent-color: var(--primary);">
-                            <label for="termsAgree" style="margin: 0; cursor: pointer; font-weight: 500; font-size: 13px; line-height: 1.5; color: #1e293b;">
-                                <em>I signify my unequivocal consent to the collection, use, and processing of my personal data under the Philippine Passport Act and the Data Privacy Act of 2012, along with all DFA rules and guidelines.</em>
-                            </label>
-                        </div>
-                        <div class="mode-btn-container">
-                            <button type="button" class="mode-btn" onclick="selectModeAndNext('individual')">
-                                <i class="fa-solid fa-user-check"></i>
-                                <span>Individual Appointment</span>
-                                <span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">Book a standard single slot</span>
-                            </button>
-                            <button type="button" class="mode-btn" onclick="startGroupAppointment()">
-                                <i class="fa-solid fa-users"></i>
-                                <span>Group Appointment</span>
-                                <span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">Book slots for multiple applicants</span>
-                            </button>
-                        </div>
-                    </div>
-                </section>
-                <!-- STEP 1: Site Location -->
-                <section class="step-pane" id="step1">
-                    <div class="form-section-card">
-                        <div class="section-title"><i class="fa-solid fa-location-dot" style="color:var(--primary);"></i> Consular Site Location</div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Region *</label><select class="form-control" name="region"><option>ASIA PACIFIC</option></select></div>
-                            <div class="form-group"><label>Country *</label><select class="form-control" name="country"><option>PHILIPPINES</option></select></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <label>Consular Office / Site *</label>
-                                <select class="form-control" name="site" id="siteSelect" onchange="updateSiteInfo()" required>
-                                    <option value="">- PLEASE SELECT A CONSULAR SITE -</option>
-                                    <option value="ANGELES">ANGELES (SM CITY CLARK, ANGELES CITY)</option>
-                                    <option value="ANTIPOLO">ANTIPOLO (SM CENTER, ANTIPOLO CITY, RIZAL)</option>
-                                    <option value="ANTIQUE">ANTIQUE (CITYMALL ANTIQUE)</option>
-                                    <option value="BACOLOD">BACOLOD (ROBINSONS BACOLOD)</option>
-                                    <option value="BAGUIO">BAGUIO (SM CITY BAGUIO)</option>
-                                    <option value="BALANGA">BALANGA (THE BUNKER BUILDING, CAPITOL COMPOUND)</option>
-                                    <option value="BUTUAN">BUTUAN (ROBINSONS BUTUAN)</option>
-                                    <option value="CAGAYAN DE ORO">CAGAYAN DE ORO (BPO TOWER SM DOWNTOWN PREMIER)</option>
-                                    <option value="CALASIAO">CALASIAO (ROBINSONS CALASIAO, PANGASINAN)</option>
-                                    <option value="CANDON">CANDON (CANDON CITY ARENA)</option>
-                                    <option value="CEBU">CEBU (ROBINSONS GALLERIA, CEBU CITY)</option>
-                                    <option value="CLARIN">CLARIN (TOWN CENTER, CLARIN, MISAMIS OCC)</option>
-                                    <option value="DFA MANILA">DFA MANILA (ASEANA)</option>
-                                    <option value="DFA NCR CENTRAL">DFA NCR CENTRAL (ROBINSONS GALLERIA ORTIGAS, QUEZON CITY)</option>
-                                    <option value="DFA NCR EAST">DFA NCR EAST (SM MEGAMALL, MANDALUYONG CITY)</option>
-                                    <option value="DFA NCR NORTH">DFA NCR NORTH (ROBINSONS NOVALICHES, QUEZON CITY)</option>
-                                    <option value="DFA NCR NORTHEAST">DFA NCR NORTHEAST (ALI MALL CUBAO, QUEZON CITY)</option>
-                                    <option value="DFA NCR SOUTH">DFA NCR SOUTH (FESTIVAL MALL, MUNTINLUPA CITY)</option>
-                                    <option value="DFA NCR WEST">DFA NCR WEST (SM CITY, MANILA)</option>
-                                    <option value="DASMARIÑAS">DASMARIÑAS (SM CITY DASMARIÑAS)</option>
-                                    <option value="DAVAO">DAVAO (SM CITY DAVAO)</option>
-                                    <option value="DUMAGUETE">DUMAGUETE (ROBINSONS DUMAGUETE)</option>
-                                    <option value="GENERAL SANTOS">GENERAL SANTOS (ROBINSONS GEN. SANTOS CITY)</option>
-                                    <option value="ILOCOS NORTE">ILOCOS NORTE (ROBINSONS PLACE, SAN NICOLAS)</option>
-                                    <option value="ILOILO">ILOILO (ROBINSONS ILOILO)</option>
-                                    <option value="KIDAPAWAN">KIDAPAWAN (KIDAPAWAN CITY)</option>
-                                    <option value="LA UNION">LA UNION (CSI MALL SAN FERNANDO, LA UNION)</option>
-                                    <option value="LEGAZPI">LEGAZPI (PACIFIC MALL LEGAZPI)</option>
-                                    <option value="LIPA">LIPA (ROBINSONS LIPA)</option>
-                                    <option value="LUCENA">LUCENA (PACIFIC MALL, LUCENA)</option>
-                                    <option value="MALOLOS">MALOLOS (CTTCH.,XENTRO MALL, MALOLOS CITY)</option>
-                                    <option value="OLONGAPO">OLONGAPO (SM CITY OLONGAPO CENTRAL)</option>
-                                    <option value="PAGADIAN">PAGADIAN (C3 MALL, PAGADIAN CITY)</option>
-                                    <option value="PAMPANGA">PAMPANGA (ROBINSONS STARMILLS SAN FERNANDO)</option>
-                                    <option value="PANIQUI, TARLAC">PANIQUI, TARLAC (WALTERMART)</option>
-                                    <option value="PUERTO PRINCESA">PUERTO PRINCESA (ROBINSONS PALAWAN)</option>
-                                    <option value="SAN PABLO">SAN PABLO (SM CITY SAN PABLO)</option>
-                                    <option value="SANTIAGO, ISABELA">SANTIAGO, ISABELA (ROBINSONS PLACE SANTIAGO)</option>
-                                    <option value="TACLOBAN">TACLOBAN (ROBINSONS N. ABUCAY, TAC. CITY)</option>
-                                    <option value="TAGBILARAN">TAGBILARAN (ALTURAS MALL, TAGBILARAN CITY)</option>
-                                    <option value="TAGUM">TAGUM (ROBINSONS PLACE OF TAGUM)</option>
-                                    <option value="TUGUEGARAO">TUGUEGARAO (REG. GOVT CENTER, TUGUEGARAO CITY)</option>
-                                    <option value="ZAMBOANGA">ZAMBOANGA (GO-VELAYO BLDG. VET. AVE. ZAMBO)</option>
-                                </select>
+           
+            <div class="dashboard-container">
+                <div class="wizard-steps" id="wizardHeader" style="display: none;">
+                    <div class="wizard-step active" id="wStep1"><div class="step-badge">1</div><span>Site</span></div>
+                    <div class="wizard-step" id="wStep2"><div class="step-badge">2</div><span>Schedule</span></div>
+                    <div class="wizard-step" id="wStep3"><div class="step-badge">3</div><span>Personal</span></div>
+                    <div class="wizard-step" id="wStep4"><div class="step-badge">4</div><span>Family</span></div>
+                    <div class="wizard-step" id="wStep5"><div class="step-badge">5</div><span>Application</span></div>
+                    <div class="wizard-step" id="wStep6"><div class="step-badge">6</div><span>Documents</span></div>
+                    <div class="wizard-step" id="wStep7"><div class="step-badge">7</div><span>Review</span></div>
+                </div>
+                <form id="passportForm" action="../api/submit-application.php" method="POST" enctype="multipart/form-data" novalidate>
+                    <input type="hidden" name="appointment_mode" id="appointmentMode" value="individual">
+                    <input type="hidden" name="appointment_location" id="appointmentLocationFull">
+                   
+                    <!-- STEP 0: Terms & Mode Selection -->
+                    <section class="step-pane active" id="step0">
+                        <div class="form-section-card">
+                            <div class="section-title"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Terms and Conditions</div>
+                            <div class="alert-box info">
+                                <i class="fa-solid fa-circle-info" style="margin-top: 2px; font-size: 15px;"></i>
+                                <div><strong>Email Reminder:</strong> Applicants are strongly advised to use official Google or Yahoo email accounts when booking appointments to prevent technical delivery issues.</div>
+                            </div>
+                            <div style="background: #f8fafc; padding: 22px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px; line-height: 1.7; margin-bottom: 22px; color: #334155;">
+                                <p style="margin-top:0; margin-bottom: 12px;">This appointment platform distributes available slots strictly on a first-come, first-served basis.</p>
+                                <p style="margin-bottom: 12px;">All applicants bear full responsibility for inputting, checking, and validating every detail supplied. Submitting inaccurate or false details can lead to the outright forfeiture of your application.</p>
+                                <p style="margin-bottom: 0;"><strong>ePayment Services:</strong> All paid fees are strictly non-refundable and will be forfeited upon failure to attend your scheduled slot or application rejection due to incorrect/fraudulent paperwork.</p>
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 25px;">
+                                <input type="checkbox" id="termsAgree" required style="width: 18px; height: 18px; margin-top: 3px; accent-color: var(--primary);">
+                                <label for="termsAgree" style="margin: 0; cursor: pointer; font-weight: 500; font-size: 13px; line-height: 1.5; color: #1e293b;">
+                                    <em>I signify my unequivocal consent to the collection, use, and processing of my personal data under the Philippine Passport Act and the Data Privacy Act of 2012, along with all DFA rules and guidelines.</em>
+                                </label>
+                            </div>
+                            <div class="mode-btn-container">
+                                <button type="button" class="mode-btn" onclick="selectModeAndNext('individual')">
+                                    <i class="fa-solid fa-user-check"></i>
+                                    <span>Individual Appointment</span>
+                                    <span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">Book a standard single slot</span>
+                                </button>
+                                <button type="button" class="mode-btn" onclick="startGroupAppointment()">
+                                    <i class="fa-solid fa-users"></i>
+                                    <span>Group Appointment</span>
+                                    <span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">Book slots for multiple applicants</span>
+                                </button>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Office Name</label><input type="text" class="form-control" id="officeName" readonly value="-"></div>
-                            <div class="form-group"><label>Contact Number</label><input type="text" class="form-control" id="officeContact" readonly value="-"></div>
-                        </div>
-                        <div class="form-group full-width"><label>Office Address</label><input type="text" class="form-control" id="officeAddress" readonly value="-"></div>
-                    </div>
-                    <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="resetToTerms()"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(2)">Next <i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                </section>
-                <!-- STEP 2: Date & Time -->
-                <section class="step-pane" id="step2">
-                    <div class="form-section-card">
-                        <div class="section-title"><i class="fa-regular fa-calendar-days" style="color:var(--primary);"></i> Appointment Date and Time</div>
-                        <div class="alert-box">
-                            <i class="fa-solid fa-clock" style="margin-top:2px; font-size:15px;"></i>
-                            <div>Your selected time slot is reserved temporarily for 30 minutes upon completion.</div>
-                        </div>
-                        <input type="hidden" name="app_date" id="selectedDateVal" required>
-                       
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Appointment Date *</label>
-                                <div class="dfa-calendar-container">
-                                    <div class="cal-header">
-                                        <button type="button" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                                        <span id="calMonthYear">September 2026</span>
-                                        <button type="button" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
-                                    </div>
-                                    <div class="cal-weekdays">
-                                        <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-                                    </div>
-                                    <div class="cal-grid" id="calGrid"></div>
-                                    <div class="cal-legend">
-                                        <div class="legend-item"><div class="legend-box" style="background:#f0fdf4; border:1px solid #dcfce7;"></div><span>Available</span></div>
-                                        <div class="legend-item"><div class="legend-box" style="background:#fee2e2;"></div><span>Fully Booked</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Time Slot *</label>
-                                <select class="form-control" name="app_time" id="appTimeSelect" required style="margin-top: 5px;">
-                                    <option value="">- PLEASE SELECT A DATE FIRST -</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(3)">Next <i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                </section>
-                <!-- STEP 3: Personal Information -->
-                <section class="step-pane" id="step3">
-                    <div class="form-section-card">
-                        <div class="section-title"><i class="fa-solid fa-user" style="color:var(--primary);"></i> Personal Information</div>
-                        <div class="alert-box danger">
-                            <i class="fa-solid fa-triangle-exclamation" style="margin-top:2px; font-size:15px;"></i>
-                            <div><strong>Warning:</strong> Ensure all name and date of birth fields are 100% correct. Editing on site is strictly prohibited.</div>
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 22px;">
-                            <input type="checkbox" id="infoAgree" required style="width: 18px; height: 18px; accent-color: var(--primary);">
-                            <label for="infoAgree" style="margin: 0; color: #991b1b; font-weight: 700; font-size: 13px;">I verify and confirm my details are accurate.</label>
-                        </div>
-                       
-                        <div class="form-row">
-                            <div class="form-group"><label>Phone Number</label><input type="text" class="form-control" name="phone"></div>
-                            <div class="form-group"><label>Mobile Number *</label><input type="text" class="form-control" name="mobile" required></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Email Address *</label><input type="email" class="form-control" name="email" required></div>
-                            <div class="form-group"><label>Confirm Email Address *</label><input type="email" class="form-control" required></div>
-                        </div>
-                       
-                        <div class="form-row">
-                            <div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="lastname" required></div>
-                            <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="givenname" required></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Middle Name</label><input type="text" class="form-control" name="middlename"></div>
-                            <div class="form-group"><label>Date of Birth *</label><input type="date" class="form-control" name="dob" required></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Gender *</label>
-                                <select class="form-control" name="gender" required>
-                                    <option value="">- SELECT GENDER -</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Civil Status *</label>
-                                <select class="form-control" name="civil_status" required>
-                                    <option value="">- SELECT CIVIL STATUS -</option>
-                                    <option value="SINGLE">SINGLE</option>
-                                    <option value="MARRIED">MARRIED</option>
-                                    <option value="WIDOWED">WIDOWED</option>
-                                    <option value="SEPARATED">SEPARATED</option>
-                                    <option value="ANNULLED">ANNULLED</option>
-                                </select>
-                            </div>
-                        </div>
-                       
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Birth Legitimacy *</label>
-                                <select class="form-control" name="legitimacy" required>
-                                    <option value="">- SELECT LEGITIMACY -</option>
-                                    <option value="LEGITIMATE">LEGITIMATE</option>
-                                    <option value="ILLEGITIMATE">ILLEGITIMATE</option>
-                                </select>
-                            </div>
-                            <div class="form-group"><label>Country of Birth *</label><input type="text" class="form-control" name="birth_country" required></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Province *</label><input type="text" class="form-control" name="birth_province" required></div>
-                            <div class="form-group"><label>City/Municipality *</label><input type="text" class="form-control" name="birth_city" required></div>
-                        </div>
-                        <!-- Dynamic Minor Fields -->
-                        <div id="minorFieldsContainer" style="display: none; border-top: 1px dashed var(--border-color); padding-top: 18px; margin-top: 18px;">
-                            <div class="alert-box info" style="margin-bottom: 15px;">
-                                <i class="fa-solid fa-child" style="margin-top:2px;"></i>
-                                <div><strong>Minor Notice:</strong> Please provide details for the travelling companion.</div>
+                    </section>
+                    <!-- STEP 1: Site Location -->
+                    <section class="step-pane" id="step1">
+                        <div class="form-section-card">
+                            <div class="section-title"><i class="fa-solid fa-location-dot" style="color:var(--primary);"></i> Consular Site Location</div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Region *</label><select class="form-control" name="region"><option>ASIA PACIFIC</option></select></div>
+                                <div class="form-group"><label>Country *</label><select class="form-control" name="country"><option>PHILIPPINES</option></select></div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>Companion Name *</label><input type="text" class="form-control" name="companion_name"></div>
-                                <div class="form-group"><label>Relationship *</label><input type="text" class="form-control" name="companion_relationship"></div>
+                                <div class="form-group full-width">
+                                    <label>Consular Office / Site *</label>
+                                    <select class="form-control" name="site" id="siteSelect" onchange="updateSiteInfo()" required>
+                                        <option value="">- PLEASE SELECT A CONSULAR SITE -</option>
+                                        <option value="ANGELES">ANGELES (SM CITY CLARK, ANGELES CITY)</option>
+                                        <option value="ANTIPOLO">ANTIPOLO (SM CENTER, ANTIPOLO CITY, RIZAL)</option>
+                                        <option value="ANTIQUE">ANTIQUE (CITYMALL ANTIQUE)</option>
+                                        <option value="BACOLOD">BACOLOD (ROBINSONS BACOLOD)</option>
+                                        <option value="BAGUIO">BAGUIO (SM CITY BAGUIO)</option>
+                                        <option value="BALANGA">BALANGA (THE BUNKER BUILDING, CAPITOL COMPOUND)</option>
+                                        <option value="BUTUAN">BUTUAN (ROBINSONS BUTUAN)</option>
+                                        <option value="CAGAYAN DE ORO">CAGAYAN DE ORO (BPO TOWER SM DOWNTOWN PREMIER)</option>
+                                        <option value="CALASIAO">CALASIAO (ROBINSONS CALASIAO, PANGASINAN)</option>
+                                        <option value="CANDON">CANDON (CANDON CITY ARENA)</option>
+                                        <option value="CEBU">CEBU (ROBINSONS GALLERIA, CEBU CITY)</option>
+                                        <option value="CLARIN">CLARIN (TOWN CENTER, CLARIN, MISAMIS OCC)</option>
+                                        <option value="DFA MANILA">DFA MANILA (ASEANA)</option>
+                                        <option value="DFA NCR CENTRAL">DFA NCR CENTRAL (ROBINSONS GALLERIA ORTIGAS, QUEZON CITY)</option>
+                                        <option value="DFA NCR EAST">DFA NCR EAST (SM MEGAMALL, MANDALUYONG CITY)</option>
+                                        <option value="DFA NCR NORTH">DFA NCR NORTH (ROBINSONS NOVALICHES, QUEZON CITY)</option>
+                                        <option value="DFA NCR NORTHEAST">DFA NCR NORTHEAST (ALI MALL CUBAO, QUEZON CITY)</option>
+                                        <option value="DFA NCR SOUTH">DFA NCR SOUTH (FESTIVAL MALL, MUNTINLUPA CITY)</option>
+                                        <option value="DFA NCR WEST">DFA NCR WEST (SM CITY, MANILA)</option>
+                                        <option value="DASMARIÑAS">DASMARIÑAS (SM CITY DASMARIÑAS)</option>
+                                        <option value="DAVAO">DAVAO (SM CITY DAVAO)</option>
+                                        <option value="DUMAGUETE">DUMAGUETE (ROBINSONS DUMAGUETE)</option>
+                                        <option value="GENERAL SANTOS">GENERAL SANTOS (ROBINSONS GEN. SANTOS CITY)</option>
+                                        <option value="ILOCOS NORTE">ILOCOS NORTE (ROBINSONS PLACE, SAN NICOLAS)</option>
+                                        <option value="ILOILO">ILOILO (ROBINSONS ILOILO)</option>
+                                        <option value="KIDAPAWAN">KIDAPAWAN (KIDAPAWAN CITY)</option>
+                                        <option value="LA UNION">LA UNION (CSI MALL SAN FERNANDO, LA UNION)</option>
+                                        <option value="LEGAZPI">LEGAZPI (PACIFIC MALL LEGAZPI)</option>
+                                        <option value="LIPA">LIPA (ROBINSONS LIPA)</option>
+                                        <option value="LUCENA">LUCENA (PACIFIC MALL, LUCENA)</option>
+                                        <option value="MALOLOS">MALOLOS (CTTCH.,XENTRO MALL, MALOLOS CITY)</option>
+                                        <option value="OLONGAPO">OLONGAPO (SM CITY OLONGAPO CENTRAL)</option>
+                                        <option value="PAGADIAN">PAGADIAN (C3 MALL, PAGADIAN CITY)</option>
+                                        <option value="PAMPANGA">PAMPANGA (ROBINSONS STARMILLS SAN FERNANDO)</option>
+                                        <option value="PANIQUI, TARLAC">PANIQUI, TARLAC (WALTERMART)</option>
+                                        <option value="PUERTO PRINCESA">PUERTO PRINCESA (ROBINSONS PALAWAN)</option>
+                                        <option value="SAN PABLO">SAN PABLO (SM CITY SAN PABLO)</option>
+                                        <option value="SANTIAGO, ISABELA">SANTIAGO, ISABELA (ROBINSONS PLACE SANTIAGO)</option>
+                                        <option value="TACLOBAN">TACLOBAN (ROBINSONS N. ABUCAY, TAC. CITY)</option>
+                                        <option value="TAGBILARAN">TAGBILARAN (ALTURAS MALL, TAGBILARAN CITY)</option>
+                                        <option value="TAGUM">TAGUM (ROBINSONS PLACE OF TAGUM)</option>
+                                        <option value="TUGUEGARAO">TUGUEGARAO (REG. GOVT CENTER, TUGUEGARAO CITY)</option>
+                                        <option value="ZAMBOANGA">ZAMBOANGA (GO-VELAYO BLDG. VET. AVE. ZAMBO)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Office Name</label><input type="text" class="form-control" id="officeName" readonly value="-"></div>
+                                <div class="form-group"><label>Contact Number</label><input type="text" class="form-control" id="officeContact" readonly value="-"></div>
+                            </div>
+                            <div class="form-group full-width"><label>Office Address</label><input type="text" class="form-control" id="officeAddress" readonly value="-"></div>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="button" class="btn-secondary" onclick="resetToTerms()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="goToStep(2)">Next <i class="fa-solid fa-arrow-right"></i></button>
+                        </div>
+                    </section>
+                    <!-- STEP 2: Date & Time -->
+                    <section class="step-pane" id="step2">
+                        <div class="form-section-card">
+                            <div class="section-title"><i class="fa-regular fa-calendar-days" style="color:var(--primary);"></i> Appointment Date and Time</div>
+                            <div class="alert-box">
+                                <i class="fa-solid fa-clock" style="margin-top:2px; font-size:15px;"></i>
+                                <div>Your selected time slot is reserved temporarily for 30 minutes upon completion.</div>
+                            </div>
+                            <input type="hidden" name="app_date" id="selectedDateVal" required>
+                           
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Appointment Date *</label>
+                                    <div class="dfa-calendar-container">
+                                        <div class="cal-header">
+                                            <button type="button" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                                            <span id="calMonthYear">September 2026</span>
+                                            <button type="button" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                                        </div>
+                                        <div class="cal-weekdays">
+                                            <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                                        </div>
+                                        <div class="cal-grid" id="calGrid"></div>
+                                        <div class="cal-legend">
+                                            <div class="legend-item"><div class="legend-box" style="background:#f0fdf4; border:1px solid #dcfce7;"></div><span>Available</span></div>
+                                            <div class="legend-item"><div class="legend-box" style="background:#fee2e2;"></div><span>Fully Booked</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Time Slot *</label>
+                                    <select class="form-control" name="app_time" id="appTimeSelect" required style="margin-top: 5px;">
+                                        <option value="">- PLEASE SELECT A DATE FIRST -</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(4)">Next <i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                </section>
-                <!-- STEP 4: Family Information -->
-                <section class="step-pane" id="step4">
-                    <div class="form-section-card">
-                        <div class="section-title"><i class="fa-solid fa-users-line" style="color:var(--primary);"></i> Family Information</div>
-                        <h4 style="margin-bottom: 12px; font-size: 14px; color: var(--text-main);">Father's Details</h4>
-                        <div class="form-row">
-                            <div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="father_lastname" required></div>
-                            <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="father_givenname" required></div>
+                        <div class="action-buttons">
+                            <button type="button" class="btn-secondary" onclick="goToStep(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="goToStep(3)">Next <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Middle Name</label><input type="text" class="form-control" name="father_middlename"></div>
+                    </section>
+                    <!-- STEP 3: Personal Information -->
+                    <section class="step-pane" id="step3">
+                        <div class="form-section-card">
+                            <div class="section-title"><i class="fa-solid fa-user" style="color:var(--primary);"></i> Personal Information</div>
+                            <div class="alert-box danger">
+                                <i class="fa-solid fa-triangle-exclamation" style="margin-top:2px; font-size:15px;"></i>
+                                <div><strong>Warning:</strong> Ensure all name and date of birth fields are 100% correct. Editing on site is strictly prohibited.</div>
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 22px;">
+                                <input type="checkbox" id="infoAgree" required style="width: 18px; height: 18px; accent-color: var(--primary);">
+                                <label for="infoAgree" style="margin: 0; color: #991b1b; font-weight: 700; font-size: 13px;">I verify and confirm my details are accurate.</label>
+                            </div>
+                           
+                            <div class="form-row">
+                                <div class="form-group"><label>Phone Number</label><input type="text" class="form-control" name="phone"></div>
+                                <div class="form-group"><label>Mobile Number *</label><input type="text" class="form-control" name="mobile" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Email Address *</label><input type="email" class="form-control" name="email" required></div>
+                                <div class="form-group"><label>Confirm Email Address *</label><input type="email" class="form-control" required></div>
+                            </div>
+                           
+                            <div class="form-row">
+                                <div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="lastname" required></div>
+                                <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="givenname" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Middle Name</label><input type="text" class="form-control" name="middlename"></div>
+                                <div class="form-group"><label>Date of Birth *</label><input type="date" class="form-control" name="dob" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Gender *</label>
+                                    <select class="form-control" name="gender" required>
+                                        <option value="">- SELECT GENDER -</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Civil Status *</label>
+                                    <select class="form-control" name="civil_status" required>
+                                        <option value="">- SELECT CIVIL STATUS -</option>
+                                        <option value="SINGLE">SINGLE</option>
+                                        <option value="MARRIED">MARRIED</option>
+                                        <option value="WIDOWED">WIDOWED</option>
+                                        <option value="SEPARATED">SEPARATED</option>
+                                        <option value="ANNULLED">ANNULLED</option>
+                                    </select>
+                                </div>
+                            </div>
+                           
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Birth Legitimacy *</label>
+                                    <select class="form-control" name="legitimacy" required>
+                                        <option value="">- SELECT LEGITIMACY -</option>
+                                        <option value="LEGITIMATE">LEGITIMATE</option>
+                                        <option value="ILLEGITIMATE">ILLEGITIMATE</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Country of Birth *</label><input type="text" class="form-control" name="birth_country" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Province *</label><input type="text" class="form-control" name="birth_province" required></div>
+                                <div class="form-group"><label>City/Municipality *</label><input type="text" class="form-control" name="birth_city" required></div>
+                            </div>
+                            <!-- Dynamic Minor Fields -->
+                            <div id="minorFieldsContainer" style="display: none; border-top: 1px dashed var(--border-color); padding-top: 18px; margin-top: 18px;">
+                                <div class="alert-box info" style="margin-bottom: 15px;">
+                                    <i class="fa-solid fa-child" style="margin-top:2px;"></i>
+                                    <div><strong>Minor Notice:</strong> Please provide details for the travelling companion.</div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Companion Name *</label><input type="text" class="form-control" name="companion_name"></div>
+                                    <div class="form-group"><label>Relationship *</label><input type="text" class="form-control" name="companion_relationship"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="button" class="btn-secondary" onclick="goToStep(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="goToStep(4)">Next <i class="fa-solid fa-arrow-right"></i></button>
+                        </div>
+                    </section>
+                    <!-- STEP 4: Family Information -->
+                    <section class="step-pane" id="step4">
+                        <div class="form-section-card">
+                            <div class="section-title"><i class="fa-solid fa-users-line" style="color:var(--primary);"></i> Family Information</div>
+                            <h4 style="margin-bottom: 12px; font-size: 14px; color: var(--text-main);">Father's Details</h4>
+                            <div class="form-row">
+                                <div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="father_lastname" required></div>
+                                <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="father_givenname" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Middle Name</label><input type="text" class="form-control" name="father_middlename"></div>
+                                <div class="form-group">
+                                    <label>Country Citizenship *</label>
+                                    <select class="form-control" name="father_citizenship" required>
+                                        <option value="PHILIPPINES">PHILIPPINES</option>
+                                        <option value="UNITED STATES">UNITED STATES</option>
+                                        <option value="CANADA">CANADA</option>
+                                        <option value="UNITED KINGDOM">UNITED KINGDOM</option>
+                                        <option value="AUSTRALIA">AUSTRALIA</option>
+                                        <option value="JAPAN">JAPAN</option>
+                                        <option value="SOUTH KOREA">SOUTH KOREA</option>
+                                        <option value="SINGAPORE">SINGAPORE</option>
+                                        <option value="OTHERS">OTHERS</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <h4 style="margin: 24px 0 12px; font-size: 14px; color: var(--text-main);">Mother's Maiden Details</h4>
+                            <div class="form-row">
+                                <div class="form-group"><label>Maiden Last Name *</label><input type="text" class="form-control" name="mother_lastname" required></div>
+                                <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="mother_givenname" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Maiden Middle Name</label><input type="text" class="form-control" name="mother_middlename"></div>
+                                <div class="form-group">
+                                    <label>Country Citizenship *</label>
+                                    <select class="form-control" name="mother_citizenship" required>
+                                        <option value="PHILIPPINES">PHILIPPINES</option>
+                                        <option value="UNITED STATES">UNITED STATES</option>
+                                        <option value="CANADA">CANADA</option>
+                                        <option value="UNITED KINGDOM">UNITED KINGDOM</option>
+                                        <option value="AUSTRALIA">AUSTRALIA</option>
+                                        <option value="JAPAN">JAPAN</option>
+                                        <option value="SOUTH KOREA">SOUTH KOREA</option>
+                                        <option value="SINGAPORE">SINGAPORE</option>
+                                        <option value="OTHERS">OTHERS</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="button" class="btn-secondary" onclick="goToStep(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="goToStep(5)">Next <i class="fa-solid fa-arrow-right"></i></button>
+                        </div>
+                    </section>
+                    <!-- STEP 5: Application & Contact -->
+                    <section class="step-pane" id="step5">
+                        <div class="form-section-card">
+                            <div class="section-title"><i class="fa-solid fa-file-lines" style="color:var(--primary);"></i> Application & Contact Information</div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Application Type *</label>
+                                    <select class="form-control" name="application_type" id="applicationTypeSelect" required>
+                                        <option value="">- SELECT APPLICATION TYPE -</option>
+                                        <option value="FIRST TIME PASSPORT">First-Time Passport</option>
+                                        <option value="PASSPORT RENEWAL">Passport Renewal</option>
+                                        <option value="LOST PASSPORT">Replacement of Lost Passport</option>
+                                        <option value="DAMAGED PASSPORT">Replacement of Damaged Passport</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Basis of Philippine Citizenship *</label>
+                                    <select class="form-control" name="citizenship_basis" id="citizenshipBasisSelect" required>
+                                        <option value="">- SELECT BASIS -</option>
+                                        <option value="BIRTH">BIRTH</option>
+                                        <option value="ELECTION">ELECTION</option>
+                                        <option value="NATURALIZATION">NATURALIZATION</option>
+                                        <option value="R.A. 9225">R.A. 9225</option>
+                                        <option value="OTHERS">OTHERS</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Foreign Passport Holder *</label><select class="form-control" name="foreign_passport" required><option>No</option><option>Yes</option></select></div>
+                                <div class="form-group" id="othersBasisContainer" style="display: none;">
+                                    <label>Please Specify Others *</label>
+                                    <input type="text" class="form-control" name="citizenship_basis_others">
+                                </div>
+                            </div>
+                           
+                            <h4 style="margin: 20px 0 12px; font-size: 14px; color: var(--text-main);">Current Contact Details</h4>
+                            <div class="form-group full-width"><label>Current Address *</label><input type="text" class="form-control" name="address" required></div>
+                            <div class="form-row">
+                                <div class="form-group"><label>City *</label><input type="text" class="form-control" name="address_city" required></div>
+                                <div class="form-group"><label>Province / State *</label><input type="text" class="form-control" name="address_province" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Emergency Contact Person *</label><input type="text" class="form-control" name="emergency_contact" required></div>
+                                <div class="form-group"><label>Emergency Contact Number *</label><input type="text" class="form-control" name="emergency_number" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Occupation *</label><input type="text" class="form-control" name="occupation" required></div>
+                                <div class="form-group"><label>Office Number</label><input type="text" class="form-control" name="office_number"></div>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="button" class="btn-secondary" onclick="goToStep(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="goToStep(6)">Next: Documents <i class="fa-solid fa-arrow-right"></i></button>
+                        </div>
+                    </section>
+                    <!-- STEP 6: Document Pre-Verification & Upload -->
+                    <section class="step-pane" id="step6">
+                        <div class="form-section-card">
+                            <div class="section-title"><i class="fa-solid fa-cloud-arrow-up" style="color:var(--primary);"></i> Document Pre-Verification & Upload</div>
+                            <div class="alert-box info">
+                                <i class="fa-solid fa-circle-info" style="margin-top:2px;"></i>
+                                <div id="docRequirementsNotice">Upload clear scanned copies or photos of your supporting documents for automated pre-screening before your appointment.</div>
+                            </div>
+                            
+                            <!-- Universal Valid ID Upload -->
                             <div class="form-group">
-                                <label>Country Citizenship *</label>
-                                <select class="form-control" name="father_citizenship" required>
-                                    <option value="PHILIPPINES">PHILIPPINES</option>
-                                    <option value="UNITED STATES">UNITED STATES</option>
-                                    <option value="CANADA">CANADA</option>
-                                    <option value="UNITED KINGDOM">UNITED KINGDOM</option>
-                                    <option value="AUSTRALIA">AUSTRALIA</option>
-                                    <option value="JAPAN">JAPAN</option>
-                                    <option value="SOUTH KOREA">SOUTH KOREA</option>
-                                    <option value="SINGAPORE">SINGAPORE</option>
-                                    <option value="OTHERS">OTHERS</option>
-                                </select>
+                                <label>Valid Government-Issued ID *</label>
+                                <div class="upload-box">
+                                    <label class="btn-upload" for="validIdFile"><i class="fa-solid fa-upload"></i> Browse ID</label>
+                                    <input type="file" id="validIdFile" name="valid_id_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
+                                    <span class="upload-file-name" id="validIdFileName">No file chosen</span>
+                                </div>
                             </div>
-                        </div>
-                        <h4 style="margin: 24px 0 12px; font-size: 14px; color: var(--text-main);">Mother's Maiden Details</h4>
-                        <div class="form-row">
-                            <div class="form-group"><label>Maiden Last Name *</label><input type="text" class="form-control" name="mother_lastname" required></div>
-                            <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="mother_givenname" required></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Maiden Middle Name</label><input type="text" class="form-control" name="mother_middlename"></div>
+                            <!-- Universal Passport Photo Upload -->
                             <div class="form-group">
-                                <label>Country Citizenship *</label>
-                                <select class="form-control" name="mother_citizenship" required>
-                                    <option value="PHILIPPINES">PHILIPPINES</option>
-                                    <option value="UNITED STATES">UNITED STATES</option>
-                                    <option value="CANADA">CANADA</option>
-                                    <option value="UNITED KINGDOM">UNITED KINGDOM</option>
-                                    <option value="AUSTRALIA">AUSTRALIA</option>
-                                    <option value="JAPAN">JAPAN</option>
-                                    <option value="SOUTH KOREA">SOUTH KOREA</option>
-                                    <option value="SINGAPORE">SINGAPORE</option>
-                                    <option value="OTHERS">OTHERS</option>
-                                </select>
+                                <label>Digital Passport Photo *</label>
+                                <div class="upload-box">
+                                    <label class="btn-upload" for="passportPhotoFile"><i class="fa-solid fa-camera"></i> Browse Photo</label>
+                                    <input type="file" id="passportPhotoFile" name="passport_photo_file" accept=".jpg,.jpeg,.png" style="display: none;" required>
+                                    <span class="upload-file-name" id="passportPhotoFileName">No file chosen</span>
+                                </div>
+                            </div>
+                            <!-- Dynamic Application Type Specific Document -->
+                            <div class="form-group" id="dynamicDocGroup">
+                                <label id="dynamicDocLabel">Supporting Document *</label>
+                                <div class="upload-box">
+                                    <label class="btn-upload" for="specificDocFile"><i class="fa-solid file"></i> Browse Document</label>
+                                    <input type="file" id="specificDocFile" name="specific_doc_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
+                                    <span class="upload-file-name" id="specificDocFileName">No file chosen</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(5)">Next <i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                </section>
-                <!-- STEP 5: Application & Contact -->
-                <section class="step-pane" id="step5">
-                    <div class="form-section-card">
-                        <div class="section-title"><i class="fa-solid fa-file-lines" style="color:var(--primary);"></i> Application & Contact Information</div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Application Type *</label>
-                                <select class="form-control" name="application_type" id="applicationTypeSelect" required>
-                                    <option value="">- SELECT APPLICATION TYPE -</option>
-                                    <option value="FIRST TIME PASSPORT">First-Time Passport</option>
-                                    <option value="PASSPORT RENEWAL">Passport Renewal</option>
-                                    <option value="LOST PASSPORT">Replacement of Lost Passport</option>
-                                    <option value="DAMAGED PASSPORT">Replacement of Damaged Passport</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Basis of Philippine Citizenship *</label>
-                                <select class="form-control" name="citizenship_basis" id="citizenshipBasisSelect" required>
-                                    <option value="">- SELECT BASIS -</option>
-                                    <option value="BIRTH">BIRTH</option>
-                                    <option value="ELECTION">ELECTION</option>
-                                    <option value="NATURALIZATION">NATURALIZATION</option>
-                                    <option value="R.A. 9225">R.A. 9225</option>
-                                    <option value="OTHERS">OTHERS</option>
-                                </select>
-                            </div>
+                        <div class="action-buttons">
+                            <button type="button" class="btn-secondary" onclick="goToStep(5)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="goToStep(7)">Review Details <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Foreign Passport Holder *</label><select class="form-control" name="foreign_passport" required><option>No</option><option>Yes</option></select></div>
-                            <div class="form-group" id="othersBasisContainer" style="display: none;">
-                                <label>Please Specify Others *</label>
-                                <input type="text" class="form-control" name="citizenship_basis_others">
+                    </section>
+                    <!-- STEP 7: Review -->
+                    <section class="step-pane" id="step7">
+                        <div class="form-section-card">
+                            <div class="section-title"><i class="fa-solid fa-clipboard-check" style="color:var(--primary);"></i> Information Review & Confirmation</div>
+                           
+                            <div class="review-grid">
+                                <div class="summary-card">
+                                    <h4>Appointment Details</h4>
+                                    <div><strong>Mode:</strong> <span id="rev-mode">INDIVIDUAL</span></div>
+                                    <div><strong>Site:</strong> <span id="rev-site">-</span></div>
+                                    <div><strong>Date:</strong> <span id="rev-date">-</span></div>
+                                    <div><strong>Time:</strong> <span id="rev-time">-</span></div>
+                                </div>
+                                <div class="summary-card">
+                                    <h4>Personal Information</h4>
+                                    <div><strong>Full Name:</strong> <span id="rev-fullname">-</span></div>
+                                    <div><strong>Date of Birth:</strong> <span id="rev-dob">-</span></div>
+                                    <div><strong>Civil Status:</strong> <span id="rev-civilstatus">-</span></div>
+                                    <div><strong>Email:</strong> <span id="rev-email">-</span></div>
+                                    <div><strong>Mobile:</strong> <span id="rev-mobile">-</span></div>
+                                </div>
+                                <div class="summary-card" id="rev-companion-card" style="display: none; grid-column: span 2;">
+                                    <h4>Travelling Companion (Minor)</h4>
+                                    <div><strong>Companion:</strong> <span id="rev-companion-name">-</span> (<span id="rev-companion-rel">-</span>)</div>
+                                </div>
+                                <div class="summary-card">
+                                    <h4>Family Background</h4>
+                                    <div><strong>Father:</strong> <span id="rev-fathername">-</span></div>
+                                    <div><strong>Mother:</strong> <span id="rev-mothername">-</span></div>
+                                </div>
+                                <div class="summary-card">
+                                    <h4>Application Summary</h4>
+                                    <div><strong>Type:</strong> <span id="rev-applicationtype">-</span></div>
+                                    <div><strong>Address:</strong> <span id="rev-address">-</span>, <span id="rev-cityprovince">-</span></div>
+                                    <div><strong>Emergency Contact:</strong> <span id="rev-emergency">-</span></div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-top: 30px; background: #f8fafc; padding: 15px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                                <input type="checkbox" id="finalAgree" required style="width: 18px; height: 18px; accent-color: var(--primary);">
+                                <label for="finalAgree" style="margin: 0; font-weight: 600; font-size: 13px; color: var(--text-main);">I confirm that all information provided is completely accurate, truthful, and final.</label>
                             </div>
                         </div>
                        
-                        <h4 style="margin: 20px 0 12px; font-size: 14px; color: var(--text-main);">Current Contact Details</h4>
-                        <div class="form-group full-width"><label>Current Address *</label><input type="text" class="form-control" name="address" required></div>
-                        <div class="form-row">
-                            <div class="form-group"><label>City *</label><input type="text" class="form-control" name="address_city" required></div>
-                            <div class="form-group"><label>Province / State *</label><input type="text" class="form-control" name="address_province" required></div>
+                        <div class="action-buttons">
+                            <button type="button" class="btn-secondary" onclick="goToStep(6)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="completePayment()" style="background-color: #10b981;"><i class="fa-solid fa-check"></i> Save & Submit Application</button>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Emergency Contact Person *</label><input type="text" class="form-control" name="emergency_contact" required></div>
-                            <div class="form-group"><label>Emergency Contact Number *</label><input type="text" class="form-control" name="emergency_number" required></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Occupation *</label><input type="text" class="form-control" name="occupation" required></div>
-                            <div class="form-group"><label>Office Number</label><input type="text" class="form-control" name="office_number"></div>
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(6)">Next: Documents <i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                </section>
-                <!-- STEP 6: Document Pre-Verification & Upload -->
-                <section class="step-pane" id="step6">
-                    <div class="form-section-card">
-                        <div class="section-title"><i class="fa-solid fa-cloud-arrow-up" style="color:var(--primary);"></i> Document Pre-Verification & Upload</div>
-                        <div class="alert-box info">
-                            <i class="fa-solid fa-circle-info" style="margin-top:2px;"></i>
-                            <div id="docRequirementsNotice">Upload clear scanned copies or photos of your supporting documents for automated pre-screening before your appointment.</div>
-                        </div>
-                        
-                        <!-- Universal Valid ID Upload -->
-                        <div class="form-group">
-                            <label>Valid Government-Issued ID *</label>
-                            <div class="upload-box">
-                                <label class="btn-upload" for="validIdFile"><i class="fa-solid fa-upload"></i> Browse ID</label>
-                                <input type="file" id="validIdFile" name="valid_id_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
-                                <span class="upload-file-name" id="validIdFileName">No file chosen</span>
-                            </div>
-                        </div>
-                        <!-- Universal Passport Photo Upload -->
-                        <div class="form-group">
-                            <label>Digital Passport Photo *</label>
-                            <div class="upload-box">
-                                <label class="btn-upload" for="passportPhotoFile"><i class="fa-solid fa-camera"></i> Browse Photo</label>
-                                <input type="file" id="passportPhotoFile" name="passport_photo_file" accept=".jpg,.jpeg,.png" style="display: none;" required>
-                                <span class="upload-file-name" id="passportPhotoFileName">No file chosen</span>
-                            </div>
-                        </div>
-                        <!-- Dynamic Application Type Specific Document -->
-                        <div class="form-group" id="dynamicDocGroup">
-                            <label id="dynamicDocLabel">Supporting Document *</label>
-                            <div class="upload-box">
-                                <label class="btn-upload" for="specificDocFile"><i class="fa-solid file"></i> Browse Document</label>
-                                <input type="file" id="specificDocFile" name="specific_doc_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
-                                <span class="upload-file-name" id="specificDocFileName">No file chosen</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(5)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                        <button type="button" class="btn-primary" onclick="goToStep(7)">Review Details <i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                </section>
-                <!-- STEP 7: Review -->
-                <section class="step-pane" id="step7">
-                    <div class="form-section-card">
-                        <div class="section-title"><i class="fa-solid fa-clipboard-check" style="color:var(--primary);"></i> Information Review & Confirmation</div>
-                       
-                        <div class="review-grid">
-                            <div class="summary-card">
-                                <h4>Appointment Details</h4>
-                                <div><strong>Mode:</strong> <span id="rev-mode">INDIVIDUAL</span></div>
-                                <div><strong>Site:</strong> <span id="rev-site">-</span></div>
-                                <div><strong>Date:</strong> <span id="rev-date">-</span></div>
-                                <div><strong>Time:</strong> <span id="rev-time">-</span></div>
-                            </div>
-                            <div class="summary-card">
-                                <h4>Personal Information</h4>
-                                <div><strong>Full Name:</strong> <span id="rev-fullname">-</span></div>
-                                <div><strong>Date of Birth:</strong> <span id="rev-dob">-</span></div>
-                                <div><strong>Civil Status:</strong> <span id="rev-civilstatus">-</span></div>
-                                <div><strong>Email:</strong> <span id="rev-email">-</span></div>
-                                <div><strong>Mobile:</strong> <span id="rev-mobile">-</span></div>
-                            </div>
-                            <div class="summary-card" id="rev-companion-card" style="display: none; grid-column: span 2;">
-                                <h4>Travelling Companion (Minor)</h4>
-                                <div><strong>Companion:</strong> <span id="rev-companion-name">-</span> (<span id="rev-companion-rel">-</span>)</div>
-                            </div>
-                            <div class="summary-card">
-                                <h4>Family Background</h4>
-                                <div><strong>Father:</strong> <span id="rev-fathername">-</span></div>
-                                <div><strong>Mother:</strong> <span id="rev-mothername">-</span></div>
-                            </div>
-                            <div class="summary-card">
-                                <h4>Application Summary</h4>
-                                <div><strong>Type:</strong> <span id="rev-applicationtype">-</span></div>
-                                <div><strong>Address:</strong> <span id="rev-address">-</span>, <span id="rev-cityprovince">-</span></div>
-                                <div><strong>Emergency Contact:</strong> <span id="rev-emergency">-</span></div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-top: 30px; background: #f8fafc; padding: 15px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-                            <input type="checkbox" id="finalAgree" required style="width: 18px; height: 18px; accent-color: var(--primary);">
-                            <label for="finalAgree" style="margin: 0; font-weight: 600; font-size: 13px; color: var(--text-main);">I confirm that all information provided is completely accurate, truthful, and final.</label>
-                        </div>
-                    </div>
-                   
-                    <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="goToStep(6)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                        <button type="submit" class="btn-primary" style="background-color: #10b981;"><i class="fa-solid fa-check"></i> Save & Submit Application</button>
-                    </div>
-                </section>
-            </form>
-        </div>
-    </main>
+                    </section>
+                </form>
+            </div>
+        </main>
+    </div>
     <script src="script.js"></script>
     <script src="passport-application.js"></script>
     <script>
-        // File upload name display helpers
+        async function loadUserData() {
+            try {
+                const response = await fetch('../api/user-data.php');
+                const data = await response.json();
+                if (data.loggedIn && data.fullName) {
+                    const userNameEl = document.getElementById('user-name');
+                    if (userNameEl) userNameEl.textContent = data.fullName;
+                    if (data.email) localStorage.setItem('userEmail', data.email);
+                }
+            } catch (error) {
+                console.error('Unable to load user data:', error);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadUserData);
+
         function bindFileInput(inputId, nameId) {
             const input = document.getElementById(inputId);
             const span = document.getElementById(nameId);
@@ -783,7 +845,6 @@
             bindFileInput('passportPhotoFile', 'passportPhotoFileName');
             bindFileInput('specificDocFile', 'specificDocFileName');
         });
-        // Dynamic Document Requirements based on Application Type selection
         function updateDocumentRequirements() {
             const appType = document.getElementById('applicationTypeSelect').value;
             const labelEl = document.getElementById('dynamicDocLabel');
@@ -806,7 +867,7 @@
             }
         }
         document.getElementById('applicationTypeSelect')?.addEventListener('change', updateDocumentRequirements);
-        // Minor Verification logic
+        
         document.addEventListener('input', function (e) {
             if (e.target && e.target.name === 'dob') {
                 const dobVal = new Date(e.target.value);
@@ -828,7 +889,7 @@
                 }
             }
         });
-        // DFA Dynamic Calendar
+
         let currentYear = 2026;
         let currentMonth = 8;
         let selectedDateStr = '';
@@ -894,7 +955,7 @@
             });
         }
         document.addEventListener('DOMContentLoaded', () => renderCalendar());
-        // Full Restored DFA Office Database mapping for auto-population
+
         const dfaOfficeData = {
             "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City", contact: "(045) 304-0194" },
             "ANTIPOLO": { name: "DFA Regional Consular Office – Antipolo", address: "3F SM Cherry Foodarama, Marikina-Infanta Highway, Antipolo City, Rizal", contact: "(02) 8697-3000" },

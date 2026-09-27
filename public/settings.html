@@ -250,7 +250,20 @@
             </div>
         </div>
     </main>
-    <!-- Only script.js will handle everything now -->
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('../api/user-data.php');
+                const userData = await response.json();
+                if (userData.loggedIn && userData.fullName) {
+                    document.getElementById('user-name').textContent = userData.fullName;
+                    if (userData.email) localStorage.setItem('userEmail', userData.email);
+                }
+            } catch (error) {
+                console.error('Unable to load user data:', error);
+            }
+        });
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -668,9 +668,15 @@
                         </a>
                     `;
                 } else {
+                    const rawLoc = application.appointmentLocation || application.appointment_location || 'DFA NCR CENTRAL';
+                    const office = dfaOfficeData[rawLoc];
+                    const fullLocationDisplay = office ? `${office.name} - ${office.address}` : rawLoc;
+
                     pendingContainer.innerHTML = `
                         <strong style="margin-bottom: 4px;">Ready for In-Person Pickup:</strong>
-                        <span style="font-size: 12px; line-height: 1.5;">You can now claim your passport at your designated consular office during regular working days (Monday to Friday, 8:00 AM to 5:00 PM). Please bring a valid ID and your official receipt.</span>
+                        <span style="font-size: 12px; line-height: 1.5; display: block; margin-bottom: 6px;">You can now claim your passport at your designated consular office:</span>
+                        <strong style="display: block; font-size: 12px; color: var(--primary); margin-bottom: 6px;">${fullLocationDisplay}</strong>
+                        <span style="font-size: 11px; color: #475569; line-height: 1.4;">Operating hours: Monday to Friday, 8:00 AM to 5:00 PM. Please bring a valid ID and your official receipt.</span>
                     `;
                 }
             } else if ((currentStatus === 'Form Submitted' || currentStatus === 'Appointment Rescheduled') && appointmentDateVal) {

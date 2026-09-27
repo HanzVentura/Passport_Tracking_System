@@ -210,13 +210,64 @@
             vertical-align: middle;
         }
         .badge-pending {
-            background-color: #fef2f2;
-            color: #dc2626;
+            background-color: #fef3c7;
+            color: #d97706;
             padding: 5px 12px;
             border-radius: 999px;
             font-size: 12px;
             font-weight: 700;
             display: inline-block;
+        }
+        .badge-resolved {
+            background-color: #dcfce7;
+            color: #166534;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .chat-history-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 140px;
+            overflow-y: auto;
+            font-size: 12px;
+            color: #334155;
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+        }
+        .member-reply-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .member-reply-textarea {
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 12px;
+            width: 100%;
+            min-height: 60px;
+            resize: vertical;
+            outline: none;
+        }
+        .btn-member-reply {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+        .btn-member-reply:hover {
+            background-color: #dc2626;
         }
     </style>
 </head>
@@ -277,20 +328,21 @@
             </div>
 
             <div class="card">
-                <div class="section-title">Active Emergency Reports</div>
-                <div class="section-subtitle">Track the status of your urgent requests submitted to consular officers.</div>
+                <div class="section-title">Active Emergency Reports & Conversation History</div>
+                <div class="section-subtitle">Track the status of your urgent requests and chat directly with consular officers.</div>
                 <table>
                     <thead>
                         <tr>
                             <th>App ID</th>
-                            <th>Subject</th>
-                            <th>Details & Location</th>
+                            <th>Subject & Location</th>
+                            <th>Initial Details</th>
                             <th>Date</th>
                             <th>Status</th>
+                            <th>Conversation Log & Reply</th>
                         </tr>
                     </thead>
                     <tbody id="emergencyTableBody">
-                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading emergency reports...</td></tr>
+                        <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading emergency reports...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -307,13 +359,13 @@
             if (!details) return;
 
             try {
-                const response = await fetch('../api/enquiries.php', {
+                const response = await fetch('../api/emergencies.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         email: userEmail,
                         applicationId: 'EMG-' + Math.floor(100000 + Math.random() * 900000),
-                        subject: `[EMERGENCY] ${emergencyType}`,
+                        subject: emergencyType,
                         message: `Office: ${office}\nDetails: ${details}`
                     })
                 });
@@ -327,37 +379,88 @@
             }
         }
 
+        async function sendEmergencyReply(emergencyId, index) {
+            const replyText = document.getElementById(`emergencyReplyText-${index}`).value.trim();
+            const userEmail = localStorage.getItem('userEmail');
+            if (!replyText) {
+                alert("Please type a reply message.");
+                return;
+            }
+            try {
+                const response = await fetch('../api/emergencies.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        emergencyId: emergencyId,
+                        reply: `Member (${userEmail}):\n${replyText}`
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.message || 'Failed to send reply.');
+
+                await loadEmergencyReports(userEmail);
+                alert("Reply sent successfully!");
+            } catch (error) {
+                alert("Error sending reply: " + error.message);
+            }
+        }
+
         async function loadEmergencyReports(userEmail) {
             const tableBody = document.getElementById('emergencyTableBody');
             try {
-                const response = await fetch('../api/enquiries.php');
+                const response = await fetch('../api/emergencies.php');
                 const result = await response.json();
-                let reports = (result.enquiries || []).filter(item => item.subject && item.subject.includes('[EMERGENCY]'));
+                let reports = result.emergencies || [];
                 if (userEmail) {
                     reports = reports.filter(item => item.email === userEmail);
                 }
                 if (reports.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No emergency reports filed yet.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No emergency reports filed yet.</td></tr>`;
                     return;
                 }
                 tableBody.innerHTML = '';
-                reports.forEach(item => {
+                reports.forEach((item, index) => {
                     const row = document.createElement('tr');
+                    const isResolved = item.status === 'Resolved';
+                    const statusClass = isResolved ? 'badge-resolved' : 'badge-pending';
+                    const replyContent = item.reply && item.reply !== 'Awaiting consular officer response...' ? item.reply : 'Awaiting consular officer response...';
+
                     row.innerHTML = `
                         <td><strong>${item.appId}</strong></td>
-                        <td>${item.subject.replace('[EMERGENCY] ', '')}</td>
-                        <td style="max-width: 250px; white-space: pre-wrap;">${item.message}</td>
+                        <td>${item.subject}</td>
+                        <td style="max-width: 220px; white-space: pre-wrap;">${item.message}</td>
                         <td>${item.date}</td>
-                        <td><span class="badge-pending">${item.status || 'Under Review'}</span></td>
+                        <td><span class="${statusClass}">${item.status || 'Open'}</span></td>
+                        <td>
+                            <div class="chat-history-box">${replyContent}</div>
+                            ${isResolved ?
+                                `<div style="color: #166534; font-weight: 600; font-size: 11px;"><i class="fa-solid fa-check-circle"></i> Ticket Closed (Resolved)</div>` :
+                                `<div class="member-reply-group">
+                                    <textarea class="member-reply-textarea" id="emergencyReplyText-${index}" placeholder="Type follow-up reply..."></textarea>
+                                    <button type="button" class="btn-member-reply" onclick="sendEmergencyReply(${item.id},${index})"><i class="fa-solid fa-paper-plane"></i> Reply</button>
+                                </div>`
+                            }
+                        </td>
                     `;
                     tableBody.appendChild(row);
                 });
             } catch (error) {
-                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Unable to load emergency reports.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Unable to load emergency reports.</td></tr>`;
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('../api/user-data.php');
+                const data = await response.json();
+                if (data.loggedIn && data.fullName) {
+                    document.getElementById('user-name').textContent = data.fullName;
+                    if (data.email) localStorage.setItem('userEmail', data.email);
+                }
+            } catch (error) {
+                console.error('Unable to load user data:', error);
+            }
+
             const userEmail = localStorage.getItem('userEmail');
             if (userEmail) loadEmergencyReports(userEmail);
         });

@@ -1,9 +1,13 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
-
 $input = json_decode(file_get_contents('php://input'), true);
 $action = $input['action'] ?? $_GET['action'] ?? '';
+
+// If no action is specified in GET request, default to listing all applications for admin convenience
+if (empty($action) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $action = 'list_all';
+}
 
 // Handle Admin Request to List All Applications
 if ($action === 'list_all') {
@@ -20,27 +24,19 @@ if ($action === 'list_all') {
 }
 
 // Handle Admin Status Updates
-if ($action === 'update_status') {
+if ($action === 'update_status' || isset($input['status']) && isset($input['applicationId'])) {
     $applicationId = $input['applicationId'] ?? '';
     $newStatus = $input['status'] ?? '';
-
-    $allowedStatuses = ['Form Submitted', 'Biometrics Received', 'Under Consular Review', 'In Printing', 'Dispatched'];
-    if (!in_array($newStatus, $allowedStatuses)) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Invalid status provided.']);
-        exit;
-    }
-
+    
     if (!$applicationId) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Application ID is required.']);
         exit;
     }
-
     try {
+        // Explicitly use the correct database column name: application_id
         $stmt = $pdo->prepare("UPDATE applications SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
         $stmt->execute([$newStatus, $applicationId]);
-
         echo json_encode([
             'success' => true,
             'applicationId' => $applicationId,

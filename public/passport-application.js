@@ -25,79 +25,114 @@ const applicationLabels = {
         citizenshipPlaceholder: 'Enter passport number'
     }
 };
-
 const labels = applicationLabels[applicationType] || applicationLabels.new;
-
 document.addEventListener('DOMContentLoaded', () => {
     document.title = `${labels.title} - Passport Tracking`;
-    document.getElementById('pageHeaderTitle').textContent = labels.title;
-    document.getElementById('greetingText').textContent = 'Good Day';
+    const headerTitle = document.getElementById('pageHeaderTitle');
+    if (headerTitle) headerTitle.textContent = labels.title;
+    const greetingText = document.getElementById('greetingText');
+    if (greetingText) greetingText.textContent = 'Good Day';
+    
     const categoryDescription = document.getElementById('categoryDescription');
     if (categoryDescription) categoryDescription.textContent = labels.description;
-    document.getElementById('identityDescription').textContent = labels.identityDescription;
-    document.getElementById('citizenshipDescription').textContent = labels.citizenshipDescription;
-    document.getElementById('citizenshipTitle').textContent = labels.citizenshipLabel;
-    document.getElementById('citizenshipNumberLabel').textContent = labels.citizenshipNumber;
-    document.getElementById('citizenshipDateLabel').textContent = labels.citizenshipDate;
-    document.getElementById('citizenshipNumber').placeholder = labels.citizenshipPlaceholder;
-    document.getElementById('summaryCategory').textContent = labels.category;
-    document.getElementById('summaryCitizenship').textContent = labels.citizenshipType;
+    
+    const identityDesc = document.getElementById('identityDescription');
+    if (identityDesc) identityDesc.textContent = labels.identityDescription;
+    
+    const citizenshipDesc = document.getElementById('citizenshipDescription');
+    if (citizenshipDesc) citizenshipDesc.textContent = labels.citizenshipDescription;
+    
+    const citizenshipTitle = document.getElementById('citizenshipTitle');
+    if (citizenshipTitle) citizenshipTitle.textContent = labels.citizenshipLabel;
+    
+    const citizenshipNumLabel = document.getElementById('citizenshipNumberLabel');
+    if (citizenshipNumLabel) citizenshipNumLabel.textContent = labels.citizenshipNumber;
+    
+    const citizenshipDateLabel = document.getElementById('citizenshipDateLabel');
+    if (citizenshipDateLabel) citizenshipDateLabel.textContent = labels.citizenshipDate;
+    
+    const citizenshipNum = document.getElementById('citizenshipNumber');
+    if (citizenshipNum) citizenshipNum.placeholder = labels.citizenshipPlaceholder;
+    
+    const summaryCategory = document.getElementById('summaryCategory');
+    if (summaryCategory) summaryCategory.textContent = labels.category;
+    
+    const summaryCitizenship = document.getElementById('summaryCitizenship');
+    if (summaryCitizenship) summaryCitizenship.textContent = labels.citizenshipType;
 
     document.querySelectorAll('input[type="file"]').forEach(input => {
         input.addEventListener('change', () => updateFileName(input.id, input.dataset.nameTarget));
     });
-
+    
     loadUserData();
-    goToWizardStep(1);
+    if (typeof goToWizardStep === 'function') {
+        goToWizardStep(1);
+    }
 });
-
 async function loadUserData() {
     try {
         const response = await fetch('../api/user-data.php');
         const data = await response.json();
         if (data.loggedIn && data.fullName) {
-            document.getElementById('greetingText').textContent = `Good Day, ${data.fullName}`;
-            document.getElementById('user-name').textContent = data.fullName;
-            document.getElementById('summaryFullName').textContent = data.fullName;
+            const greeting = document.getElementById('greetingText');
+            if (greeting) greeting.textContent = `Good Day, ${data.fullName}`;
+            
+            const userNameEl = document.getElementById('user-name');
+            if (userNameEl) userNameEl.textContent = data.fullName;
+            
+            const summaryFullName = document.getElementById('summaryFullName');
+            if (summaryFullName) summaryFullName.textContent = data.fullName;
+            
+            if (data.email) localStorage.setItem('userEmail', data.email);
         }
     } catch (error) {
         console.error('Unable to load user data:', error);
     }
 }
-
 function updateFileName(inputId, nameId) {
     const fileInput = document.getElementById(inputId);
     const fileName = document.getElementById(nameId);
-    if (fileInput.files.length > 0) {
-        fileName.textContent = fileInput.files[0].name;
-        fileName.style.color = '#10b981';
-    } else {
-        fileName.textContent = 'No file selected';
-        fileName.style.color = '#6b7280';
+    if (fileInput && fileName) {
+        if (fileInput.files.length > 0) {
+            fileName.textContent = fileInput.files[0].name;
+            fileName.style.color = '#10b981';
+        } else {
+            fileName.textContent = 'No file selected';
+            fileName.style.color = '#6b7280';
+        }
     }
 }
-
 function goToWizardStep(stepNumber) {
     document.querySelectorAll('.step-pane').forEach(pane => { pane.hidden = true; });
     document.querySelectorAll('.wizard-step').forEach(step => { step.className = 'wizard-step'; });
-
-    document.getElementById(`pane${stepNumber}`).hidden = false;
+    const paneTarget = document.getElementById(`pane${stepNumber}`);
+    if (paneTarget) paneTarget.hidden = false;
+    
     const stepCount = applicationType === 'renewal' ? 2 : 3;
     for (let index = 1; index <= stepCount; index += 1) {
         const step = document.getElementById(`wStep${index}`);
-        if (index < stepNumber) step.classList.add('completed');
-        if (index === stepNumber) step.classList.add('active');
+        if (step) {
+            if (index < stepNumber) step.classList.add('completed');
+            if (index === stepNumber) step.classList.add('active');
+        }
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 function validateAndProceed() {
-    const idComplete = document.getElementById('idNumber').value.trim()
-        && document.getElementById('idExpiry').value
-        && document.getElementById('idFile').files.length;
-    const citizenshipComplete = document.getElementById('citizenshipNumber').value.trim()
-        && document.getElementById('citizenshipDate').value
-        && document.getElementById('citizenshipFile').files.length;
+    const idNumberEl = document.getElementById('idNumber');
+    const idExpiryEl = document.getElementById('idExpiry');
+    const idFileEl = document.getElementById('idFile');
+    const citizenshipNumEl = document.getElementById('citizenshipNumber');
+    const citizenshipDateEl = document.getElementById('citizenshipDate');
+    const citizenshipFileEl = document.getElementById('citizenshipFile');
+
+    const idComplete = (!idNumberEl || idNumberEl.value.trim())
+        && (!idExpiryEl || idExpiryEl.value)
+        && (!idFileEl || idFileEl.files.length);
+        
+    const citizenshipComplete = (!citizenshipNumEl || citizenshipNumEl.value.trim())
+        && (!citizenshipDateEl || citizenshipDateEl.value)
+        && (!citizenshipFileEl || citizenshipFileEl.files.length);
 
     if (!idComplete) {
         alert('Please complete all fields and attach a document for Proof of Identity.');
@@ -107,21 +142,20 @@ function validateAndProceed() {
         alert(`Please complete all fields and attach a document for ${labels.citizenshipLabel}.`);
         return;
     }
-
     const selectedId = document.getElementById('idType');
-    document.getElementById('summaryIdType').textContent = selectedId.options[selectedId.selectedIndex].text;
+    const summaryIdType = document.getElementById('summaryIdType');
+    if (summaryIdType && selectedId) {
+        summaryIdType.textContent = selectedId.options[selectedId.selectedIndex].text;
+    }
     goToWizardStep(applicationType === 'renewal' ? 2 : 3);
 }
-
 async function completePayment() {
     const randomId = `PH-${Math.floor(100000 + Math.random() * 900000)}`;
     const userEmail = localStorage.getItem('userEmail');
-
     if (!userEmail) {
         alert('Please log in before saving your application.');
         return;
     }
-
     try {
         const response = await fetch('../api/applications.php', {
             method: 'POST',

@@ -3,54 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal - Passport Tracking</title>
+    <title>Administration Portal - Passport Tracking System</title>
+    <!-- FontAwesome & Google Plus Jakarta Sans Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         body {
-            background-color: #f4f7f6;
-            color: #333;
+            background-color: var(--bg-main);
+            color: var(--text-main);
             display: flex;
             height: 100vh;
             overflow-x: hidden;
         }
-        /* Admin Sidebar */
+        /* Sidebar */
         .sidebar {
             width: 260px;
-            background-color: #1e293b;
-            color: white;
+            background-color: #0f172a;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px 0;
+            padding: 24px 0;
+        }
+        .sidebar-top {
+            display: flex;
+            flex-direction: column;
         }
         .user-profile-mini {
             display: flex;
             align-items: center;
-            padding: 0 20px 20px 20px;
-            border-bottom: 1px solid #334155;
-            margin-bottom: 20px;
+            padding: 0 24px 20px;
+            border-bottom: 1px solid #1e293b;
+            margin-bottom: 16px;
         }
         .user-profile-mini i {
-            font-size: 36px;
+            font-size: 38px;
             color: #38bdf8;
             margin-right: 12px;
         }
         .user-info .name {
-            font-weight: 600;
-            font-size: 13px;
-            color: #f8fafc;
+            font-weight: 700;
+            font-size: 14px;
+            color: #ffffff;
         }
         .user-info .role {
             font-size: 11px;
-            color: #38bdf8;
+            color: #94a3b8;
             text-transform: uppercase;
             font-weight: 700;
+            letter-spacing: 0.05em;
         }
         .nav-links {
             list-style: none;
@@ -58,33 +79,35 @@
         .nav-links li a {
             display: flex;
             align-items: center;
-            padding: 12px 20px;
+            padding: 12px 24px;
             color: #94a3b8;
             text-decoration: none;
             font-size: 14px;
+            font-weight: 500;
             transition: all 0.2s ease;
             cursor: pointer;
         }
         .nav-links li.active a, .nav-links li a:hover {
-            background-color: #334155;
-            color: #fff;
+            background-color: #1e293b;
+            color: #ffffff;
             border-left: 4px solid #38bdf8;
+            font-weight: 600;
         }
         .nav-links li a i {
             margin-right: 12px;
             font-size: 16px;
         }
         .sidebar-bottom {
-            padding: 0 20px;
+            padding: 0 24px;
         }
         .sidebar-bottom a {
             display: flex;
             align-items: center;
             padding: 10px 0;
-            color: #f87171;
+            color: #ef4444;
             text-decoration: none;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
         }
         .sidebar-bottom a i {
             margin-right: 12px;
@@ -97,151 +120,86 @@
             overflow-y: auto;
         }
         .header {
-            background-color: #ffffff;
-            padding: 20px 30px;
-            border-bottom: 1px solid #e0e0e0;
-            font-size: 20px;
+            background-color: var(--card-bg);
+            padding: 22px 36px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 18px;
             font-weight: 700;
-            color: #1f2937;
+            color: var(--text-main);
+            letter-spacing: -0.3px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+        .admin-email-display {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
         .content-container {
-            padding: 30px;
+            padding: 35px 40px;
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
         }
-        .admin-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            margin-bottom: 30px;
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 24px;
         }
         .section-title {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 700;
-            color: #1f2937;
+            color: var(--text-main);
             margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         .section-subtitle {
             font-size: 13px;
-            color: #6b7280;
+            color: var(--text-muted);
             margin-bottom: 24px;
-        }
-        /* Table Styling */
-        .table-container {
-            overflow-x: auto;
+            line-height: 1.5;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            font-size: 13px;
+            font-size: 14px;
         }
         th {
-            background-color: #f9fafb;
-            color: #374151;
-            font-weight: 600;
-            padding: 12px 16px;
-            border-bottom: 1px solid #e5e7eb;
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 14px 16px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
         }
         td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            color: #4b5563;
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
             vertical-align: middle;
         }
-        .badge-pending {
-            background-color: #fef3c7;
-            color: #d97706;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .badge-resolved {
-            background-color: #d1fae5;
-            color: #059669;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .badge-status {
-            background-color: #e0e7ff;
-            color: #4f46e5;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .reply-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            min-width: 260px;
-        }
-        .reply-textarea {
-            padding: 8px 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 12px;
-            width: 100%;
-            min-height: 70px;
-            resize: vertical;
-            outline: none;
-        }
-        .reply-btn-row {
-            display: flex;
-            gap: 6px;
-        }
-        .btn-reply, .btn-action, .btn-solve {
-            border: none;
+        .btn-action {
             padding: 6px 12px;
             border-radius: 6px;
+            border: none;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.2s;
-            white-space: nowrap;
+            margin-right: 4px;
+            margin-bottom: 4px;
         }
-        .btn-reply {
-            background-color: #3b82f6;
-            color: white;
-        }
-        .btn-reply:hover {
-            background-color: #2563eb;
-        }
-        .btn-solve {
-            background-color: #059669;
-            color: white;
-        }
-        .btn-solve:hover {
-            background-color: #047857;
-        }
-        .btn-action {
-            background-color: #3b82f6;
-            color: white;
-        }
-        .btn-action:hover {
-            background-color: #2563eb;
-        }
-        .action-buttons-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .admin-tab-content {
-            display: none;
-        }
-        .admin-tab-content.active-tab {
-            display: block;
-        }
-        .history-box {
+        .btn-status { background: #e0e7ff; color: #4f46e5; }
+        .btn-status:hover { background: #c7d2fe; }
+        .badge-resolved { background-color: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .badge-pending { background-color: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .chat-history-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
@@ -253,236 +211,347 @@
             margin-bottom: 8px;
             white-space: pre-wrap;
         }
+        .admin-reply-textarea {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 11px;
+            min-height: 50px;
+            resize: vertical;
+            outline: none;
+            margin-bottom: 4px;
+        }
+        .tab-view {
+            display: none;
+        }
+        .tab-view.active-tab {
+            display: block;
+        }
     </style>
 </head>
 <body>
+    <!-- Sidebar Navigation -->
     <div class="sidebar">
-        <div>
+        <div class="sidebar-top">
             <div class="user-profile-mini">
-                <i class="fa-solid fa-user-shield"></i>
+                <i class="fa-solid fa-shield-halved"></i>
                 <div class="user-info">
-                    <div class="name" id="user-name">Hanz Christian Ventura</div>
+                    <div class="name" id="admin-name">System Admin</div>
                     <div class="role">System Administrator</div>
                 </div>
             </div>
             <ul class="nav-links">
-                <li id="navEnquiries" class="active"><a onclick="switchTab('enquiries')"><i class="fa-solid fa-folder-open"></i> Manage Enquiries</a></li>
-                <li id="navApplications"><a onclick="switchTab('applications')"><i class="fa-solid fa-id-card"></i> Application Status</a></li>
-                <li><a href="#" onclick="alert('User oversight management module coming soon.')"><i class="fa-solid fa-users"></i> Users Oversight</a></li>
-                <li><a href="#" onclick="alert('System audit logs module coming soon.')"><i class="fa-solid fa-chart-line"></i> Audit Logs</a></li>
+                <li class="active" onclick="switchTab('enquiriesTab', this)"><a href="#"><i class="fa-solid fa-circle-question"></i> Manage Enquiries</a></li>
+                <li onclick="switchTab('emergenciesTab', this)"><a href="#"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Reports</a></li>
+                <li onclick="switchTab('statusTab', this)"><a href="#"><i class="fa-solid fa-list-check"></i> Application Status</a></li>
             </ul>
         </div>
         <div class="sidebar-bottom">
             <a href="index.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
         </div>
     </div>
+   
+    <!-- Main Content Area -->
     <div class="main-content">
         <div class="header">
-            <span>ADMINISTRATION OVERSIGHT PORTAL</span>
-            <span style="font-size: 13px; font-weight: 500; color: #6b7280;">Logged in as: hanzchristian.ventura@neu.edu.ph</span>
+            <span id="headerTitle">ADMINISTRATION OVERSIGHT PORTAL - MANAGE ENQUIRIES</span>
+            <span class="admin-email-display" id="adminEmailDisplay">Logged in as: admin@neu.edu.ph</span>
         </div>
        
         <div class="content-container">
-            <!-- Tab 1: Manage Enquiries -->
-            <div id="tabEnquiries" class="admin-tab-content active-tab">
-                <div class="admin-card">
-                    <div class="section-title">Client Enquiries & Support Management</div>
-                    <div class="section-subtitle">Review incoming member enquiries linked to active application IDs, chat back and forth freely, and click Mark as Solved when finalized.</div>
-                   
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>App ID</th>
-                                    <th>Subject / Topic</th>
-                                    <th>User Message</th>
-                                    <th>Date Submitted</th>
-                                    <th>Status</th>
-                                    <th>Admin Response History & Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminTableBody">
-                                <tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">Loading enquiries...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <!-- TAB 1: MANAGE ENQUIRIES -->
+            <div id="enquiriesTab" class="tab-view active-tab">
+                <div class="card">
+                    <div class="section-title">Customer Enquiries & Support Tickets</div>
+                    <div class="section-subtitle">Review user support messages, respond to enquiries, and resolve tickets.</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>App ID</th>
+                                <th>User Email</th>
+                                <th>Subject</th>
+                                <th>Initial Message</th>
+                                <th>Status</th>
+                                <th>Conversation Log & Admin Reply</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminEnquiriesTable">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading enquiries...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <!-- Tab 2: Application Status Approval -->
-            <div id="tabApplications" class="admin-tab-content">
-                <div class="admin-card">
+
+            <!-- TAB 2: EMERGENCY REPORTS -->
+            <div id="emergenciesTab" class="tab-view">
+                <div class="card" style="border-left: 4px solid #ef4444;">
+                    <div class="section-title" style="color: #ef4444;">Urgent Emergency Reports</div>
+                    <div class="section-subtitle">Monitor urgent travel, hospital, or consular emergencies and coordinate immediate assistance.</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>App ID</th>
+                                <th>User Email</th>
+                                <th>Subject & Details</th>
+                                <th>Date Filed</th>
+                                <th>Status</th>
+                                <th>Conversation Log & Admin Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminEmergenciesTable">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading emergency reports...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: APPLICATION STATUS -->
+            <div id="statusTab" class="tab-view">
+                <div class="card">
                     <div class="section-title">Application Status Review & Approval</div>
                     <div class="section-subtitle">Monitor user passport applications and advance their status pipeline following consular attendance and processing steps.</div>
-                   
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>App ID</th>
-                                    <th>Applicant Email</th>
-                                    <th>Type</th>
-                                    <th>Payment</th>
-                                    <th>Current Status</th>
-                                    <th>Actions / Advance Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminApplicationsBody">
-                                <tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">Loading applications...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>App ID</th>
+                                <th>Applicant Email</th>
+                                <th>Type</th>
+                                <th>Payment</th>
+                                <th>Current Status</th>
+                                <th>Actions / Advance Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminAppsTable">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading applications...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+
     <script>
-        let adminEnquiries = [];
-        let adminApplications = [];
-        function switchTab(tabName) {
-            document.querySelectorAll('.admin-tab-content').forEach(tab => tab.classList.remove('active-tab'));
-            document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
-            if (tabName === 'enquiries') {
-                document.getElementById('tabEnquiries').classList.add('active-tab');
-                document.getElementById('navEnquiries').classList.add('active');
-            } else if (tabName === 'applications') {
-                document.getElementById('tabApplications').classList.add('active-tab');
-                document.getElementById('navApplications').classList.add('active');
-                loadAdminApplications();
-            }
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active-tab'));
+            document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active-tab');
+            element.classList.add('active');
+
+            const titles = {
+                'enquiriesTab': 'ADMINISTRATION OVERSIGHT PORTAL - MANAGE ENQUIRIES',
+                'emergenciesTab': 'ADMINISTRATION OVERSIGHT PORTAL - EMERGENCY REPORTS',
+                'statusTab': 'ADMINISTRATION OVERSIGHT PORTAL - APPLICATION STATUS'
+            };
+            document.getElementById('headerTitle').innerText = titles[tabId];
         }
-        window.addEventListener('DOMContentLoaded', async () => {
-            await loadAdminEnquiries();
-        });
+
+        async function loadAdminData() {
+            try {
+                const userRes = await fetch('../api/user-data.php');
+                const userData = await userRes.json();
+                if (userData.loggedIn && userData.fullName) {
+                    document.getElementById('admin-name').textContent = userData.fullName;
+                    if (userData.email) document.getElementById('adminEmailDisplay').innerText = `Logged in as: ${userData.email}`;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            loadAdminEnquiries();
+            loadAdminEmergencies();
+            loadAdminApplications();
+        }
+
         async function loadAdminEnquiries() {
-            const tableBody = document.getElementById('adminTableBody');
+            const tableBody = document.getElementById('adminEnquiriesTable');
             try {
                 const response = await fetch('../api/enquiries.php');
                 const result = await response.json();
-                adminEnquiries = result.enquiries || [];
-            } catch (error) {
-                console.error('Unable to load enquiries:', error);
-                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">Unable to load enquiries.</td></tr>`;
-                return;
-            }
-            if (adminEnquiries.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">No user enquiries submitted at this time.</td></tr>`;
-                return;
-            }
-            tableBody.innerHTML = '';
-            adminEnquiries.forEach((item, index) => {
-                const row = document.createElement('tr');
-                const isResolved = item.status === 'Resolved';
-                const hasHistory = item.reply && item.reply !== 'Awaiting administrator response...';
-               
-                row.innerHTML = `
-                    <td><strong>${item.appId}</strong></td>
-                    <td>${item.subject}</td>
-                    <td style="max-width: 230px; white-space: pre-wrap;">${item.message || ''}</td>
-                    <td>${item.date}</td>
-                    <td><span class="${isResolved ? 'badge-resolved' : 'badge-pending'}">${item.status || 'Open'}</span></td>
-                    <td>
-                        ${hasHistory ? `<div class="history-box"><strong>Conversation Log:</strong><br>${item.reply}</div>` : ''}
-                        ${isResolved ?
-                            `<div style="color: #059669; font-weight: 600; font-size: 11px; margin-top: 4px;"><i class="fa-solid fa-check-circle"></i> Ticket Closed (Solved)</div>` :
-                            `<div class="reply-input-group">
-                                <textarea class="reply-textarea" id="replyText-${index}" placeholder="Type next response..."></textarea>
-                                <div class="reply-btn-row">
-                                    <button type="button" class="btn-reply" onclick="sendReply(${index}, false)"><i class="fa-solid fa-paper-plane"></i> Send Reply</button>
-                                    <button type="button" class="btn-solve" onclick="sendReply(${index}, true)"><i class="fa-solid fa-check"></i> Mark as Solved</button>
-                                </div>
-                            </div>`
-                        }
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-        async function loadAdminApplications() {
-            const appBody = document.getElementById('adminApplicationsBody');
-            try {
-                const response = await fetch('../api/applications.php?action=list_all');
-                const result = await response.json();
-                adminApplications = result.applications || [];
-            } catch (error) {
-                console.error('Unable to load applications:', error);
-                adminApplications = [];
-            }
-            if (adminApplications.length === 0) {
-                appBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 30px;">No passport applications found in system.</td></tr>`;
-                return;
-            }
-            appBody.innerHTML = '';
-            adminApplications.forEach((app) => {
-                const appId = app.application_id || app.applicationId;
-                const email = app.email || 'N/A';
-                const type = app.application_type || app.applicationType || 'New First-Time Application';
-                const payStatus = app.payment_status || app.paymentStatus || 'Unpaid';
-                const currentStatus = app.status || 'Form Submitted';
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${appId}</strong></td>
-                    <td>${email}</td>
-                    <td>${type}</td>
-                    <td><span style="font-weight:600; color:${payStatus === 'Paid' ? '#059669':'#d97706'}">${payStatus}</span></td>
-                    <td><span class="badge-status">${currentStatus}</span></td>
-                    <td>
-                        <div class="action-buttons-group">
-                            <button type="button" class="btn-action" style="background:#0284c7;" onclick="updateAppStatus('${appId}', 'Biometrics Received')">Biometrics Received</button>
-                            <button type="button" class="btn-action" style="background:#7c3aed;" onclick="updateAppStatus('${appId}', 'Under Consular Review')">Consular Review</button>
-                            <button type="button" class="btn-action" style="background:#d97706;" onclick="updateAppStatus('${appId}', 'In Printing')">In Printing</button>
-                            <button type="button" class="btn-action" style="background:#059669;" onclick="updateAppStatus('${appId}', 'Dispatched')">Dispatched</button>
-                        </div>
-                    </td>
-                `;
-                appBody.appendChild(row);
-            });
-        }
-        async function updateAppStatus(applicationId, newStatus) {
-            try {
-                const response = await fetch('../api/applications.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'update_status', applicationId, status: newStatus })
-                });
-                const result = await response.json();
-                if (!response.ok || !result.success) throw new Error(result.message || 'Failed to update status.');
-               
-                alert(`Application ${applicationId} status updated successfully to: ${newStatus}`);
-                loadAdminApplications();
-            } catch (error) {
-                alert('Error updating status: ' + error.message);
-            }
-        }
-        async function sendReply(index, markAsSolved) {
-            const replyText = document.getElementById(`replyText-${index}`).value.trim();
-            if (!replyText) {
-                alert("Please type a valid reply message.");
-                return;
-            }
-            const enquiry = adminEnquiries[index];
-            if (!enquiry) {
-                alert("Unable to find this enquiry. Please refresh the page.");
-                return;
-            }
-            const newStatus = markAsSolved ? 'Resolved' : 'Open';
-            try {
-                const response = await fetch('../api/enquiries.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ enquiryId: enquiry.id, reply: replyText, status: newStatus })
-                });
-                const result = await response.json();
-                if (!response.ok || !result.success) {
-                    throw new Error(result.message || 'Reply submission failed.');
+                const enquiries = result.enquiries || [];
+                if (enquiries.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No enquiries found.</td></tr>`;
+                    return;
                 }
-                await loadAdminEnquiries();
-                alert(markAsSolved ? "Response sent and case marked as Solved!" : "Response sent successfully and added to history. The ticket remains Open for ongoing discussion.");
-            } catch (error) {
-                console.error('Unable to save reply:', error);
-                alert("Unable to save the reply: " + error.message);
+                tableBody.innerHTML = '';
+                enquiries.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    const isResolved = item.status === 'Resolved';
+                    row.innerHTML = `
+                        <td><strong>${item.appId}</strong></td>
+                        <td>${item.email}</td>
+                        <td>${item.subject}</td>
+                        <td style="max-width: 200px; white-space: pre-wrap;">${item.message || ''}</td>
+                        <td><span class="${isResolved ? 'badge-resolved' : 'badge-pending'}">${item.status || 'Open'}</span></td>
+                        <td>
+                            <div class="chat-history-box">${item.reply || 'Awaiting administrator response...'}</div>
+                            <textarea class="admin-reply-textarea" id="adminEnqReply-${index}" placeholder="Type reply..."></textarea>
+                            <div style="display: flex; gap: 4px;">
+                                <button class="btn-action btn-status" onclick="sendAdminEnqReply(${item.id}, ${index})">Send Reply</button>
+                                <button class="btn-action" style="background:${isResolved ? '#fef3c7' : '#dcfce7'}; color:${isResolved ? '#d97706' : '#166534'};" onclick="toggleEnqStatus(${item.id}, '${isResolved ? 'Open' : 'Resolved'}')">${isResolved ? 'Reopen' : 'Mark Resolved'}</button>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (e) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Unable to load enquiries.</td></tr>`;
             }
         }
+
+        async function sendAdminEnqReply(enquiryId, index) {
+            const replyText = document.getElementById(`adminEnqReply-${index}`).value.trim();
+            if (!replyText) return alert("Please type a reply.");
+            try {
+                const res = await fetch('../api/enquiries.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enquiryId, reply: `Admin:\n${replyText}` })
+                });
+                const result = await res.json();
+                if (!res.ok || !result.success) throw new Error(result.message);
+                loadAdminEnquiries();
+                alert("Reply sent successfully!");
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        }
+
+        async function toggleEnqStatus(enquiryId, newStatus) {
+            try {
+                await fetch('../api/enquiries.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enquiryId, status: newStatus })
+                });
+                loadAdminEnquiries();
+            } catch (e) {
+                alert("Error updating status.");
+            }
+        }
+
+        async function loadAdminEmergencies() {
+            const tableBody = document.getElementById('adminEmergenciesTable');
+            try {
+                const response = await fetch('../api/emergencies.php');
+                const result = await response.json();
+                const emergencies = result.emergencies || [];
+                if (emergencies.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No emergency reports found.</td></tr>`;
+                    return;
+                }
+                tableBody.innerHTML = '';
+                emergencies.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    const isResolved = item.status === 'Resolved';
+                    row.innerHTML = `
+                        <td><strong>${item.appId}</strong></td>
+                        <td>${item.email}</td>
+                        <td style="max-width: 220px; white-space: pre-wrap;"><strong>${item.subject}</strong><br>${item.message}</td>
+                        <td>${item.date}</td>
+                        <td><span class="${isResolved ? 'badge-resolved' : 'badge-pending'}">${item.status || 'Open'}</span></td>
+                        <td>
+                            <div class="chat-history-box">${item.reply || 'Awaiting consular officer response...'}</div>
+                            <textarea class="admin-reply-textarea" id="adminEmgReply-${index}" placeholder="Type consular response..."></textarea>
+                            <div style="display: flex; gap: 4px;">
+                                <button class="btn-action btn-status" onclick="sendAdminEmgReply(${item.id}, ${index})">Send Reply</button>
+                                <button class="btn-action" style="background:${isResolved ? '#fef3c7' : '#dcfce7'}; color:${isResolved ? '#d97706' : '#166534'};" onclick="toggleEmgStatus(${item.id}, '${isResolved ? 'Open' : 'Resolved'}')">${isResolved ? 'Reopen' : 'Resolve'}</button>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (e) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Unable to load emergency reports.</td></tr>`;
+            }
+        }
+
+        async function sendAdminEmgReply(emergencyId, index) {
+            const replyText = document.getElementById(`adminEmgReply-${index}`).value.trim();
+            if (!replyText) return alert("Please type a response.");
+            try {
+                const res = await fetch('../api/emergencies.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ emergencyId, reply: `Consular Officer:\n${replyText}` })
+                });
+                const result = await res.json();
+                if (!res.ok || !result.success) throw new Error(result.message);
+                loadAdminEmergencies();
+                alert("Consular reply sent successfully!");
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        }
+
+        async function toggleEmgStatus(emergencyId, newStatus) {
+            try {
+                await fetch('../api/emergencies.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ emergencyId, status: newStatus })
+                });
+                loadAdminEmergencies();
+            } catch (e) {
+                alert("Error updating status.");
+            }
+        }
+
+        async function loadAdminApplications() {
+            const tableBody = document.getElementById('adminAppsTable');
+            try {
+                const response = await fetch('../api/applications.php');
+                const result = await response.json();
+                const applications = result.applications || [];
+                if (applications.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No applications found.</td></tr>`;
+                    return;
+                }
+                tableBody.innerHTML = '';
+                applications.forEach(app => {
+                    const row = document.createElement('tr');
+                    const appId = app.application_id || app.applicationId;
+                    const email = app.email;
+                    const type = app.application_type || app.applicationType || 'Passport Application';
+                    const payment = app.payment_status || app.paymentStatus || 'Paid';
+                    const status = app.status || 'Form Submitted';
+
+                    row.innerHTML = `
+                        <td><strong>${appId}</strong></td>
+                        <td>${email}</td>
+                        <td>${type}</td>
+                        <td><span style="color: #166534; font-weight: 600;">${payment}</span></td>
+                        <td><span class="badge-pending">${status}</span></td>
+                        <td>
+                            <button class="btn-action btn-status" onclick="updateAppStatus('${appId}', 'Biometrics Received')">Biometrics</button>
+                            <button class="btn-action btn-status" onclick="updateAppStatus('${appId}', 'Under Consular Review')">Review</button>
+                            <button class="btn-action btn-status" onclick="updateAppStatus('${appId}', 'In Printing')">Printing</button>
+                            <button class="btn-action" style="background:#dcfce7; color:#166534;" onclick="updateAppStatus('${appId}', 'Dispatched')">Dispatch</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (e) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Unable to load applications.</td></tr>`;
+            }
+        }
+
+        async function updateAppStatus(appId, newStatus) {
+            try {
+                const res = await fetch('../api/applications.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ applicationId: appId, status: newStatus })
+                });
+                const result = await res.json();
+                if (!res.ok || !result.success) throw new Error(result.message);
+                loadAdminApplications();
+                alert(`Application ${appId} status updated to: ${newStatus}`);
+            } catch (e) {
+                alert("Error updating status: " + e.message);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadAdminData);
     </script>
-    <script src="script.js"></script>
 </body>
 </html>

@@ -1,26 +1,30 @@
 <?php
 session_start();
 header('Content-Type: application/json');
+require_once __DIR__ . '/../db.php';
 
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Not authenticated']);
+if (!isset($_SESSION['user_email'])) {
+    echo json_encode(['loggedIn' => false]);
     exit;
 }
 
-try {
-    // Connect to MySQL database via centralized connection
-    require_once __DIR__ . '/../db.php';
+$email = $_SESSION['user_email'];
 
-    $stmt = $pdo->prepare("SELECT fullname, email, two_factor_enabled FROM users WHERE id = ?");
-    $stmt->execute([$_SESSION['user_id']]);
+try {
+    $stmt = $pdo->prepare("SELECT fullname, email FROM users WHERE email = ?");
+    $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
-        echo json_encode(['success' => true, 'user' => $user]);
+        echo json_encode([
+            'loggedIn' => true,
+            'fullName' => $user['fullname'],
+            'email' => $user['email']
+        ]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'User not found']);
+        echo json_encode(['loggedIn' => false]);
     }
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    echo json_encode(['loggedIn' => false, 'error' => $e->getMessage()]);
 }
 ?>
