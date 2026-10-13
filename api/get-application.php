@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
 
 try {
-    $applicationId = $_GET['applicationId'] ?? $_GET['application_id'] ?? '';
+    $applicationId = $_GET['id'] ?? $_GET['applicationId'] ?? $_GET['application_id'] ?? '';
     $email = $_GET['email'] ?? '';
 
     if (!$applicationId && !$email) {
@@ -14,10 +14,10 @@ try {
 
     $stmt = null;
     if ($applicationId) {
-        $stmt = $pdo->prepare("SELECT application_id, application_type, status, payment_status, processing_type, amount, payment_method, receiving_option, delivery_address, delivery_fee, tracking_number, appointment_date, appointment_time, appointment_location, created_at FROM applications WHERE application_id = ? OR id = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? OR id = ? LIMIT 1");
         $stmt->execute([$applicationId, $applicationId]);
     } else {
-        $stmt = $pdo->prepare("SELECT application_id, application_type, status, payment_status, processing_type, amount, payment_method, receiving_option, delivery_address, delivery_fee, tracking_number, appointment_date, appointment_time, appointment_location, created_at FROM applications WHERE email = ? ORDER BY id DESC LIMIT 1");
+        $stmt = $pdo->prepare("SELECT * FROM applications WHERE email = ? ORDER BY id DESC LIMIT 1");
         $stmt->execute([$email]);
     }
 
@@ -25,7 +25,7 @@ try {
 
     if (!$application) {
         http_response_code(404);
-        echo json_encode(['success' => false, 'message' => 'Application not found.']);
+        echo json_encode(['success' => false, 'message' => 'Active application record not found.']);
         exit;
     }
 
@@ -47,13 +47,10 @@ try {
             'receivingOption' => $application['receiving_option'],
             'delivery_address' => $application['delivery_address'],
             'deliveryAddress' => $application['delivery_address'],
-            'delivery_fee' => $application['delivery_fee'],
-            'deliveryFee' => $application['delivery_fee'],
-            'tracking_number' => $application['tracking_number'],
-            'trackingNumber' => $application['tracking_number'],
             'appointmentDate' => $application['appointment_date'],
             'appointmentTime' => $application['appointment_time'],
             'appointmentLocation' => $application['appointment_location'],
+            'created_at' => $application['created_at'],
             'createdAt' => $application['created_at']
         ]
     ]);

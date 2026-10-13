@@ -277,10 +277,13 @@
         const form = document.getElementById('paymentForm');
         const message = document.getElementById('formMessage');
         const payButton = document.getElementById('payButton');
+
         function showMessage(text, type) {
+            message.style.display = ''; // This forces the box to reappear
             message.textContent = text;
             message.className = `message ${type}`;
         }
+
         function calculateDeliveryFee(addressText) {
             if (!addressText || addressText.trim().length < 5) return 150; // Base fare
             const words = addressText.trim().split(/\s+/).length;
@@ -324,6 +327,10 @@
             document.getElementById('summaryAmount').textContent = `₱${totalDue.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
         }
         function displayApplication(application) {
+            // FIX: Hide the red error box immediately when data successfully loads
+            message.style.display = 'none';
+            message.textContent = '';
+           
             const applicationId = storedApplicationId || application.application_id || application.applicationId;
             if (!applicationId) {
                 throw new Error('No active application was found. Start an application from the dashboard first.');

@@ -578,7 +578,6 @@
             }
         }
         document.addEventListener('DOMContentLoaded', loadUserData);
-
         function bindFileInput(inputId, nameId) {
             const input = document.getElementById(inputId);
             const span = document.getElementById(nameId);
@@ -776,12 +775,18 @@
         }
         function populateReviewSummary() {
             let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            let app1 = groupData['applicant_1'] || {};
             const reviewGrid = document.querySelector('.review-grid');
             if (!reviewGrid) return;
             let htmlContent = '';
             for (let i = 1; i <= totalApplicants; i++) {
                 let app = groupData[`applicant_${i}`] || {};
                 let fullName = `${app.givenname || ''} ${app.lastname || ''}`.trim() || '-';
+                
+                let site = app.site_selection || app1.site_selection || '-';
+                let date = app.app_date_selection || app1.app_date_selection || '-';
+                let time = app.app_time_selection || app1.app_time_selection || '-';
+
                 htmlContent += `
                     <div class="summary-card" style="background: #f8fafc; border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-sm); grid-column: span 2; margin-bottom: 15px;">
                         <h4 style="font-size: 15px; color: var(--primary); margin-bottom: 12px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; font-weight: 700; text-transform: uppercase;">Applicant ${i}: ${fullName}</h4>
@@ -793,8 +798,8 @@
                             </div>
                             <div>
                                 <div><strong>DOB:</strong> ${app.dob || '-'}</div>
-                                <div><strong>Site:</strong> ${app.site_selection || '-'}</div>
-                                <div><strong>Date/Time:</strong> ${app.app_date_selection || '-'} (${app.app_time_selection || '-'})</div>
+                                <div><strong>Site:</strong> ${site}</div>
+                                <div><strong>Date/Time:</strong> ${date} (${time})</div>
                             </div>
                         </div>
                     </div>
@@ -813,6 +818,19 @@
             if (currentApplicant > 1 && currentStep < 3) currentStep = 3;
             goToStep(currentStep);
             updateApplicantBadge();
+            
+            if (currentApplicant > 1) {
+                let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+                let app1 = groupData['applicant_1'] || {};
+                let currApp = groupData[`applicant_${currentApplicant}`] || {};
+                
+                currApp['site_selection'] = app1['site_selection'] || '';
+                currApp['app_date_selection'] = app1['app_date_selection'] || '';
+                currApp['app_time_selection'] = app1['app_time_selection'] || '';
+                
+                groupData[`applicant_${currentApplicant}`] = currApp;
+                localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+            }
         });
        
         function updateApplicantBadge() {
@@ -857,24 +875,71 @@
             let sharedSite = document.getElementById('siteSelect')?.value || '';
             let sharedDate = document.getElementById('selectedDateVal')?.value || '';
             let sharedTime = document.getElementById('appTimeSelect')?.value || '';
+            
             let appData = groupData[`applicant_${currentApplicant}`] || {};
             formData.forEach((value, key) => {
                 appData[key] = value;
             });
-            appData['site_selection'] = sharedSite || appData['site_selection'];
-            appData['app_date_selection'] = sharedDate || appData['app_date_selection'];
-            appData['app_time_selection'] = sharedTime || appData['app_time_selection'];
+
+            if (currentApplicant === 1) {
+                if (sharedSite) appData['site_selection'] = sharedSite;
+                if (sharedDate) appData['app_date_selection'] = sharedDate;
+                if (sharedTime) appData['app_time_selection'] = sharedTime;
+            } else {
+                let app1 = groupData['applicant_1'] || {};
+                appData['site_selection'] = app1['site_selection'] || sharedSite;
+                appData['app_date_selection'] = app1['app_date_selection'] || sharedDate;
+                appData['app_time_selection'] = app1['app_time_selection'] || sharedTime;
+            }
+
             groupData[`applicant_${currentApplicant}`] = appData;
             localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
         }
-        document.getElementById('passportForm').addEventListener('submit', function(e) {
+
+        document.getElementById('passportForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             saveCurrentApplicantData();
             let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
             let app1 = groupData['applicant_1'] || {};
+            
             document.getElementById('hiddenSite').value = app1.site_selection || '';
             document.getElementById('hiddenAppDate').value = app1.app_date_selection || '';
             document.getElementById('hiddenAppTime').value = app1.app_time_selection || '';
             document.getElementById('groupDataPayload').value = JSON.stringify(groupData);
+
+            const userEmail = localStorage.getItem('userEmail') || app1.email || 'group@applicant.com';
+            const randomGrpId = `PH-GRP-${Math.floor(100000 + Math.random() * 900000)}`;
+
+            try {
+                const response = await fetch('../api/submit-group-application.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: userEmail,
+                        applicationId: randomGrpId,
+                        applicationType: 'Group Passport Application',
+                        status: 'Form Submitted',
+                        appointmentDate: app1.app_date_selection || '2027-01-01',
+                        appointmentTime: app1.app_time_selection || '15:00',
+                        appointmentLocation: app1.site_selection || 'ANGELES',
+                        groupPayload: groupData
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Unable to save group application.');
+                }
+
+                const savedAppId = result.application_id || result.applicationId || randomGrpId;
+                localStorage.setItem('currentApplicationId', savedAppId);
+                localStorage.setItem('activeAppId', savedAppId);
+
+                window.location.href = 'payments.html?id=' + savedAppId;
+            } catch (error) {
+                console.error('Group submission error:', error);
+                alert(error.message);
+            }
         });
     </script>
 </body>

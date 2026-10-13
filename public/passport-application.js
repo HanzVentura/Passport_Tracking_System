@@ -28,42 +28,43 @@ const applicationLabels = {
 const labels = applicationLabels[applicationType] || applicationLabels.new;
 document.addEventListener('DOMContentLoaded', () => {
     document.title = `${labels.title} - Passport Tracking`;
+   
     const headerTitle = document.getElementById('pageHeaderTitle');
     if (headerTitle) headerTitle.textContent = labels.title;
+   
     const greetingText = document.getElementById('greetingText');
     if (greetingText) greetingText.textContent = 'Good Day';
-    
+   
     const categoryDescription = document.getElementById('categoryDescription');
     if (categoryDescription) categoryDescription.textContent = labels.description;
-    
+   
     const identityDesc = document.getElementById('identityDescription');
     if (identityDesc) identityDesc.textContent = labels.identityDescription;
-    
+   
     const citizenshipDesc = document.getElementById('citizenshipDescription');
     if (citizenshipDesc) citizenshipDesc.textContent = labels.citizenshipDescription;
-    
+   
     const citizenshipTitle = document.getElementById('citizenshipTitle');
     if (citizenshipTitle) citizenshipTitle.textContent = labels.citizenshipLabel;
-    
+   
     const citizenshipNumLabel = document.getElementById('citizenshipNumberLabel');
     if (citizenshipNumLabel) citizenshipNumLabel.textContent = labels.citizenshipNumber;
-    
+   
     const citizenshipDateLabel = document.getElementById('citizenshipDateLabel');
     if (citizenshipDateLabel) citizenshipDateLabel.textContent = labels.citizenshipDate;
-    
+   
     const citizenshipNum = document.getElementById('citizenshipNumber');
     if (citizenshipNum) citizenshipNum.placeholder = labels.citizenshipPlaceholder;
-    
+   
     const summaryCategory = document.getElementById('summaryCategory');
     if (summaryCategory) summaryCategory.textContent = labels.category;
-    
+   
     const summaryCitizenship = document.getElementById('summaryCitizenship');
     if (summaryCitizenship) summaryCitizenship.textContent = labels.citizenshipType;
-
     document.querySelectorAll('input[type="file"]').forEach(input => {
         input.addEventListener('change', () => updateFileName(input.id, input.dataset.nameTarget));
     });
-    
+   
     loadUserData();
     if (typeof goToWizardStep === 'function') {
         goToWizardStep(1);
@@ -76,13 +77,13 @@ async function loadUserData() {
         if (data.loggedIn && data.fullName) {
             const greeting = document.getElementById('greetingText');
             if (greeting) greeting.textContent = `Good Day, ${data.fullName}`;
-            
+           
             const userNameEl = document.getElementById('user-name');
             if (userNameEl) userNameEl.textContent = data.fullName;
-            
+           
             const summaryFullName = document.getElementById('summaryFullName');
             if (summaryFullName) summaryFullName.textContent = data.fullName;
-            
+           
             if (data.email) localStorage.setItem('userEmail', data.email);
         }
     } catch (error) {
@@ -107,7 +108,7 @@ function goToWizardStep(stepNumber) {
     document.querySelectorAll('.wizard-step').forEach(step => { step.className = 'wizard-step'; });
     const paneTarget = document.getElementById(`pane${stepNumber}`);
     if (paneTarget) paneTarget.hidden = false;
-    
+   
     const stepCount = applicationType === 'renewal' ? 2 : 3;
     for (let index = 1; index <= stepCount; index += 1) {
         const step = document.getElementById(`wStep${index}`);
@@ -125,15 +126,13 @@ function validateAndProceed() {
     const citizenshipNumEl = document.getElementById('citizenshipNumber');
     const citizenshipDateEl = document.getElementById('citizenshipDate');
     const citizenshipFileEl = document.getElementById('citizenshipFile');
-
     const idComplete = (!idNumberEl || idNumberEl.value.trim())
         && (!idExpiryEl || idExpiryEl.value)
         && (!idFileEl || idFileEl.files.length);
-        
+       
     const citizenshipComplete = (!citizenshipNumEl || citizenshipNumEl.value.trim())
         && (!citizenshipDateEl || citizenshipDateEl.value)
         && (!citizenshipFileEl || citizenshipFileEl.files.length);
-
     if (!idComplete) {
         alert('Please complete all fields and attach a document for Proof of Identity.');
         return;
@@ -151,13 +150,16 @@ function validateAndProceed() {
 }
 async function completePayment() {
     const randomId = `PH-${Math.floor(100000 + Math.random() * 900000)}`;
-    const userEmail = localStorage.getItem('userEmail');
+   
+    const userEmail = localStorage.getItem('userEmail') || document.getElementById('email')?.value;
+   
     if (!userEmail) {
-        alert('Please log in before saving your application.');
+        alert('Please provide your email or log in before saving your application.');
         return;
     }
+   
     try {
-        const response = await fetch('../api/applications.php', {
+        const response = await fetch('../api/submit-application.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -167,18 +169,24 @@ async function completePayment() {
                 status: 'Form Submitted',
                 appointmentDate: localStorage.getItem('selectedAppointmentDate') || '2027-01-01',
                 appointmentTime: localStorage.getItem('selectedAppointmentTime') || '15:00',
-                appointmentLocation: localStorage.getItem('selectedSite') || 'CANDON'
+                appointmentLocation: localStorage.getItem('selectedSite') || 'ANGELES'
             })
         });
+       
         const result = await response.json();
+       
         if (!response.ok || !result.success) {
             throw new Error(result.message || 'Unable to save your application.');
         }
+       
         const savedApplicationId = result.application_id || result.applicationId || randomId;
+       
         localStorage.setItem('currentApplicationId', savedApplicationId);
         localStorage.setItem('activeAppId', savedApplicationId);
         localStorage.setItem('applicationType', result.applicationType || labels.category);
-        window.location.href = 'payments.html';
+       
+        window.location.href = 'payments.html?id=' + savedApplicationId;
+       
     } catch (error) {
         console.error('Unable to save application:', error);
         alert(error.message);
