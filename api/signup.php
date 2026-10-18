@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
-$fullName = $data['fullName'] ?? $data['full_name'] ?? '';
+$fullName = $data['fullName'] ?? $data['full_name'] ?? $data['fullname'] ?? '';
 $email = $data['email'] ?? '';
 $password = $data['password'] ?? '';
 
