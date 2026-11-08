@@ -163,6 +163,79 @@
         .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
         .btn-secondary { background-color: #f1f5f9; color: #475569; border: 1px solid var(--border-color); }
         .btn-secondary:hover { background-color: #e2e8f0; }
+    
+        @media (max-width: 768px) {
+            body {
+                display: block !important;
+                height: auto;
+                overflow: auto;
+            }
+
+            .sidebar {
+                width: 100% !important;
+                flex: none;
+                height: auto;
+                padding: 12px 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .nav-links {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 4px;
+                padding: 0 12px;
+            }
+
+            .nav-links li a {
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+                padding: 8px 4px;
+                font-size: 11px;
+                border-right: none !important;
+                border-bottom: 3px solid transparent;
+                border-radius: 6px;
+            }
+
+            .nav-links li.active a, .nav-links li a:hover {
+                border-right: none !important;
+                border-bottom-color: var(--primary);
+            }
+
+            .nav-links li a i {
+                margin-right: 0 !important;
+                margin-bottom: 4px;
+                font-size: 14px;
+            }
+
+            .main-container {
+                min-height: auto;
+            }
+
+            .main-content {
+                padding: 20px 16px !important;
+            }
+
+            /* Custom wizard step adjustments for mobile */
+            .wizard-steps {
+                display: flex;
+                overflow-x: auto;
+                padding: 12px;
+                gap: 6px;
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .wizard-step {
+                flex-shrink: 0;
+                padding: 8px 10px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
 <body data-application-type="new">
