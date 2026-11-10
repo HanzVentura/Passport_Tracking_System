@@ -6,9 +6,8 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 body {
-    width: 100%;
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100vh;
+    overflow: hidden;
 }
 /* Split Screen Layout */
 .split-layout {
@@ -433,45 +432,105 @@ input[type="password"]:focus {
 }
 
 /* ==========================================================
-   RESPONSIVE DESIGN FIXES FOR MOBILE & TABLETS
+   ADMIN DASHBOARD - THREE-STATE BUTTON ARCHITECTURE
    ========================================================== */
-@media (max-width: 768px) {
-    /* Allow the page to scroll naturally on mobile instead of locking height */
-    body {
-        height: auto;
-        overflow: auto;
-    }
 
-    /* Stack the split layout vertically: form on top, carousel below */
-    .split-layout,
-    .split-layout.reverse-layout {
-        flex-direction: column;
-        height: auto;
-        min-height: 100vh;
-    }
-
-    /* Make the form side take full width with comfortable padding */
-    .form-side {
-        width: 100%;
-        min-height: 100vh;
-        padding: 20px 0;
-    }
-
-    .form-container {
-        max-width: 100%;
-        padding: 20px 16px;
-    }
-
-    /* Give the image carousel a fixed visible height on mobile so it doesn't disappear */
-    .image-side {
-        width: 100%;
-        height: 300px;
-        min-height: 300px;
-    }
-
-    /* Adjust success screen overlay for small screens */
-    .success-box {
-        padding: 30px 20px;
-        width: 95%;
-    }
+/* Base button-action styles for three-state buttons */
+.btn-action.btn-status-locked,
+.btn-action.btn-status-open,
+.btn-action.btn-status-future {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
+
+/* A. LOCKED / COMPLETED (Red) - Highest specificity to override generic disabled styles */
+.btn-action.btn-status-locked,
+.btn-action.btn-status-locked:disabled,
+.btn-action.btn-status-locked.disabled {
+    background-color: #fef2f2 !important;
+    color: #991b1b !important;
+    border: 1px solid #fca5a5 !important;
+    cursor: not-allowed !important;
+    opacity: 0.85 !important;
+}
+.btn-action.btn-status-locked:hover,
+.btn-action.btn-status-locked:disabled:hover,
+.btn-action.btn-status-locked.disabled:hover {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+    border-color: #fca5a5 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+.btn-action.btn-status-locked i.fa-lock {
+    font-size: 10px;
+    color: #991b1b !important;
+}
+
+/* B. OPEN / ACTIVE NEXT STEP (Blue) */
+.btn-action.btn-status-open {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid #1d4ed8 !important;
+    cursor: pointer !important;
+}
+.btn-action.btn-status-open:hover {
+    background-color: #1d4ed8 !important;
+    border-color: #1e40af !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* C. FUTURE STEPS (Muted Gray) */
+.btn-action.btn-status-future,
+.btn-action.btn-status-future:disabled,
+.btn-action.btn-status-future.disabled {
+    background-color: #f3f4f6 !important;
+    color: #9ca3af !important;
+    border: 1px solid #e5e7eb !important;
+    cursor: not-allowed !important;
+}
+.btn-action.btn-status-future:hover,
+.btn-action.btn-status-future:disabled:hover,
+.btn-action.btn-status-future.disabled:hover {
+    background-color: #f3f4f6 !important;
+    color: #9ca3af !important;
+    border-color: #e5e7eb !important;
+    transform: none !important;
+}
+
+/* Status Legend Bar */
+.status-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    flex-shrink: 0;
+}
+.legend-dot.locked { background: #fca5a5; border: 2px solid #ef4444; }
+.legend-dot.open { background: #60a5fa; border: 2px solid #2563eb; }
+.legend-dot.future { background: #d1d5db; border: 2px solid #9ca3af; }

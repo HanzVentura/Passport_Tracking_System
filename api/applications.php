@@ -20,24 +20,129 @@ if ($action === 'list_all') {
         exit;
     }
 }
+
+// Status hierarchy for irreversible pipeline progression
+// Higher rank = further in the pipeline
+$STATUS_RANKS = [
+    'Form Submitted' => 1,
+    'Payment Pending' => 2,
+    'Paid' => 3,
+    'Appointment Scheduled' => 4,
+    'Processing' => 5,
+    'Biometrics Received' => 6,
+    'Under Consular Review' => 7,
+    'Under Review' => 7,      // Alias for same rank
+    'Review Completed' => 7,  // Alias for same rank
+    'In Printing' => 8,
+    'Dispatched' => 9,
+    'Ready for Release' => 9, // Alias for same rank
+    'Cancelled' => 0          // Terminal state, not part of forward pipeline
+];
+
+/**
+ * Validates if a status transition is allowed (forward-only, no skipping backwards)
+ * @param string $currentStatus Current status in database
+ * @param string $newStatus Target status to transition to
+ * @return array ['valid' => bool, 'message' => string, 'currentRank' => int, 'newRank' => int]
+ */
+function validateStatusTransition($currentStatus, $newStatus, $statusRanks) {
+    $currentRank = $statusRanks[$currentStatus] ?? 0;
+    $newRank = $statusRanks[$newStatus] ?? 0;
+
+    // Unknown status - reject
+    if ($newRank === 0 && $newStatus !== 'Cancelled') {
+        return [
+            'valid' => false,
+            'message' => "Invalid target status: $newStatus",
+            'currentRank' => $currentRank,
+            'newRank' => $newRank
+        ];
+    }
+
+    // Allow transition to Cancelled from any state (terminal)
+    if ($newStatus === 'Cancelled') {
+        return [
+            'valid' => true,
+            'message' => 'Status updated to Cancelled.',
+            'currentRank' => $currentRank,
+            'newRank' => $newRank
+        ];
+    }
+
+    // Must move forward in rank (strictly greater)
+    if ($newRank <= $currentRank) {
+        return [
+            'valid' => false,
+            'message' => 'Invalid status transition. Status updates are irreversible and must progress forward.',
+            'currentRank' => $currentRank,
+            'newRank' => $newRank
+        ];
+    }
+
+    // Allow skipping intermediate steps (e.g., Form Submitted -> Under Consular Review)
+    // as long as it's forward progression
+    return [
+        'valid' => true,
+        'message' => 'Valid status transition.',
+        'currentRank' => $currentRank,
+        'newRank' => $newRank
+    ];
+}
+
 // Handle Admin Status Updates
-if ($action === 'update_status' || isset($input['status']) && isset($input['applicationId'])) {
+if ($action === 'update_status' || (isset($input['status']) && isset($input['applicationId']))) {
     $applicationId = $input['applicationId'] ?? '';
     $newStatus = $input['status'] ?? '';
-   
+
     if (!$applicationId) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Application ID is required.']);
         exit;
     }
+
+    if (!$newStatus) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Target status is required.']);
+        exit;
+    }
+
     try {
-        // Explicitly use the correct database column name: application_id
+        // First, fetch current status from database
+        $stmt = $pdo->prepare("SELECT status FROM applications WHERE application_id = ?");
+        $stmt->execute([$applicationId]);
+        $app = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$app) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Application not found.']);
+            exit;
+        }
+
+        $currentStatus = $app['status'] ?? 'Form Submitted';
+
+        // Validate transition
+        $validation = validateStatusTransition($currentStatus, $newStatus, $STATUS_RANKS);
+
+        if (!$validation['valid']) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'message' => $validation['message'],
+                'currentStatus' => $currentStatus,
+                'attemptedStatus' => $newStatus
+            ]);
+            exit;
+        }
+
+        // Valid transition - proceed with update
         $stmt = $pdo->prepare("UPDATE applications SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
         $stmt->execute([$newStatus, $applicationId]);
+
         echo json_encode([
             'success' => true,
             'applicationId' => $applicationId,
             'status' => $newStatus,
+            'previousStatus' => $currentStatus,
             'message' => 'Application status updated successfully.'
         ]);
         exit;
