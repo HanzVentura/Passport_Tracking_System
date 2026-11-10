@@ -32,8 +32,7 @@
             background-color: var(--bg-main);
             color: var(--text-main);
             display: flex;
-            min-height: 100vh;
-            margin: 0;
+            height: 100vh;
             overflow-x: hidden;
         }
         /* Sidebar */
@@ -116,11 +115,9 @@
         /* Main Content */
         .main-content {
             flex: 1;
-            min-width: 0;
             display: flex;
             flex-direction: column;
-            height: auto;
-            min-height: 100vh;
+            overflow-y: auto;
         }
         .header {
             background-color: var(--card-bg);
@@ -140,8 +137,8 @@
             font-weight: 500;
         }
         .content-container {
-            padding: 24px 30px;
-            max-width: 1350px;
+            padding: 35px 40px;
+            max-width: 1400px;
             margin: 0 auto;
             width: 100%;
         }
@@ -197,9 +194,116 @@
             cursor: pointer;
             margin-right: 4px;
             margin-bottom: 4px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
+
+        /* Three-State Button Architecture */
+        /* A. LOCKED / COMPLETED (Red) - Highest specificity to override generic disabled styles */
+        .btn-action.btn-status-locked,
+        .btn-action.btn-status-locked:disabled,
+        .btn-action.btn-status-locked.disabled {
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+            border: 1px solid #fca5a5 !important;
+            cursor: not-allowed !important;
+            opacity: 0.85 !important;
+        }
+        .btn-action.btn-status-locked:hover,
+        .btn-action.btn-status-locked:disabled:hover,
+        .btn-action.btn-status-locked.disabled:hover {
+            background-color: #fee2e2 !important;
+            color: #991b1b !important;
+            border-color: #fca5a5 !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .btn-action.btn-status-locked i.fa-lock {
+            font-size: 10px;
+            color: #991b1b !important;
+        }
+
+        /* B. OPEN / ACTIVE NEXT STEP (Blue) */
+        .btn-action.btn-status-open {
+            background-color: #2563eb !important;
+            color: #ffffff !important;
+            border: 1px solid #1d4ed8 !important;
+            cursor: pointer !important;
+        }
+        .btn-action.btn-status-open:hover {
+            background-color: #1d4ed8 !important;
+            border-color: #1e40af !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3) !important;
+        }
+
+        /* C. FUTURE STEPS (Muted Gray) */
+        .btn-action.btn-status-future,
+        .btn-action.btn-status-future:disabled,
+        .btn-action.btn-status-future.disabled {
+            background-color: #f3f4f6 !important;
+            color: #9ca3af !important;
+            border: 1px solid #e5e7eb !important;
+            cursor: not-allowed !important;
+        }
+        .btn-action.btn-status-future:hover,
+        .btn-action.btn-status-future:disabled:hover,
+        .btn-action.btn-status-future.disabled:hover {
+            background-color: #f3f4f6 !important;
+            color: #9ca3af !important;
+            border-color: #e5e7eb !important;
+            transform: none !important;
+        }
+
+        /* Legacy support */
         .btn-status { background: #e0e7ff; color: #4f46e5; }
         .btn-status:hover { background: #c7d2fe; }
+
+        /* Generic disabled fallback - only applies when no three-state class is present */
+        .btn-action.disabled:not(.btn-status-locked):not(.btn-status-open):not(.btn-status-future),
+        .btn-action[disabled]:not(.btn-status-locked):not(.btn-status-open):not(.btn-status-future) {
+            opacity: 0.4 !important;
+            cursor: not-allowed !important;
+            background: #f1f5f9 !important;
+            color: #94a3b8 !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        .btn-action.disabled:not(.btn-status-locked):not(.btn-status-open):not(.btn-status-future):hover,
+        .btn-action[disabled]:not(.btn-status-locked):not(.btn-status-open):not(.btn-status-future):hover {
+            background: #f1f5f9 !important;
+            color: #94a3b8 !important;
+            transform: none !important;
+        }
+
+        /* Status Legend Bar */
+        .status-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 999px;
+            flex-shrink: 0;
+        }
+        .legend-dot.locked { background: #fca5a5; border: 2px solid #ef4444; }
+        .legend-dot.open { background: #60a5fa; border: 2px solid #2563eb; }
+        .legend-dot.future { background: #d1d5db; border: 2px solid #9ca3af; }
         .badge-resolved { background-color: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; display: inline-block; }
         .badge-pending { background-color: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; display: inline-block; }
         .chat-history-box {
@@ -230,37 +334,6 @@
         }
         .tab-view.active-tab {
             display: block;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                display: block !important;
-                height: auto;
-                overflow: auto;
-            }
-            .sidebar {
-                width: 100% !important;
-                flex: none;
-                height: auto;
-                padding: 12px 0;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
-            .nav-links {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 4px;
-                padding: 0 12px;
-            }
-            .main-content {
-                min-height: auto;
-            }
-            .content-container {
-                padding: 20px 16px !important;
-            }
-            .content-grid, .form-row {
-                grid-template-columns: 1fr !important;
-            }
         }
     </style>
 </head>
@@ -345,6 +418,23 @@
                 <div class="card">
                     <div class="section-title">Application Status Review & Approval</div>
                     <div class="section-subtitle">Monitor user passport applications and advance their status pipeline following consular attendance and processing steps.</div>
+
+                    <!-- Status Legend Bar -->
+                    <div class="status-legend" role="region" aria-label="Application Pipeline Status Legend">
+                        <div class="legend-item">
+                            <span class="legend-dot locked" aria-hidden="true"></span>
+                            <span>Locked / Completed</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot open" aria-hidden="true"></span>
+                            <span>Open / Next Action</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot future" aria-hidden="true"></span>
+                            <span>Future Step</span>
+                        </div>
+                    </div>
+
                     <table>
                         <thead>
                             <tr>
@@ -530,6 +620,124 @@
             }
         }
 
+        // Status hierarchy ranks for irreversible pipeline progression
+        const STATUS_RANKS = {
+            'Form Submitted': 1,
+            'Payment Pending': 2,
+            'Paid': 3,
+            'Appointment Scheduled': 4,
+            'Processing': 5,
+            'Biometrics Received': 6,
+            'Under Consular Review': 7,
+            'Under Review': 7,
+            'Review Completed': 7,
+            'In Printing': 8,
+            'Dispatched': 9,
+            'Ready for Release': 9,
+            'Cancelled': 0
+        };
+
+        // Pipeline steps for admin buttons - defines the strict sequence
+        // Each step corresponds to an admin action button and its target status
+        const PIPELINE_STEPS = [
+            { id: 'biometrics', label: 'Biometrics', targetStatus: 'Biometrics Received', rank: 6, icon: 'fa-fingerprint' },
+            { id: 'review', label: 'Review', targetStatus: 'Under Consular Review', rank: 7, icon: 'fa-magnifying-glass' },
+            { id: 'printing', label: 'Printing', targetStatus: 'In Printing', rank: 8, icon: 'fa-print' },
+            { id: 'dispatch', label: 'Dispatch', targetStatus: 'Dispatched', rank: 9, icon: 'fa-truck-fast' }
+        ];
+
+        /**
+         * Determines the visual state for each pipeline button based on current status
+         * Three states: 'locked' (red), 'open' (blue), 'future' (gray)
+         * @param {string} currentStatus - The application's current status
+         * @returns {Object} Object with button IDs as keys and state objects {state, className, disabled, icon}
+         */
+        function getPipelineButtonStates(currentStatus) {
+            const currentRank = STATUS_RANKS[currentStatus] || 0;
+            const states = {};
+            let openAssigned = false;
+
+            // If cancelled, all buttons are locked
+            if (currentStatus === 'Cancelled') {
+                PIPELINE_STEPS.forEach(step => {
+                    states[step.id] = {
+                        state: 'locked',
+                        className: 'btn-status-locked',
+                        disabled: true,
+                        icon: step.icon,
+                        label: step.label,
+                        targetStatus: step.targetStatus
+                    };
+                });
+                return states;
+            }
+
+            // Find the first admin pipeline step (rank 6 = Biometrics Received)
+            const firstAdminRank = PIPELINE_STEPS[0].rank; // 6
+
+            PIPELINE_STEPS.forEach(step => {
+                if (step.rank <= currentRank) {
+                    // Completed step - LOCKED (Red)
+                    states[step.id] = {
+                        state: 'locked',
+                        className: 'btn-status-locked',
+                        disabled: true,
+                        icon: step.icon,
+                        label: step.label,
+                        targetStatus: step.targetStatus
+                    };
+                } else if (!openAssigned && (step.rank === currentRank + 1 || (currentRank < firstAdminRank && step.rank === firstAdminRank))) {
+                    // Next valid action - OPEN (Blue) - only ONE button gets this
+                    // If current rank is before the first admin step, the first admin step is open
+                    states[step.id] = {
+                        state: 'open',
+                        className: 'btn-status-open',
+                        disabled: false,
+                        icon: step.icon,
+                        label: step.label,
+                        targetStatus: step.targetStatus
+                    };
+                    openAssigned = true;
+                } else {
+                    // Future step - FUTURE (Gray)
+                    states[step.id] = {
+                        state: 'future',
+                        className: 'btn-status-future',
+                        disabled: true,
+                        icon: step.icon,
+                        label: step.label,
+                        targetStatus: step.targetStatus
+                    };
+                }
+            });
+
+            return states;
+        }
+
+        /**
+         * Generates HTML for pipeline action buttons with three-state visual architecture
+         * @param {string} appId - Application ID
+         * @param {string} currentStatus - Current status of the application
+         * @returns {string} HTML string for action buttons
+         */
+        function renderActionButtons(appId, currentStatus) {
+            const buttonStates = getPipelineButtonStates(currentStatus);
+            let buttonsHtml = '';
+
+            PIPELINE_STEPS.forEach(step => {
+                const btnState = buttonStates[step.id];
+                const disabledAttr = btnState.disabled ? 'disabled' : '';
+                const onclickAttr = !btnState.disabled ? `onclick="updateAppStatus('${appId}', '${btnState.targetStatus}')"` : '';
+                const iconHtml = btnState.state === 'locked'
+                    ? `<i class="fas fa-lock me-1"></i>`
+                    : `<i class="fas ${btnState.icon} me-1"></i>`;
+
+                buttonsHtml += `<button class="btn-action ${btnState.className}" ${disabledAttr} ${onclickAttr}>${iconHtml}${btnState.label}</button>`;
+            });
+
+            return buttonsHtml;
+        }
+
         async function loadAdminApplications() {
             const tableBody = document.getElementById('adminAppsTable');
             try {
@@ -549,17 +757,22 @@
                     const payment = app.payment_status || app.paymentStatus || 'Paid';
                     const status = app.status || 'Form Submitted';
 
+                    // Determine badge class based on status
+                    let badgeClass = 'badge-pending';
+                    if (status === 'Dispatched' || status === 'Ready for Release') {
+                        badgeClass = 'badge-resolved';
+                    } else if (status === 'Cancelled') {
+                        badgeClass = 'badge-pending'; // Could add a specific cancelled badge
+                    }
+
                     row.innerHTML = `
                         <td><strong>${appId}</strong></td>
                         <td>${email}</td>
                         <td>${type}</td>
                         <td><span style="color: #166534; font-weight: 600;">${payment}</span></td>
-                        <td><span class="badge-pending">${status}</span></td>
+                        <td><span class="${badgeClass}">${status}</span></td>
                         <td>
-                            <button class="btn-action btn-status" onclick="updateAppStatus('${appId}', 'Biometrics Received')">Biometrics</button>
-                            <button class="btn-action btn-status" onclick="updateAppStatus('${appId}', 'Under Consular Review')">Review</button>
-                            <button class="btn-action btn-status" onclick="updateAppStatus('${appId}', 'In Printing')">Printing</button>
-                            <button class="btn-action" style="background:#dcfce7; color:#166534;" onclick="updateAppStatus('${appId}', 'Dispatched')">Dispatch</button>
+                            ${renderActionButtons(appId, status)}
                         </td>
                     `;
                     tableBody.appendChild(row);
