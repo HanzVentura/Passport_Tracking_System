@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquiries - Passport Tracking</title>
+    <!-- FontAwesome & Google Plus Jakarta Sans Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 0;
+        }
+        .sidebar-top {
+            display: flex;
+            flex-direction: column;
+        }
+        .user-profile-mini {
+            display: flex;
+            align-items: center;
+            padding: 0 24px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 16px;
+        }
+        .user-profile-mini i {
+            font-size: 38px;
+            color: var(--primary);
+            margin-right: 12px;
+        }
+        .user-info .name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+        .nav-links {
+            list-style: none;
+        }
+        .nav-links li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .nav-links li.active a, .nav-links li a:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-right: 4px solid var(--primary);
+            font-weight: 600;
+        }
+        .nav-links li a i {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        .sidebar-bottom {
+            padding: 0 24px;
+        }
+        .sidebar-bottom a {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            color: #ef4444;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .sidebar-bottom a i {
+            margin-right: 12px;
+        }
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .header {
+            background-color: var(--card-bg);
+            padding: 22px 36px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.3px;
+        }
+        .content-container {
+            padding: 35px 40px;
+            max-width: 1350px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* Cards */
+        .enquiry-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 24px;
+            transition: all 0.2s ease;
+        }
+        .enquiry-card:hover {
+            box-shadow: var(--shadow-elevated);
+            border-color: #cbd5e1;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .section-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .form-control {
+            padding: 11px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: #fff;
+            font-family: inherit;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+        .form-control[readonly] {
+            background-color: #f1f5f9;
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 110px;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            box-shadow: var(--shadow-subtle);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            box-shadow: var(--shadow-elevated);
+        }
+        .btn-primary:disabled {
+            background-color: #a5b4fc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        /* Warning banner for no application */
+        .no-app-banner {
+            background-color: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            padding: 16px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            line-height: 1.5;
+        }
+        /* Table Styling */
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 14px 16px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+        .badge-pending {
+            background-color: #fef3c7;
+            color: #d97706;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .badge-resolved {
+            background-color: #dcfce7;
+            color: #166534;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .chat-history-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 140px;
+            overflow-y: auto;
+            font-size: 12px;
+            color: #334155;
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+        }
+        .member-reply-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .member-reply-textarea {
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 12px;
+            width: 100%;
+            min-height: 60px;
+            resize: vertical;
+            outline: none;
+        }
+        .btn-member-reply {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+        .btn-member-reply:hover {
+            background-color: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-top">
+            <div class="user-profile-mini">
+                <i class="fa-solid fa-circle-user"></i>
+                <div class="user-info">
+                    <div class="name" id="user-name">Loading...</div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-wallet"></i> Payments</a></li>
+                <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
+                <li class="active"><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
+                <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
+                <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-bottom">
+            <a href="index.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+        </div>
+    </div>
+   
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="header">ENQUIRIES & SUPPORT</div>
+       
+        <div class="content-container">
+            <!-- Submit Enquiry Card -->
+            <div class="enquiry-card">
+                <div class="section-title">Submit a New Enquiry or Complaint</div>
+                <div class="section-subtitle">Your enquiry will be automatically linked to your active application ID for identification[cite: 14].</div>
+               
+                <div id="noAppWarning" class="no-app-banner" style="display: none;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 18px;"></i>
+                    <span><strong>No Active Application Found:</strong> You must submit a passport application from your dashboard before you can submit an enquiry[cite: 14].</span>
+                </div>
+               
+                <form onsubmit="handleEnquirySubmit(event)" id="enquiryForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Application ID (Linked)</label>
+                            <input type="text" class="form-control" id="enquiryAppId" value="No Active Application" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject / Topic</label>
+                            <select class="form-control" id="enquirySubject">
+                                <option>Application Status Inquiry</option>
+                                <option>Document Verification Issue</option>
+                                <option>Appointment Schedule Change</option>
+                                <option>Payment & Fees Question</option>
+                                <option>Other Concerns</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Message / Description</label>
+                        <textarea class="form-control" id="enquiryMessage" placeholder="Describe your concern or question in detail..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" id="submitBtn">Submit Enquiry</button>
+                </form>
+            </div>
+            <!-- View Submitted Enquiries Card -->
+            <div class="enquiry-card">
+                <div class="section-title">Submitted Enquiries & Conversation History</div>
+                <div class="section-subtitle">View your ongoing conversation with administrators. You can reply back as long as the ticket remains Open[cite: 14].</div>
+               
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>App ID</th>
+                                <th>Subject</th>
+                                <th>Initial Message</th>
+                                <th>Date Submitted</th>
+                                <th>Status</th>
+                                <th>Conversation Log & Follow-up Reply</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enquiryTableBody">
+                            <!-- Populated dynamically via script[cite: 14] -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const userResponse = await fetch('../api/user-data.php');
+                const userData = await userResponse.json();
+                if (userData.loggedIn && userData.fullName) {
+                    document.getElementById('user-name').textContent = userData.fullName;
+                    if (userData.email) localStorage.setItem('userEmail', userData.email);
+                }
+            } catch (error) {
+                console.error('Unable to load user data:', error);
+            }
+
+            const userEmail = localStorage.getItem('userEmail');
+            const urlParams = new URLSearchParams(window.location.search);
+            const explicitAppId = urlParams.get('id') || urlParams.get('applicationId') || localStorage.getItem('activeAppId');
+           
+            const appIdInput = document.getElementById('enquiryAppId');
+            const noAppWarning = document.getElementById('noAppWarning');
+            const submitBtn = document.getElementById('submitBtn');
+            const messageBox = document.getElementById('enquiryMessage');
+            const subjectBox = document.getElementById('enquirySubject');
+            if (userEmail) {
+                try {
+                    let fetchUrl = `../api/get-application.php?email=${encodeURIComponent(userEmail)}`;
+                    if (explicitAppId) {
+                        fetchUrl = `../api/get-application.php?applicationId=${encodeURIComponent(explicitAppId)}`;
+                    }
+                    const response = await fetch(fetchUrl);
+                    const result = await response.json();
+                    const application = result.application;
+                    if (response.ok && application) {
+                        appIdInput.value = application.application_id || application.applicationId;
+                        localStorage.setItem('activeAppId', appIdInput.value);
+                        noAppWarning.style.display = 'none';
+                        submitBtn.disabled = false;
+                        messageBox.disabled = false;
+                        subjectBox.disabled = false;
+                    } else {
+                        showNoApplicationState();
+                    }
+                } catch (error) {
+                    console.error('Unable to load application:', error);
+                    showNoApplicationState();
+                }
+            } else {
+                showNoApplicationState();
+            }
+            loadEnquiries(userEmail);
+            function showNoApplicationState() {
+                appIdInput.value = "No Active Application";
+                noAppWarning.style.display = 'flex';
+                submitBtn.disabled = true;
+                messageBox.disabled = true;
+                subjectBox.disabled = true;
+            }
+        });
+        async function handleEnquirySubmit(event) {
+            event.preventDefault();
+            const appId = document.getElementById('enquiryAppId').value;
+            const userEmail = localStorage.getItem('userEmail');
+            if (!appId || appId === 'No Active Application') {
+                alert("Cannot submit enquiry without an active application.");
+                return;
+            }
+            const subject = document.getElementById('enquirySubject').value;
+            const message = document.getElementById('enquiryMessage').value.trim();
+            if (!message) {
+                alert("Please enter a message description before submitting.");
+                return;
+            }
+            try {
+                const response = await fetch('../api/enquiries.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail, applicationId: appId, subject, message })
+                });
+                if (!response.ok) {
+                    throw new Error('Enquiry submission failed.');
+                }
+                await loadEnquiries(userEmail);
+                alert("Your enquiry has been successfully linked and submitted!");
+                document.getElementById('enquiryMessage').value = '';
+            } catch (error) {
+                console.error('Unable to submit enquiry:', error);
+                alert("Unable to submit your enquiry. Please try again.");
+            }
+        }
+        async function sendMemberReply(enquiryId, index) {
+            const replyText = document.getElementById(`memberReplyText-${index}`).value.trim();
+            const userEmail = localStorage.getItem('userEmail');
+            if (!replyText) {
+                alert("Please type a reply message.");
+                return;
+            }
+            try {
+                const response = await fetch('../api/enquiries.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enquiryId: enquiryId, reply: `Member (${userEmail}):\n${replyText}` })
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.message || 'Failed to send reply.');
+               
+                await loadEnquiries(userEmail);
+                alert("Reply sent successfully!");
+            } catch (error) {
+                alert("Error sending reply: " + error.message);
+            }
+        }
+        async function loadEnquiries(userEmail) {
+            const tableBody = document.getElementById('enquiryTableBody');
+            try {
+                const response = await fetch('../api/enquiries.php');
+                const result = await response.json();
+                let enquiries = result.enquiries || [];
+                if (userEmail) {
+                    enquiries = enquiries.filter(item => item.email === userEmail);
+                }
+                if (enquiries.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No enquiries submitted yet.</td></tr>`;
+                    return;
+                }
+                tableBody.innerHTML = '';
+                enquiries.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    const isResolved = item.status === 'Resolved';
+                    const statusClass = isResolved ? 'badge-resolved' : 'badge-pending';
+                    const replyContent = item.reply && item.reply !== 'Awaiting administrator response...' ? item.reply : 'Awaiting administrator response...';
+                   
+                    row.innerHTML = `
+                        <td><strong>${item.appId}</strong></td>
+                        <td>${item.subject}</td>
+                        <td style="max-width: 220px; white-space: pre-wrap;">${item.message || ''}</td>
+                        <td>${item.date}</td>
+                        <td><span class="${statusClass}">${item.status || 'Open'}</span></td>
+                        <td>
+                            <div class="chat-history-box">${replyContent}</div>
+                            ${isResolved ?
+                                `<div style="color: #166534; font-weight: 600; font-size: 11px;"><i class="fa-solid fa-check-circle"></i> Ticket Closed (Solved)</div>` :
+                                `<div class="member-reply-group">
+                                    <textarea class="member-reply-textarea" id="memberReplyText-${index}" placeholder="Type follow-up reply..."></textarea>
+                                    <button type="button" class="btn-member-reply" onclick="sendMemberReply(${item.id},${index})"><i class="fa-solid fa-paper-plane"></i> Reply</button>
+                                </div>`
+                            }
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Unable to load enquiries:', error);
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Unable to load enquiries.</td></tr>`;
+            }
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments - Passport Tracking</title>
+    <!-- FontAwesome & Google Plus Jakarta Sans Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
+       
+        .sidebar { width: 260px; flex: 0 0 260px; background: var(--card-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; }
+        .user-profile-mini { display: flex; align-items: center; padding: 0 24px 20px; border-bottom: 1px solid #f1f5f9; margin-bottom: 16px; }
+        .user-profile-mini i { font-size: 38px; color: var(--primary); margin-right: 12px; }
+        .user-info .name { font-weight: 700; font-size: 14px; color: var(--text-main); overflow-wrap: anywhere; }
+       
+        .nav-links { list-style: none; }
+        .nav-links li a { display: flex; align-items: center; padding: 12px 24px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: all .2s ease; }
+        .nav-links li.active a, .nav-links li a:hover { background: var(--primary-light); color: var(--primary); border-right: 4px solid var(--primary); font-weight: 600; }
+        .nav-links li a i { width: 16px; margin-right: 12px; text-align: center; }
+       
+        .sidebar-bottom { padding: 0 24px; }
+        .sidebar-bottom a { display: flex; align-items: center; padding: 10px 0; color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 600; }
+        .sidebar-bottom a i { margin-right: 12px; }
+       
+        .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow-y: auto; }
+        .header { background: var(--card-bg); padding: 22px 36px; border-bottom: 1px solid var(--border-color); font-size: 18px; font-weight: 700; color: var(--text-main); letter-spacing: -0.3px; }
+        .dashboard-container { padding: 35px 40px; max-width: 1350px; margin: 0 auto; width: 100%; }
+       
+        .welcome-banner { background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: #fff; padding: 28px 34px; border-radius: var(--radius-md); margin-bottom: 30px; box-shadow: var(--shadow-elevated); }
+        .welcome-banner h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .welcome-banner p { font-size: 14px; opacity: .9; }
+       
+        .content-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 24px; align-items: start; }
+       
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 28px; box-shadow: var(--shadow-subtle); transition: all 0.2s ease; }
+        .card:hover { box-shadow: var(--shadow-elevated); border-color: #cbd5e1; }
+       
+        .card-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .card-subtitle { color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
+       
+        .notice { display: flex; gap: 14px; padding: 16px; margin-bottom: 24px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-sm); color: #1e40af; }
+        .notice i { margin-top: 2px; font-size: 18px; color: var(--primary); }
+        .notice strong { display: block; font-size: 14px; margin-bottom: 4px; }
+        .notice p { font-size: 13px; line-height: 1.5; }
+       
+        .section-label { display: block; color: #334155; font-size: 13px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+       
+        .plan-list { display: grid; gap: 12px; margin-bottom: 24px; }
+        .plan-option { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; border: 2px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; transition: border-color .2s, background .2s, box-shadow .2s; }
+        .plan-option:hover, .plan-option.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: var(--shadow-subtle); }
+        .plan-option input { position: absolute; opacity: 0; }
+        .plan-copy { display: flex; align-items: flex-start; gap: 12px; }
+        .plan-copy i { color: #94a3b8; margin-top: 3px; font-size: 16px; }
+        .plan-option.selected .plan-copy i { color: var(--primary); }
+        .plan-name { color: var(--text-main); font-size: 14px; font-weight: 700; display: block; margin-bottom: 4px; }
+        .plan-time { color: var(--text-muted); font-size: 12px; font-weight: 500; }
+        .plan-price { color: var(--primary); font-size: 16px; font-weight: 700; white-space: nowrap; }
+       
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { color: #334155; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+       
+        .form-control { width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); outline: none; background: #fff; color: var(--text-main); font-size: 14px; font-family: inherit; transition: all 0.2s ease; }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        .form-control:disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; }
+       
+        .method-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+        .method-option { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 12px 8px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; background: #fff; }
+        .method-option:has(input:checked) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .method-option input { accent-color: var(--primary); }
+       
+        .button-row { display: flex; justify-content: flex-end; align-items: center; gap: 16px; margin-top: 24px; }
+        .btn-primary, .btn-secondary { border-radius: var(--radius-sm); padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s ease; }
+        .btn-primary { background: var(--primary); color: #fff; border: 0; box-shadow: var(--shadow-subtle); }
+        .btn-primary:hover { background: var(--primary-hover); box-shadow: var(--shadow-elevated); }
+        .btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; box-shadow: none; }
+        .btn-secondary { background: #fff; color: #334155; border: 1px solid var(--border-color); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-secondary:hover { background: #f1f5f9; border-color: #cbd5e1; }
+       
+        .summary-line { display: flex; justify-content: space-between; gap: 15px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+        .summary-line span:first-child { color: var(--text-muted); font-weight: 500; }
+        .summary-line strong { color: var(--text-main); text-align: right; overflow-wrap: anywhere; font-weight: 600; }
+        .total-line { border: 0; padding-top: 18px; font-size: 16px; }
+        .total-line strong { color: var(--primary); font-weight: 700; }
+       
+        .empty-state, .success-state { text-align: center; padding: 24px 8px; }
+        .empty-state i, .success-state i { color: #cbd5e1; font-size: 36px; margin-bottom: 12px; }
+        .empty-state p, .success-state p { color: var(--text-muted); font-size: 13px; line-height: 1.5; }
+        .success-state { display: none; }
+        .success-state i { color: #10b981; }
+       
+        .message { display: none; margin-top: 16px; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.4; }
+        .message.error { display: block; color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; }
+        .message.success { display: block; color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; }
+       
+        @media (max-width: 900px) { .content-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 680px) { body { display: block; } .sidebar { width: 100%; height: auto; padding: 12px 0; } .sidebar-bottom { display: none; } .nav-links { display: grid; grid-template-columns: repeat(3, 1fr); } .nav-links li a { justify-content: center; padding: 10px 6px; font-size: 11px; gap: 4px; flex-direction: column; } .nav-links li a i { margin: 0; } .header { padding: 16px 20px; } .dashboard-container { padding: 20px 16px; } .welcome-banner { padding: 20px; } .form-row, .method-list { grid-template-columns: 1fr; } .form-group.full { grid-column: auto; } .button-row { justify-content: stretch; flex-direction: column-reverse; } .button-row a, .button-row button { width: 100%; text-align: center; } }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div>
+            <div class="user-profile-mini">
+                <i class="fa-solid fa-circle-user"></i>
+                <div class="user-info"><div class="name" id="user-name">Loading...</div></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fa-solid fa-house"></i>Dashboard</a></li>
+                <li class="active"><a href="payments.html"><i class="fa-solid fa-wallet"></i>Payments</a></li>
+                <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i>Receipts</a></li>
+                <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i>Enquiries</a></li>
+                <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
+                <li><a href="#"><i class="fa-solid fa-user"></i>Profile</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-bottom"><a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
+    </aside>
+   
+    <main class="main-content">
+        <div class="header">PAYMENTS</div>
+        <div class="dashboard-container">
+            <div class="welcome-banner">
+                <h1 id="greetingText">Passport Payment</h1>
+                <p>Complete your payment to lock in your appointment schedule.</p>
+            </div>
+            <div class="content-grid" id="paymentContent">
+                <section class="card">
+                    <div class="card-title">Passport Processing Fee</div>
+                    <div class="card-subtitle">Choose the processing time that suits your travel plans.</div>
+                    <div class="notice" role="note">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <div><strong>Official DFA Notice</strong><p>Payment is required to lock in your appointment schedule. Your appointment will only be generated after your payment is successfully recorded.</p></div>
+                    </div>
+                    <span class="section-label">Select processing option</span>
+                    <div class="plan-list">
+                        <label class="plan-option selected" id="planRegular">
+                            <input type="radio" name="processingType" value="Regular Processing" data-amount="950" checked>
+                            <span class="plan-copy"><i class="fa-solid fa-circle-check"></i><span><span class="plan-name">Regular Processing</span><span class="plan-time">12 working days</span></span></span>
+                            <span class="plan-price">₱950.00</span>
+                        </label>
+                        <label class="plan-option" id="planExpedited">
+                            <input type="radio" name="processingType" value="Expedited / Rush Processing" data-amount="1200">
+                            <span class="plan-copy"><i class="fa-regular fa-circle-check"></i><span><span class="plan-name">Expedited / Rush Processing</span><span class="plan-time">7 working days</span></span></span>
+                            <span class="plan-price">₱1,200.00</span>
+                        </label>
+                    </div>
+                    <!-- Delivery vs In-Person Receiving Section -->
+                    <span class="section-label">Receiving Option</span>
+                    <div class="plan-list" style="margin-bottom: 20px;">
+                        <label class="plan-option selected" id="planInPerson">
+                            <input type="radio" name="receivingOption" value="In-Person" checked>
+                            <span class="plan-copy"><i class="fa-solid fa-circle-check"></i><span><span class="plan-name">In-Person Claiming</span><span class="plan-time">Pick up at consular office (Free)</span></span></span>
+                            <span class="plan-price">₱0.00</span>
+                        </label>
+                        <label class="plan-option" id="planDelivery">
+                            <input type="radio" name="receivingOption" value="Delivery">
+                            <span class="plan-copy"><i class="fa-regular fa-circle-check"></i><span><span class="plan-name">Courier Delivery</span><span class="plan-time">Delivered straight to your address</span></span></span>
+                            <span class="plan-price" id="deliveryPriceDisplay">₱150.00</span>
+                        </label>
+                    </div>
+                    <div id="deliveryAddressSection" style="display: none; margin-bottom: 24px; padding: 18px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                        <div class="form-group full" style="margin-bottom: 0;">
+                            <label for="deliveryAddress">Complete Delivery Address</label>
+                            <input class="form-control" id="deliveryAddress" type="text" placeholder="House/Unit No., Street, Barangay, City/Municipality, Province">
+                            <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px;">Fare is calculated automatically after you finish typing.</small>
+                        </div>
+                    </div>
+                    <form id="paymentForm">
+                        <span class="section-label">Payment method</span>
+                        <div class="method-list">
+                            <label class="method-option"><input type="radio" name="paymentMethod" value="GCash" checked> GCash</label>
+                            <label class="method-option"><input type="radio" name="paymentMethod" value="Maya"> Maya</label>
+                            <label class="method-option"><input type="radio" name="paymentMethod" value="Credit Card"> Card</label>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full"><label for="accountName">Account or cardholder name</label><input class="form-control" id="accountName" type="text" autocomplete="name" required placeholder="Juan Dela Cruz"></div>
+                            <div class="form-group full"><label for="accountReference">Mobile number or card number</label><input class="form-control" id="accountReference" type="text" required placeholder="09XX XXX XXXX"></div>
+                            <div class="form-group"><label for="paymentEmail">Email receipt to</label><input class="form-control" id="paymentEmail" type="email" required></div>
+                            <div class="form-group"><label for="paymentNote">Reference note <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label><input class="form-control" id="paymentNote" type="text" placeholder="e.g. payment reference"></div>
+                        </div>
+                        <div id="formMessage" class="message" role="status"></div>
+                        <div class="button-row"><a class="btn-secondary" id="backToDashBtn" href="dashboard.html">Back to Dashboard</a><button class="btn-primary" id="payButton" type="submit"><i class="fa-solid fa-lock"></i> Pay Now</button></div>
+                    </form>
+                </section>
+               
+                <aside class="card">
+                    <div class="card-title">Payment Summary</div>
+                    <div class="card-subtitle">Review your application before continuing.</div>
+                    <div id="applicationSummary" class="empty-state"><i class="fa-regular fa-file-lines"></i><p>Loading your active application...</p></div>
+                    <div id="summaryDetails" style="display:none;">
+                        <div class="summary-line"><span>Application ID</span><strong id="summaryId">---</strong></div>
+                        <div class="summary-line"><span>Applicant</span><strong id="summaryApplicant">---</strong></div>
+                        <div class="summary-line"><span>Current status</span><strong id="summaryStatus">Form Submitted</strong></div>
+                        <div class="summary-line"><span>Processing</span><strong id="summaryPlan">Regular Processing</strong></div>
+                        <div class="summary-line" id="summaryDeliveryLine" style="display:none;"><span>Receiving / Delivery</span><strong id="summaryDeliveryText">Courier Delivery (₱150.00)</strong></div>
+                        <div class="summary-line total-line"><span>Total due</span><strong id="summaryAmount">₱950.00</strong></div>
+                    </div>
+                    <div id="successState" class="success-state"><i class="fa-solid fa-circle-check"></i><p id="successMessage"></p><a class="btn-primary" href="dashboard.html" style="display:inline-block;margin-top:16px;text-decoration:none;">View Dashboard</a></div>
+                </aside>
+            </div>
+        </div>
+    </main>
+   
+    <script src="script.js"></script>
+    <script>
+        const dfaOfficeData = {
+            "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City", contact: "(045) 304-0194" },
+            "ANTIPOLO": { name: "DFA Regional Consular Office – Antipolo", address: "3F SM Cherry Foodarama, Marikina-Infanta Highway, Antipolo City, Rizal", contact: "(02) 8697-3000" },
+            "ANTIQUE": { name: "DFA Regional Consular Office – Antique", address: "CityMall Antique, National Road, San Jose de Buenavista, Antique", contact: "(036) 540-0123" },
+            "BACOLOD": { name: "DFA Regional Consular Office – Bacolod", address: "3rd Level Robinsons Place Bacolod, Brgy. Mandalangan, Bacolod City", contact: "(034) 441-2675" },
+            "BAGUIO": { name: "DFA Regional Consular Office – Baguio", address: "SM City Baguio Upper Basement, Luneta Hill, Upper Session Road, Baguio City", contact: "(074) 422-1465" },
+            "BALANGA": { name: "DFA Regional Consular Office – Balanga", address: "The Bunker Building, Capitol Compound, Balanga City, Bataan", contact: "(047) 237-0111" },
+            "BUTUAN": { name: "DFA Regional Consular Office – Butuan", address: "3rd Level Robinsons Place Butuan, J.C. Aquino Ave., Butuan City", contact: "(085) 342-5700" },
+            "CAGAYAN DE ORO": { name: "DFA Regional Consular Office – Cagayan de Oro", address: "3F Centrio Mall, cor. Corrales and Recto Sts., Cagayan de Oro City", contact: "(088) 857-6565" },
+            "CALASIAO": { name: "DFA Regional Consular Office – Calasiao", address: "2F Robinsons Place-Pangasinan, Brgy. San Miguel, Calasiao, Pangasinan", contact: "(075) 632-7705" },
+            "CANDON": { name: "DFA Regional Consular Office – Candon", address: "Candon City Arena, Candon City, Ilocos Sur", contact: "(077) 644-0111" },
+            "CEBU": { name: "DFA Regional Consular Office – Cebu", address: "4th Level Pacific Mall-Metro Mandaue, UN Ave. cor. MC Briones St., Mandaue City", contact: "(032) 520-5898" },
+            "CLARIN": { name: "DFA Regional Consular Office – Clarin", address: "Clarin Town Center, Clarin, Misamis Occidental", contact: "(088) 530-5312" },
+            "DFA MANILA": { name: "DFA Manila (ASEANA)", address: "ASEANA Business Park, Bradco Avenue corner Macapagal Boulevard, Parañaque City", contact: "556-0000 / 651-9400" },
+            "DFA NCR CENTRAL": { name: "DFA NCR Central", address: "Lingkod Pinoy Center, Robinsons Galleria, West Lane EDSA cor. Ortigas Ave., Quezon City", contact: "(02) 8631-0806" },
+            "DFA NCR EAST": { name: "DFA NCR East (Megamall)", address: "7F Building C, SM Megamall, EDSA cor. J. Vargas Ave., Mandaluyong City", contact: "(02) 8570-3230" },
+            "DFA NCR NORTH": { name: "DFA NCR North (Novaliches)", address: "Quirino Highway, Novaliches, Quezon City (across SM City Fairview)", contact: "(02) 8834-4000" },
+            "DFA NCR NORTHEAST": { name: "DFA NCR Northeast (Ali Mall)", address: "Level 2, Ali Mall Government Center, Cubao, Quezon City", contact: "(02) 8293-0105" },
+            "DFA NCR SOUTH": { name: "DFA NCR South (Alabang)", address: "4th Floor, Metro Alabang Town Center, Muntinlupa City", contact: "(02) 8551-1051" },
+            "DFA NCR WEST": { name: "DFA NCR West (SM Manila)", address: "5th Floor, SM City Manila, Concepcion St., Manila", contact: "(02) 8536-9994" },
+            "DASMARIÑAS": { name: "DFA Regional Consular Office – Dasmariñas", address: "SM City Dasmariñas, Governor's Drive, Brgy. Sampaloc 1, Dasmariñas City, Cavite", contact: "(046) 432-0000" },
+            "DAVAO": { name: "DFA Regional Consular Office – Davao", address: "3F SM City-Davao Quimpo Boulevard, Ecoland Subdivision, Davao City", contact: "(082) 285-4885" },
+            "DUMAGUETE": { name: "DFA Regional Consular Office – Dumaguete", address: "2F Robinsons Place South Road, Calidangan, Dumaguete City", contact: "(035) 532-0024" },
+            "GENERAL SANTOS": { name: "DFA Regional Consular Office – General Santos", address: "GF Robinsons Place GenSan, Jose Catolico Sr. Ave., General Santos City", contact: "(083) 552-0000" },
+            "ILOCOS NORTE": { name: "DFA Regional Consular Office – Ilocos Norte", address: "Robinsons Place Ilocos Norte, Brgy. San Francisco, San Nicolas, Ilocos Norte", contact: "(077) 843-4000" },
+            "ILOILO": { name: "DFA Regional Consular Office – Iloilo", address: "3F Robinsons Place Iloilo Quezon Wing, Iloilo City", contact: "(033) 336-1737" },
+            "KIDAPAWAN": { name: "DFA Regional Consular Office – Kidapawan", address: "People's Palace, City Hall, Kidapawan City", contact: "(064) 421-3495" },
+            "LA UNION": { name: "DFA Regional Consular Office – La Union", address: "2nd Floor Manna Mall, Marcos Highway corner Diversion Road, San Fernando, La Union", contact: "(072) 607-6510" },
+            "LEGAZPI": { name: "DFA Regional Consular Office – Legazpi", address: "3F Pacific Mall-Legazpi, Landco Business Park, Legazpi City", contact: "(052) 480-3000" },
+            "LIPA": { name: "DFA Regional Consular Office – Lipa", address: "2F Robinsons Place-Lipa, JP Laurel Highway, Lipa City, Batangas", contact: "(043) 722-0578" },
+            "LUCENA": { name: "DFA Regional Consular Office – Lucena", address: "3F Pacific Mall-Lucena, M.L. Tagarao St., Lucena City", contact: "(042) 710-4526" },
+            "MALOLOS": { name: "DFA Regional Consular Office – Malolos", address: "3F Malolos Central Transport Terminal and Commercial Hub by Xentro Mall, Malolos City", contact: "(044) 794-0000" },
+            "OLONGAPO": { name: "DFA Regional Consular Office – Olongapo", address: "SM City Olongapo Central, Gordon Ave., Olongapo City", contact: "(047) 222-0000" },
+            "PAGADIAN": { name: "DFA Regional Consular Office – Pagadian", address: "C3 Mall, Pagadian City, Zamboanga del Sur", contact: "(062) 215-0000" },
+            "PAMPANGA": { name: "DFA Regional Consular Office – Pampanga Starmills", address: "2F Robinsons StarMills, City of San Fernando, Pampanga", contact: "(045) 636-0007" },
+            "PANIQUI, TARLAC": { name: "DFA Regional Consular Office – Paniqui", address: "Waltermart Paniqui, Tarlac", contact: "(045) 931-0000" },
+            "PUERTO PRINCESA": { name: "DFA Regional Consular Office – Puerto Princesa", address: "2nd Level Robinsons Place Palawan, National Highway, Puerto Princesa City", contact: "(048) 434-1773" },
+            "SAN PABLO": { name: "DFA Regional Consular Office – San Pablo", address: "2F SM City San Pablo, Maharlika Highway, San Pablo City, Laguna", contact: "(049) 562-0000" },
+            "SANTIAGO, ISABELA": { name: "DFA Regional Consular Office – Santiago", address: "Robinsons Place Santiago, Maharlika Highway, Santiago City, Isabela", contact: "(078) 305-0000" },
+            "TACLOBAN": { name: "DFA Regional Consular Office – Tacloban", address: "3rd Level, Robinsons North Tacloban, Brgy. Abucay, Tacloban City", contact: "(053) 321-0000" },
+            "TAGBILARAN": { name: "DFA Regional Consular Office – Tagbilaran", address: "Alturas Mall, Tagbilaran City, Bohol", contact: "(038) 411-0000" },
+            "TAGUM": { name: "DFA Regional Consular Office – Tagum", address: "Robinsons Place Tagum, Tagum City, Davao del Norte", contact: "(084) 655-0000" },
+            "TUGUEGARAO": { name: "DFA Regional Consular Office – TugueGarao", address: "Regional Government Center, Carig Sur, TugueGarao City", contact: "(078) 844-0000" },
+            "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City", contact: "(062) 991-0000" }
+        };
+        const urlParams = new URLSearchParams(window.location.search);
+        const storedApplicationId = urlParams.get('id')
+            || urlParams.get('application_id')
+            || localStorage.getItem('currentApplicationId')
+            || localStorage.getItem('activeAppId');
+        let activeApplication = null;
+        let typingTimer = null; // Debounce timer
+        const form = document.getElementById('paymentForm');
+        const message = document.getElementById('formMessage');
+        const payButton = document.getElementById('payButton');
+
+        function showMessage(text, type) {
+            message.style.display = ''; // This forces the box to reappear
+            message.textContent = text;
+            message.className = `message ${type}`;
+        }
+
+        function calculateDeliveryFee(addressText) {
+            if (!addressText || addressText.trim().length < 5) return 150; // Base fare
+            const words = addressText.trim().split(/\s+/).length;
+            return 150 + (words * 15);
+        }
+        function updateSelectedPlan() {
+            const selectedPlan = document.querySelector('input[name="processingType"]:checked');
+            const receivingOption = document.querySelector('input[name="receivingOption"]:checked').value;
+            const addressVal = document.getElementById('deliveryAddress').value;
+           
+            document.querySelectorAll('input[name="processingType"]').forEach(inp => {
+                const parent = inp.closest('.plan-option');
+                const isSelected = inp.checked;
+                parent.classList.toggle('selected', isSelected);
+                parent.querySelector('i').className = isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle-check';
+            });
+            document.querySelectorAll('input[name="receivingOption"]').forEach(inp => {
+                const parent = inp.closest('.plan-option');
+                const isSelected = inp.checked;
+                parent.classList.toggle('selected', isSelected);
+                parent.querySelector('i').className = isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle-check';
+            });
+            const baseAmount = Number(selectedPlan.dataset.amount);
+            let deliveryFee = 0;
+            const deliverySection = document.getElementById('deliveryAddressSection');
+            const summaryDeliveryLine = document.getElementById('summaryDeliveryLine');
+            const summaryDeliveryText = document.getElementById('summaryDeliveryText');
+            if (receivingOption === 'Delivery') {
+                deliverySection.style.display = 'block';
+                deliveryFee = calculateDeliveryFee(addressVal);
+                document.getElementById('deliveryPriceDisplay').textContent = `₱${deliveryFee.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+               
+                summaryDeliveryLine.style.display = 'flex';
+                summaryDeliveryText.textContent = `Courier Delivery (₱${deliveryFee.toLocaleString('en-PH', { minimumFractionDigits: 2 })})`;
+            } else {
+                deliverySection.style.display = 'none';
+                summaryDeliveryLine.style.display = 'none';
+            }
+            const totalDue = baseAmount + deliveryFee;
+            document.getElementById('summaryPlan').textContent = selectedPlan.value;
+            document.getElementById('summaryAmount').textContent = `₱${totalDue.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+        }
+        function displayApplication(application) {
+            // FIX: Hide the red error box immediately when data successfully loads
+            message.style.display = 'none';
+            message.textContent = '';
+           
+            const applicationId = storedApplicationId || application.application_id || application.applicationId;
+            if (!applicationId) {
+                throw new Error('No active application was found. Start an application from the dashboard first.');
+            }
+            application.application_id = applicationId;
+            application.applicationId = applicationId;
+            activeApplication = application;
+            localStorage.setItem('currentApplicationId', applicationId);
+            localStorage.setItem('activeAppId', applicationId);
+            document.getElementById('backToDashBtn').href = `dashboard.html?id=${applicationId}`;
+            document.getElementById('applicationSummary').style.display = 'none';
+            document.getElementById('summaryDetails').style.display = 'block';
+            document.getElementById('summaryId').textContent = applicationId;
+            document.getElementById('summaryApplicant').textContent = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || 'User');
+           
+            const paymentStatus = application.payment_status || application.paymentStatus;
+            const currentStatus = application.status;
+            const isAlreadyPaid = (paymentStatus === 'Paid' || currentStatus === 'Paid' || currentStatus === 'Biometrics Received');
+            document.getElementById('summaryStatus').textContent = isAlreadyPaid ? 'Paid' : 'Form Submitted';
+           
+            const savedProcessing = application.processing_type || application.processingType;
+            if (savedProcessing) {
+                document.querySelectorAll('input[name="processingType"]').forEach(input => {
+                    if (input.value.toLowerCase() === savedProcessing.toLowerCase() || savedProcessing.toLowerCase().includes(input.value.toLowerCase())) {
+                        input.checked = true;
+                    }
+                });
+            }
+            if (application.delivery_address || application.deliveryAddress) {
+                document.querySelector('input[name="receivingOption"][value="Delivery"]').checked = true;
+                document.getElementById('deliveryAddress').value = application.delivery_address || application.deliveryAddress;
+            }
+            updateSelectedPlan();
+            if (document.getElementById('paymentEmail')) {
+                document.getElementById('paymentEmail').value = typeof userEmail !== 'undefined' ? userEmail : (localStorage.getItem('userEmail') || '');
+            }
+           
+            payButton.disabled = false;
+            if (isAlreadyPaid) {
+                payButton.disabled = true;
+                payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Already Paid';
+                showMessage('This application has already been paid. Your appointment is locked in.', 'success');
+               
+                document.querySelectorAll('input').forEach(inp => inp.disabled = true);
+                document.querySelectorAll('.plan-option').forEach(opt => opt.style.cursor = 'not-allowed');
+                document.querySelectorAll('.method-option').forEach(opt => opt.style.cursor = 'not-allowed');
+            }
+        }
+        async function loadPage() {
+            try {
+                const userResponse = await fetch('../api/user-data.php');
+                const userData = await userResponse.json();
+                const activeEmail = userData.email || localStorage.getItem('userEmail');
+                if (userData.fullName) {
+                    document.getElementById('user-name').textContent = userData.fullName;
+                    document.getElementById('greetingText').textContent = `Good Day, ${userData.fullName}`;
+                } else if (activeEmail) {
+                    document.getElementById('user-name').textContent = activeEmail;
+                }
+                const targetId = storedApplicationId;
+                const fetchUrl = targetId ? `../api/get-application.php?applicationId=${encodeURIComponent(targetId)}` : `../api/get-application.php?email=${encodeURIComponent(activeEmail)}`;
+               
+                const response = await fetch(fetchUrl);
+                const result = await response.json();
+                if (response.ok && result.application) {
+                    displayApplication(result.application);
+                } else if (targetId) {
+                    displayApplication({
+                        application_id: targetId,
+                        applicationType: localStorage.getItem('applicationType') || 'New First-Time Application',
+                        status: 'Form Submitted'
+                    });
+                } else {
+                    throw new Error('No active application was found. Start an application from the dashboard first.');
+                }
+            } catch (error) {
+                document.getElementById('applicationSummary').innerHTML = `<i class="fa-regular fa-file-lines"></i><p>${error.message}</p>`;
+                payButton.disabled = true;
+            }
+        }
+        document.querySelectorAll('input[name="processingType"], input[name="receivingOption"]').forEach(input => input.addEventListener('change', updateSelectedPlan));
+       
+        document.getElementById('deliveryAddress').addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                updateSelectedPlan();
+            }, 2000);
+        });
+       
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!activeApplication) return showMessage('No active application is available for payment.', 'error');
+           
+            const receivingOption = document.querySelector('input[name="receivingOption"]:checked').value;
+            const deliveryAddressVal = document.getElementById('deliveryAddress').value.trim();
+            if (receivingOption === 'Delivery' && !deliveryAddressVal) {
+                return showMessage('Please provide your complete delivery address for courier delivery.', 'error');
+            }
+            payButton.disabled = true;
+            payButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+           
+            const selectedPlan = document.querySelector('input[name="processingType"]:checked');
+            const baseAmount = Number(selectedPlan.dataset.amount);
+            const deliveryFee = receivingOption === 'Delivery' ? calculateDeliveryFee(deliveryAddressVal) : 0;
+            const totalPaymentAmount = baseAmount + deliveryFee;
+            const applicationType = activeApplication.applicationType
+                || localStorage.getItem('applicationType')
+                || 'New First-Time Application';
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const currentEmail = typeof userEmail !== 'undefined' ? userEmail : localStorage.getItem('userEmail');
+            try {
+                const response = await fetch('../api/payments.php', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: currentEmail,
+                        applicationId: activeApplication.applicationId,
+                        processingType: selectedPlan.value,
+                        amount: totalPaymentAmount,
+                        paymentMethod,
+                        receivingOption: receivingOption,
+                        deliveryAddress: receivingOption === 'Delivery' ? deliveryAddressVal : null,
+                        deliveryFee: deliveryFee
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.message || 'Unable to process payment.');
+               
+                activeApplication.status = result.status;
+                activeApplication.paymentAmount = result.amount ?? totalPaymentAmount;
+                activeApplication.applicationType = applicationType;
+               
+                document.getElementById('summaryStatus').textContent = 'Paid';
+               
+                const rawLoc = result.appointmentLocation || 'DFA NCR CENTRAL';
+                const officeInfo = dfaOfficeData[rawLoc];
+                const fullLocationText = officeInfo ? `${officeInfo.name} - ${officeInfo.address}` : rawLoc;
+                document.getElementById('successMessage').textContent = `${result.message} Appointment date: ${new Date(`${result.appointmentDate}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} at ${fullLocationText}.`;
+                document.getElementById('successState').style.display = 'block';
+                payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Already Paid';
+                showMessage('Payment successful.', 'success');
+            } catch (error) {
+                showMessage(error.message, 'error');
+                payButton.disabled = false;
+                payButton.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Now';
+            }
+        });
+        loadPage();
+    </script>
+</body>
+</html>

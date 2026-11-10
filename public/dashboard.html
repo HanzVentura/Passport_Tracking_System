@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Passport Tracking</title>
+    <!-- FontAwesome & Google Inter Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 0;
+        }
+        .sidebar-top {
+            display: flex;
+            flex-direction: column;
+        }
+        .user-profile-mini {
+            display: flex;
+            align-items: center;
+            padding: 0 24px 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 16px;
+        }
+        .user-profile-mini i {
+            font-size: 38px;
+            color: var(--primary);
+            margin-right: 12px;
+        }
+        .user-info .name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+        .nav-links {
+            list-style: none;
+        }
+        .nav-links li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .nav-links li.active a, .nav-links li a:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-right: 4px solid var(--primary);
+            font-weight: 600;
+        }
+        .nav-links li a i {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        .sidebar-bottom {
+            padding: 0 24px;
+        }
+        .sidebar-bottom a {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            color: #ef4444;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .sidebar-bottom a i {
+            margin-right: 12px;
+        }
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .header {
+            background-color: var(--card-bg);
+            padding: 22px 36px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.3px;
+        }
+        .dashboard-container {
+            padding: 35px 40px;
+            max-width: 1350px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white;
+            padding: 28px 34px;
+            border-radius: var(--radius-md);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-elevated);
+        }
+        .welcome-banner h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+        .welcome-banner p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        /* Top 3 Cards Grid */
+        .top-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 35px;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-elevated);
+            border-color: #cbd5e1;
+        }
+       
+        /* Clickable Active Application Card */
+        #cardActiveApp.clickable-card {
+            cursor: pointer;
+            position: relative;
+        }
+        #cardActiveApp.clickable-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        #cardActiveApp.clickable-card::after {
+            content: 'Click to Download Summary';
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--primary);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        #cardActiveApp.clickable-card:hover::after {
+            opacity: 1;
+        }
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .dashboard-card {
+            justify-content: flex-start;
+        }
+        .dashboard-card > .empty-state-content,
+        .dashboard-card > #activeAppFilled,
+        .dashboard-card > #statusAppFilled,
+        .dashboard-card > #pendingAppFilled {
+            flex: 1;
+            width: 100%;
+        }
+        .application-meta-label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            line-height: 1.4;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        #dispAppId,
+        #dispAppType,
+        #dispAppStatus,
+        #dispSubDate {
+            font-size: 14px !important;
+        }
+        #statusAppFilled {
+            gap: 10px;
+            padding: 2px 0;
+            font-size: 12px !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .status-step {
+            display: flex;
+            align-items: center;
+            min-height: 22px;
+            font-weight: 500;
+        }
+        .status-step i {
+            flex: 0 0 16px;
+            margin-right: 10px !important;
+            text-align: center;
+        }
+        .status-step.inactive {
+            color: #94a3b8;
+        }
+        .status-step.inactive i {
+            color: #94a3b8 !important;
+            font-size: 13px !important;
+        }
+        .status-step:not(.inactive) i {
+            color: #10b981 !important;
+            font-size: 13px !important;
+        }
+        .estimated-date-badge {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #f1f5f9;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            color: #475569;
+            font-weight: 600;
+        }
+        /* Missing Documents Action Flag Banner */
+        .action-flag-alert {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        .action-flag-alert strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        #pendingAppFilled {
+            padding: 16px !important;
+            border-radius: var(--radius-sm);
+            font-size: 13px !important;
+            line-height: 1.6;
+            background: var(--primary-light) !important;
+            border: 1px solid #c7d2fe !important;
+            color: #1e40af !important;
+        }
+        #pendingAppFilled strong:first-child {
+            margin-bottom: 4px !important;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        #pendingAppFilled #dispComeDate {
+            margin: 4px 0 !important;
+            font-size: 13px !important;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        /* Empty State Interior */
+        .empty-state-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex: 1;
+            margin: 10px 0;
+        }
+        .empty-state-content i {
+            font-size: 34px;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+        }
+        .empty-state-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+        .empty-state-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            max-width: 220px;
+            line-height: 1.4;
+        }
+        /* Start Application Section Styles */
+        .selection-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+        .action-banner-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 28px 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.25s ease;
+            margin-bottom: 24px;
+        }
+        .action-banner-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-elevated);
+            transform: translateY(-2px);
+        }
+        .action-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+        .action-banner-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-light);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 26px;
+            flex-shrink: 0;
+        }
+        .action-banner-text h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+        .action-banner-text p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .action-banner-right {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .app-view {
+            display: none;
+        }
+        .app-view.active-view {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-top">
+            <div class="user-profile-mini">
+                <i class="fa-solid fa-circle-user"></i>
+                <div class="user-info">
+                    <div class="name" id="user-name">Loading...</div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li class="active"><a href="dashboard.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-wallet"></i> Payments</a></li>
+                <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
+                <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
+                <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
+                <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-bottom">
+            <a href="index.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+        </div>
+    </div>
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="header" id="pageHeaderTitle">DASHBOARD</div>
+       
+        <div class="dashboard-container">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <h1 id="greetingText">Good Day</h1>
+                <p>Track your passport application and stay updated on the status of your passport application anytime, anywhere.</p>
+            </div>
+            <!-- DASHBOARD VIEW -->
+            <div id="dashboardView" class="app-view active-view">
+                <!-- Top Cards Grid -->
+                <div class="top-cards-grid">
+                    <!-- Card 1: Active Application (Clickable for Download) -->
+                    <div class="card dashboard-card" id="cardActiveApp" onclick="downloadApplicationSummary()">
+                        <div>
+                            <div class="card-title">Active Application</div>
+                            <div class="empty-state-content" id="activeAppDefault">
+                                <i class="fa-regular fa-file-lines"></i>
+                                <div class="empty-state-title">No Active Application</div>
+                                <div class="empty-state-desc">Select an application below to begin your process.</div>
+                            </div>
+                            <div id="activeAppFilled" style="display: none; font-size: 13px; line-height: 1.6;">
+                                <div class="application-meta-label">Application ID</div>
+                                <div id="dispAppId" style="font-weight: 700; color: #1f2937; margin-bottom: 6px;">---</div>
+                               
+                                <div class="application-meta-label">Type</div>
+                                <div id="dispAppType" style="font-weight: 700; color: #1f2937; margin-bottom: 6px;">---</div>
+                               
+                                <div class="application-meta-label">Current Status</div>
+                                <div id="dispAppStatus" style="font-weight: 700; color: #4f46e5; margin-bottom: 6px;">Form Submitted</div>
+                                <div class="application-meta-label">Online Payment</div>
+                                <div id="dispPaymentStatus" style="font-weight: 700; color: #10b981; margin-bottom: 6px;">Verified (Online)</div>
+                               
+                                <div class="application-meta-label">Submitted</div>
+                                <div id="dispSubDate" style="font-weight: 600; color: #1f2937;">---</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 2: Application Status -->
+                    <div class="card dashboard-card">
+                        <div class="card-title">Application Status</div>
+                        <div class="empty-state-content" id="statusAppDefault">
+                            <i class="fa-regular fa-file-lines"></i>
+                            <div class="empty-state-title">Not Started</div>
+                            <div class="empty-state-desc">Application progress will be tracked here once submitted.</div>
+                        </div>
+                        <div id="statusAppFilled" style="display: none;">
+                            <div class="status-step" data-status-step="Form Submitted"><i class="fa-solid fa-circle-check"></i>Form Submitted</div>
+                            <div class="status-step inactive" data-status-step="Biometrics Received"><i class="fa-regular fa-circle"></i>Biometrics Received</div>
+                            <div class="status-step inactive" data-status-step="Under Consular Review"><i class="fa-regular fa-circle"></i>Under Consular Review</div>
+                            <div class="status-step inactive" data-status-step="In Printing"><i class="fa-regular fa-circle"></i>In Printing</div>
+                            <div class="status-step inactive" data-status-step="Dispatched"><i class="fa-regular fa-circle"></i>Dispatched</div>
+                            <div class="estimated-date-badge" id="estimatedDateDisplay">Est. Completion: ---</div>
+                        </div>
+                    </div>
+                    <!-- Card 3: Pending Action & Missing Document Flags -->
+                    <div class="card dashboard-card">
+                        <div class="card-title">Pending Action</div>
+                        <div id="missingDocsAlert" class="action-flag-alert">
+                            <strong><i class="fa-solid fa-triangle-exclamation"></i> Action Flag: Missing Documents</strong>
+                            <span id="missingDocsReasonText">Please upload required supporting certificates.</span>
+                        </div>
+                        <div class="empty-state-content" id="pendingAppDefault">
+                            <i class="fa-regular fa-calendar"></i>
+                            <div class="empty-state-title">All Clear</div>
+                            <div class="empty-state-desc">No upcoming appointments or tasks at this time.</div>
+                        </div>
+                        <div id="pendingAppFilled" style="display: none; flex-direction: column; justify-content: center;">
+                            <!-- Dynamically populated based on status and receiving option -->
+                        </div>
+                    </div>
+                </div>
+                <!-- Start Application Section -->
+                <div class="selection-section-title">Start Application</div>
+                <a class="action-banner-card" href="new-passport.html">
+                    <div class="action-banner-left">
+                        <div class="action-banner-icon">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+                        <div class="action-banner-text">
+                            <h3>Passport Application</h3>
+                            <p>Apply for a new passport, renew an existing one, or request a replacement for a lost or damaged passport.</p>
+                        </div>
+                    </div>
+                    <div class="action-banner-right">
+                        <span>Get Started</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </a>
+                <!-- Manage Appointment Section -->
+                <div class="selection-section-title">Manage Appointment</div>
+                <a class="action-banner-card" href="reschedule.html">
+                    <div class="action-banner-left">
+                        <div class="action-banner-icon" style="background: #eff6ff; color: #2563eb;">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <div class="action-banner-text">
+                            <h3>Reschedule or Cancel</h3>
+                            <p>Modify your appointment date/time slot or completely cancel an existing application.</p>
+                        </div>
+                    </div>
+                    <div class="action-banner-right">
+                        <span>Manage Schedule</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- Script Logic -->
+    <script>
+        let currentAppData = null;
+        const dfaOfficeData = {
+            "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City" },
+            "ANTIPOLO": { name: "DFA Regional Consular Office – Antipolo", address: "3F SM Cherry Foodarama, Marikina-Infanta Highway, Antipolo City, Rizal" },
+            "ANTIQUE": { name: "DFA Regional Consular Office – Antique", address: "CityMall Antique, National Road, San Jose de Buenavista, Antique" },
+            "BACOLOD": { name: "DFA Regional Consular Office – Bacolod", address: "3rd Level Robinsons Place Bacolod, Brgy. Mandalangan, Bacolod City" },
+            "BAGUIO": { name: "DFA Regional Consular Office – Baguio", address: "SM City Baguio Upper Basement, Luneta Hill, Upper Session Road, Baguio City" },
+            "BALANGA": { name: "DFA Regional Consular Office – Balanga", address: "The Bunker Building, Capitol Compound, Balanga City, Bataan" },
+            "BUTUAN": { name: "DFA Regional Consular Office – Butuan", address: "3rd Level Robinsons Place Butuan, J.C. Aquino Ave., Butuan City" },
+            "CAGAYAN DE ORO": { name: "DFA Regional Consular Office – Cagayan de Oro", address: "3F Centrio Mall, cor. Corrales and Recto Sts., Cagayan de Oro City" },
+            "CALASIAO": { name: "DFA Regional Consular Office – Calasiao", address: "2F Robinsons Place-Pangasinan, Brgy. San Miguel, Calasiao, Pangasinan" },
+            "CANDON": { name: "DFA Regional Consular Office – Candon", address: "Candon City Arena, Candon City, Ilocos Sur" },
+            "CEBU": { name: "DFA Regional Consular Office – Cebu", address: "4th Level Pacific Mall-Metro Mandaue, UN Ave. cor. MC Briones St., Mandaue City" },
+            "CLARIN": { name: "DFA Regional Consular Office – Clarin", address: "Clarin Town Center, Clarin, Misamis Occidental" },
+            "DFA MANILA": { name: "DFA Manila (ASEANA)", address: "ASEANA Business Park, Bradco Avenue corner Macapagal Boulevard, Parañaque City" },
+            "DFA NCR CENTRAL": { name: "DFA NCR Central", address: "Lingkod Pinoy Center, Robinsons Galleria, West Lane EDSA cor. Ortigas Ave., Quezon City" },
+            "DFA NCR EAST": { name: "DFA NCR East (Megamall)", address: "7F Building C, SM Megamall, EDSA cor. J. Vargas Ave., Mandaluyong City" },
+            "DFA NCR NORTH": { name: "DFA NCR North (Novaliches)", address: "Quirino Highway, Novaliches, Quezon City (across SM City Fairview)" },
+            "DFA NCR NORTHEAST": { name: "DFA NCR Northeast (Ali Mall)", address: "Level 2, Ali Mall Government Center, Cubao, Quezon City" },
+            "DFA NCR SOUTH": { name: "DFA NCR South (Alabang)", address: "4th Floor, Metro Alabang Town Center, Muntinlupa City" },
+            "DFA NCR WEST": { name: "DFA NCR West (SM Manila)", address: "5th Floor, SM City Manila, Concepcion St., Manila" },
+            "DASMARIÑAS": { name: "DFA Regional Consular Office – Dasmariñas", address: "SM City Dasmariñas, Governor's Drive, Brgy. Sampaloc 1, Dasmariñas City, Cavite" },
+            "DAVAO": { name: "DFA Regional Consular Office – Davao", address: "3F SM City-Davao Quimpo Boulevard, Ecoland Subdivision, Davao City" },
+            "DUMAGUETE": { name: "DFA Regional Consular Office – Dumaguete", address: "2F Robinsons Place South Road, Calidangan, Dumaguete City" },
+            "GENERAL SANTOS": { name: "DFA Regional Consular Office – General Santos", address: "GF Robinsons Place GenSan, Jose Catolico Sr. Ave., General Santos City" },
+            "ILOCOS NORTE": { name: "DFA Regional Consular Office – Ilocos Norte", address: "Robinsons Place Ilocos Norte, Brgy. San Francisco, San Nicolas, Ilocos Norte" },
+            "ILOILO": { name: "DFA Regional Consular Office – Iloilo", address: "3F Robinsons Place Iloilo Quezon Wing, Iloilo City" },
+            "KIDAPAWAN": { name: "DFA Regional Consular Office – Kidapawan", address: "People's Palace, City Hall, Kidapawan City" },
+            "LA UNION": { name: "DFA Regional Consular Office – La Union", address: "2nd Floor Manna Mall, Marcos Highway corner Diversion Road, San Fernando, La Union" },
+            "LEGAZPI": { name: "DFA Regional Consular Office – Legazpi", address: "3F Pacific Mall-Legazpi, Landco Business Park, Legazpi City" },
+            "LIPA": { name: "DFA Regional Consular Office – Lipa", address: "2F Robinsons Place-Lipa, JP Laurel Highway, Lipa City, Batangas" },
+            "LUCENA": { name: "DFA Regional Consular Office – Lucena", address: "3F Pacific Mall-Lucena, M.L. Tagarao St., Lucena City" },
+            "MALOLOS": { name: "DFA Regional Consular Office – Malolos", address: "3F Malolos Central Transport Terminal and Commercial Hub by Xentro Mall, Malolos City" },
+            "OLONGAPO": { name: "DFA Regional Consular Office – Olongapo", address: "SM City Olongapo Central, Gordon Ave., Olongapo City" },
+            "PAGADIAN": { name: "DFA Regional Consular Office – Pagadian", address: "C3 Mall, Pagadian City, Zamboanga del Sur" },
+            "PAMPANGA": { name: "DFA Regional Consular Office – Pampanga Starmills", address: "2F Robinsons StarMills, City of San Fernando, Pampanga" },
+            "PANIQUI, TARLAC": { name: "DFA Regional Consular Office – Paniqui", address: "Waltermart Paniqui, Tarlac" },
+            "PUERTO PRINCESA": { name: "DFA Regional Consular Office – Puerto Princesa", address: "2nd Level Robinsons Place Palawan, National Highway, Puerto Princesa City" },
+            "SAN PABLO": { name: "DFA Regional Consular Office – San Pablo", address: "2F SM City San Pablo, Maharlika Highway, San Pablo City, Laguna" },
+            "SANTIAGO, ISABELA": { name: "DFA Regional Consular Office – Santiago", address: "Robinsons Place Santiago, Maharlika Highway, Santiago City, Isabela" },
+            "TACLOBAN": { name: "DFA Regional Consular Office – Tacloban", address: "3rd Level, Robinsons North Tacloban, Brgy. Abucay, Tacloban City" },
+            "TAGBILARAN": { name: "DFA Regional Consular Office – Tagbilaran", address: "Alturas Mall, Tagbilaran City, Bohol" },
+            "TAGUM": { name: "DFA Regional Consular Office – Tagum", address: "Robinsons Place Tagum, Tagum City, Davao del Norte" },
+            "TUGUEGARAO": { name: "DFA Regional Consular Office – TugueGarao", address: "Regional Government Center, Carig Sur, TugueGarao City" },
+            "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City" }
+        };
+       
+        function formatAppointmentDate(dateValue, timeValue) {
+            if (!dateValue) return '---';
+            const date = new Date(`${dateValue}T00:00:00`);
+            const formattedDate = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            let cleanTime = timeValue || '09:00 AM';
+            if (cleanTime.includes('-')) cleanTime = cleanTime.split('-')[0].trim();
+            return `${formattedDate} at ${cleanTime}`;
+        }
+       
+        function calculateEstimatedCompletion(appointmentDateValue, processingType) {
+            const start = appointmentDateValue ? new Date(`${appointmentDateValue}T00:00:00`) : new Date();
+            const daysToAdd = (processingType && processingType.toLowerCase().includes('expedited')) ? 7 : 12;
+            let added = 0;
+            while (added < daysToAdd) {
+                start.setDate(start.getDate() + 1);
+                const dayOfWeek = start.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    added++;
+                }
+            }
+            return start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        function updateStatusTracker(status) {
+            const normalizedStatus = (status || '').toLowerCase().trim();
+            let activeCount = 1;
+            if (normalizedStatus.includes('biometric')) activeCount = 2;
+            if (normalizedStatus.includes('review')) activeCount = 3;
+            if (normalizedStatus.includes('print')) activeCount = 4;
+            if (normalizedStatus.includes('dispatch') || normalizedStatus.includes('ready')) activeCount = 5;
+           
+            document.querySelectorAll('[data-status-step]').forEach((step, index) => {
+                const isActive = index < activeCount;
+                const icon = step.querySelector('i');
+                step.classList.toggle('inactive', !isActive);
+                icon.className = isActive ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle';
+            });
+        }
+        function displaySavedApplication(application) {
+            currentAppData = application;
+            const appId = application.application_id || application.applicationId;
+            document.getElementById('dispAppId').innerText = appId;
+            localStorage.setItem('currentApplicationId', appId);
+            localStorage.setItem('activeAppId', appId);
+           
+            document.getElementById('dispAppType').innerText = application.application_type || application.applicationType || 'New First-Time Application';
+            const currentStatus = application.status || 'Form Submitted';
+            document.getElementById('dispAppStatus').innerText = currentStatus;
+            updateStatusTracker(currentStatus);
+           
+            const paymentStatus = application.payment_status || application.paymentStatus || 'Unpaid';
+            document.getElementById('dispPaymentStatus').innerText = paymentStatus === 'Paid' ? 'Verified (Online)' : 'Unpaid';
+           
+            const estDisplay = document.getElementById('estimatedDateDisplay');
+            const processingType = application.processing_type || application.processingType || 'Regular Processing';
+            const appointmentDateVal = application.appointmentDate || application.appointment_date;
+           
+            if (currentStatus === 'Form Submitted') {
+                estDisplay.innerText = 'Est. Completion: Available after biometrics';
+            } else {
+                const computedDate = calculateEstimatedCompletion(appointmentDateVal, processingType);
+                estDisplay.innerText = `Est. Completion: ${computedDate}`;
+            }
+            if (application.missingDocumentsFlag) {
+                document.getElementById('missingDocsReasonText').innerText = application.missingDocumentsReason || 'Please review missing requirements.';
+                document.getElementById('missingDocsAlert').style.display = 'block';
+            }
+           
+            const pendingContainer = document.getElementById('pendingAppFilled');
+            const pendingDefault = document.getElementById('pendingAppDefault');
+            if (currentStatus === 'Dispatched') {
+                pendingDefault.style.display = 'none';
+                pendingContainer.style.display = 'flex';
+               
+                const receivingOpt = application.receiving_option || application.receivingOption;
+                if (receivingOpt === 'Delivery') {
+                    pendingContainer.innerHTML = `
+                        <strong style="margin-bottom: 4px;">Courier Dispatch Notice:</strong>
+                        <span style="font-size: 12px; margin-bottom: 8px;">Your passport has been successfully dispatched to your registered delivery address.</span>
+                        <a href="delivery-tracker.html?id=${appId}" style="display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; width: fit-content; margin-top: 4px;">
+                            <i class="fa-solid fa-truck-fast"></i> Click Here to Track Delivery
+                        </a>
+                    `;
+                } else {
+                    const rawLoc = application.appointmentLocation || application.appointment_location || 'DFA NCR CENTRAL';
+                    const office = dfaOfficeData[rawLoc];
+                    const fullLocationDisplay = office ? `${office.name} - ${office.address}` : rawLoc;
+
+                    pendingContainer.innerHTML = `
+                        <strong style="margin-bottom: 4px;">Ready for In-Person Pickup:</strong>
+                        <span style="font-size: 12px; line-height: 1.5; display: block; margin-bottom: 6px;">You can now claim your passport at your designated consular office:</span>
+                        <strong style="display: block; font-size: 12px; color: var(--primary); margin-bottom: 6px;">${fullLocationDisplay}</strong>
+                        <span style="font-size: 11px; color: #475569; line-height: 1.4;">Operating hours: Monday to Friday, 8:00 AM to 5:00 PM. Please bring a valid ID and your official receipt.</span>
+                    `;
+                }
+            } else if ((currentStatus === 'Form Submitted' || currentStatus === 'Appointment Rescheduled') && appointmentDateVal) {
+                pendingDefault.style.display = 'none';
+                pendingContainer.style.display = 'flex';
+               
+                const rawLoc = application.appointmentLocation || application.appointment_location || '';
+                const office = dfaOfficeData[rawLoc];
+                const fullLocationDisplay = office ? `${office.name} - ${office.address}` : rawLoc;
+               
+                pendingContainer.innerHTML = `
+                    <strong style="display: block; margin-bottom: 4px;">Appointment Schedule:</strong>
+                    <span>You are expected to come on</span>
+                    <strong id="dispComeDate" style="display: block; margin: 4px 0; color: #1d4ed8; font-size: 13px;">${formatAppointmentDate(appointmentDateVal, application.appointmentTime || application.appointment_time)}</strong>
+                    <span id="dispAppointmentLocation" style="font-size: 11px; color: #475569; line-height: 1.4;">in ${fullLocationDisplay || 'Appointment location assigned.'}</span>
+                `;
+            } else {
+                pendingDefault.style.display = 'flex';
+                pendingContainer.style.display = 'none';
+            }
+            if (application.createdAt || application.created_at) {
+                document.getElementById('dispSubDate').innerText = new Date(application.createdAt || application.created_at)
+                    .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+            document.getElementById('activeAppDefault').style.display = 'none';
+            document.getElementById('activeAppFilled').style.display = 'block';
+            document.getElementById('statusAppDefault').style.display = 'none';
+            document.getElementById('statusAppFilled').style.display = 'flex';
+            document.getElementById('cardActiveApp').classList.add('clickable-card');
+        }
+        function downloadApplicationSummary() {
+            if (!currentAppData) return;
+            const app = currentAppData;
+            const appId = app.application_id || app.applicationId || 'N/A';
+            const appType = app.application_type || app.applicationType || 'New First-Time Application';
+            const status = app.status || 'Form Submitted';
+            const payment = app.payment_status || app.paymentStatus || 'Verified (Online)';
+            const subDate = app.createdAt || app.created_at ? new Date(app.createdAt || app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A';
+            const rawAppDate = app.appointmentDate || app.appointment_date;
+            const appDate = rawAppDate ? new Date(`${rawAppDate}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not Scheduled';
+            const appTime = app.appointmentTime || app.appointment_time || 'N/A';
+            const rawLoc = app.appointmentLocation || app.appointment_location || 'DFA Consular Office';
+            const office = dfaOfficeData[rawLoc];
+            const appLoc = office ? `${office.name} - ${office.address}` : rawLoc;
+           
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Passport Application Summary - ${appId}</title>
+                    <style>
+                        body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; padding: 40px; color: #0f172a; }
+                        .header { text-align: center; border-bottom: 2px solid #4f46e5; padding-bottom: 20px; margin-bottom: 30px; }
+                        .header h1 { color: #4f46e5; font-size: 24px; margin-bottom: 5px; }
+                        .header p { color: #64748b; font-size: 14px; }
+                        .details-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        .details-table th, .details-table td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 14px; }
+                        .details-table th { width: 35%; color: #64748b; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; }
+                        .details-table td { font-weight: 700; color: #0f172a; }
+                        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Passport Tracking System</h1>
+                        <p>Official Application Summary Report</p>
+                    </div>
+                    <table class="details-table">
+                        <tr><th>Application ID</th><td>${appId}</td></tr>
+                        <tr><th>Application Type</th><td>${appType}</td></tr>
+                        <tr><th>Current Status</th><td>${status}</td></tr>
+                        <tr><th>Online Payment</th><td>${payment}</td></tr>
+                        <tr><th>Submitted Date</th><td>${subDate}</td></tr>
+                        <tr><th>Appointment Date</th><td>${appDate}</td></tr>
+                        <tr><th>Appointment Time</th><td>${appTime}</td></tr>
+                        <tr><th>Appointment Location</th><td>${appLoc}</td></tr>
+                    </table>
+                    <div class="footer">
+                        <p>Generated securely via Passport Tracking System Dashboard.</p>
+                    </div>
+                    <script>
+                        window.onload = function() { window.print(); }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+       
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('../api/user-data.php');
+                const data = await response.json();
+                if (data.loggedIn && data.fullName) {
+                    document.getElementById('greetingText').textContent = 'Good Day, ' + data.fullName;
+                    document.getElementById('user-name').textContent = data.fullName;
+                }
+            } catch (error) {
+                console.error('Unable to load user data:', error);
+            }
+           
+            const urlParams = new URLSearchParams(window.location.search);
+            const explicitAppId = urlParams.get('id') || urlParams.get('applicationId') || localStorage.getItem('activeAppId');
+            const userEmail = localStorage.getItem('userEmail');
+            let fetchUrl = '../api/get-application.php';
+           
+            if (explicitAppId) {
+                fetchUrl += `?applicationId=${encodeURIComponent(explicitAppId)}`;
+            } else if (userEmail) {
+                fetchUrl += `?email=${encodeURIComponent(userEmail)}`;
+            } else {
+                return;
+            }
+            try {
+                const response = await fetch(fetchUrl);
+                const result = await response.json();
+                const application = result.application;
+                if (!response.ok || !application) return;
+                displaySavedApplication(application);
+            } catch (error) {
+                console.error('Unable to load saved application:', error);
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
