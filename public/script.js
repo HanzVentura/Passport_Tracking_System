@@ -119,11 +119,11 @@ signupForm.addEventListener('submit', async function(event) {
             successScreen.classList.remove('hidden');
         } else {
             errorMessage.textContent = result.message;
-            errorMessage.classList.add('hidden');
+            errorMessage.classList.remove('hidden');
         }
     } catch (err) {
         errorMessage.textContent = "Connection error. Make sure server is running.";
-        errorMessage.classList.add('hidden');
+        errorMessage.classList.remove('hidden');
     }
 });
 }

@@ -17,8 +17,9 @@ try {
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->execute([$email]);
     if ($stmt->fetch()) {
-        echo json_encode(['success' => false, 'message' => 'Email is already registered.']);
-        exit;
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Email already have an account']);
+        return;
     }
 
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);

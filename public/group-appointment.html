@@ -33,6 +33,7 @@
             color: var(--text-main);
             display: flex;
             min-height: 100vh;
+            margin: 0;
             overflow-x: hidden;
         }
         /* Sidebar */
@@ -108,9 +109,11 @@
         /* Main Content */
         .main-container {
             flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
+            height: auto;
+            min-height: 100vh;
         }
         .header {
             background-color: var(--card-bg);
@@ -122,8 +125,8 @@
             letter-spacing: -0.3px;
         }
         .dashboard-container {
-            padding: 35px 40px;
-            max-width: 1000px;
+            padding: 24px 30px;
+            max-width: 1350px;
             margin: 0 auto;
             width: 100%;
         }
@@ -214,6 +217,64 @@
         }
         .btn-secondary:hover {
             background-color: #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                display: block !important;
+                height: auto;
+                overflow: auto;
+            }
+
+            .sidebar {
+                width: 100% !important;
+                flex: none;
+                height: auto;
+                padding: 12px 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .nav-links {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 4px;
+                padding: 0 12px;
+            }
+
+            .nav-links li a {
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+                padding: 8px 4px;
+                font-size: 11px;
+                border-right: none !important;
+                border-bottom: 3px solid transparent;
+                border-radius: 6px;
+            }
+
+            .nav-links li.active a, .nav-links li a:hover {
+                border-right: none !important;
+                border-bottom-color: var(--primary);
+            }
+
+            .nav-links li a i {
+                margin-right: 0 !important;
+                margin-bottom: 4px;
+                font-size: 14px;
+            }
+
+            .main-container {
+                min-height: auto;
+            }
+
+            .dashboard-container {
+                padding: 20px 16px !important;
+            }
+
+            .content-grid, .selection-grid, .category-grid, .form-row {
+                grid-template-columns: 1fr !important;
+            }
         }
     </style>
 </head>

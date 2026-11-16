@@ -9,6 +9,7 @@ body {
     background: #f4f7f6;
     color: #333;
     display: flex;
+    width: 100%;
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -93,4 +94,141 @@ body {
     .selection-grid, .category-grid, .form-row, .form-row.two-col { grid-template-columns: 1fr; }
     .form-actions { gap: 12px; flex-direction: column-reverse; }
     .form-actions a, .form-actions button { width: 100%; text-align: center; }
+}
+
+/* ==========================================================
+   RESPONSIVE DESIGN FIXES FOR PASSPORT APPLICATION WIZARD
+   ========================================================== */
+@media (max-width: 768px) {
+    /* Allow the body to stack vertically instead of side-by-side */
+    body {
+        display: block !important;
+        height: auto;
+        overflow: auto;
+    }
+
+    /* Transform the sidebar into a top/bottom header-style bar on mobile */
+    .sidebar {
+        width: 100% !important;
+        flex: none;
+        height: auto;
+        padding: 12px 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .user-profile-mini {
+        padding: 0 16px 12px;
+        margin-bottom: 10px;
+    }
+
+    /* Convert sidebar navigation into a multi-column tap bar */
+    .nav-links {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        padding: 0 12px;
+    }
+
+    .nav-links li a {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        padding: 8px 4px;
+        font-size: 11px;
+        border-right: none !important;
+        border-bottom: 3px solid transparent;
+        border-radius: 6px;
+    }
+
+    .nav-links li.active a, .nav-links li a:hover {
+        border-right: none !important;
+        border-bottom-color: var(--primary);
+    }
+
+    .nav-links li a i {
+        margin-right: 0 !important;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .sidebar-bottom {
+        padding: 12px 16px 0;
+        border-top: 1px solid #f1f5f9;
+        margin-top: 10px;
+    }
+
+    /* Adjust main content containers for mobile padding */
+    .main-container {
+        overflow-y: visible;
+    }
+
+    .main-content {
+        padding: 20px 16px !important;
+    }
+
+    .header-banner {
+        padding: 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    /* Condense wizard step indicators for mobile */
+    .wizard-steps {
+        grid-template-columns: repeat(7, 1fr);
+        padding: 10px 6px;
+        gap: 4px;
+    }
+
+    .wizard-step {
+        font-size: 9px;
+        padding: 6px 2px;
+        flex-direction: column;
+        gap: 2px;
+        text-align: center;
+    }
+
+    .wizard-step span {
+        display: none; /* Hide step names on very small screens to prevent crowding, keep numbers */
+    }
+
+    .step-badge {
+        width: 18px;
+        height: 18px;
+        font-size: 9px;
+        margin-right: 0;
+    }
+
+    /* Stack form rows into single columns */
+    .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+    }
+
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+
+    .mode-btn-container {
+        grid-template-columns: 1fr;
+    }
+
+    .review-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .summary-card[style*="grid-column: span 2"] {
+        grid-column: span 1 !important;
+    }
+
+    .action-buttons {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .action-buttons button {
+        width: 100%;
+        justify-content: center;
+    }
 }
