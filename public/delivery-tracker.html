@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courier Delivery Tracker - Passport Tracking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+       
+        .top-nav { background: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 18px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 700; font-size: 18px; color: var(--text-main); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo i { color: var(--primary); }
+        .back-link { font-size: 14px; font-weight: 600; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .back-link:hover { text-decoration: underline; }
+       
+        .container { max-width: 900px; margin: 0 auto; width: 100%; padding: 40px; flex: 1; }
+       
+        .hero-banner { background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: #fff; padding: 32px 36px; border-radius: var(--radius-md); margin-bottom: 30px; box-shadow: var(--shadow-elevated); }
+        .hero-banner h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+        .hero-banner p { font-size: 14px; opacity: 0.9; }
+
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 32px; box-shadow: var(--shadow-subtle); margin-bottom: 24px; }
+        .card-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 20px; }
+
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; background: var(--bg-main); padding: 20px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); }
+        .info-item label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .info-item span { font-size: 14px; font-weight: 700; color: var(--text-main); word-break: break-all; }
+
+        .timeline { display: flex; flex-direction: column; gap: 24px; position: relative; padding-left: 20px; margin-top: 10px; }
+        .timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--border-color); }
+        .timeline-step { display: flex; align-items: flex-start; gap: 16px; position: relative; }
+        .timeline-step i { font-size: 16px; color: #cbd5e1; background: #fff; padding: 2px 0; z-index: 1; }
+        .timeline-step.completed i { color: #10b981; }
+        .timeline-step.active i { color: var(--primary); animation: pulse 2s infinite; }
+        
+        .step-content h4 { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+        .timeline-step:not(.completed):not(.active) .step-content h4 { color: var(--text-muted); }
+        .step-content p { font-size: 12px; color: var(--text-muted); }
+
+        .notice-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 16px; font-size: 13px; color: #1e40af; line-height: 1.5; margin-top: 20px; display: flex; gap: 12px; align-items: flex-start; }
+        .notice-box i { font-size: 16px; margin-top: 2px; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <header class="top-nav">
+        <a href="dashboard.html" class="logo"><i class="fa-solid fa-passport"></i> Passport Tracking System</a>
+        <a href="dashboard.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+    </header>
+
+    <div class="container">
+        <div class="hero-banner">
+            <h1>Courier Delivery Status</h1>
+            <p>Real-time shipment tracking for your printed passport booklet.</p>
+        </div>
+
+        <section class="card">
+            <div class="card-title">Shipment Overview</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Application ID</label>
+                    <span id="trackAppId">---</span>
+                </div>
+                <div class="info-item">
+                    <label>Tracking Number</label>
+                    <span id="trackNumber">PH-LBC-883920</span>
+                </div>
+                <div class="info-item" style="grid-column: 1 / -1;">
+                    <label>Delivery Address</label>
+                    <span id="trackAddress">---</span>
+                </div>
+            </div>
+
+            <div class="card-title" style="margin-bottom: 16px;">Delivery Progress</div>
+            <div class="timeline">
+                <div class="timeline-step completed">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div class="step-content">
+                        <h4>Passport Printed & Handed to Courier</h4>
+                        <p>Secured and dispatched from DFA Central Printing Facility.</p>
+                    </div>
+                </div>
+                <div class="timeline-step completed">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div class="step-content">
+                        <h4>Arrived at Regional Sorting Hub</h4>
+                        <p>Package scanned and processed at local courier sorting center.</p>
+                    </div>
+                </div>
+                <div class="timeline-step active">
+                    <i class="fa-solid fa-circle-dot"></i>
+                    <div class="step-content">
+                        <h4>Out for Delivery</h4>
+                        <p>Courier rider is currently en route to deliver your passport.</p>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <i class="fa-regular fa-circle"></i>
+                    <div class="step-content">
+                        <h4>Delivered Successfully</h4>
+                        <p>Received by applicant or authorized representative.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notice-box">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>
+                    <strong>Important Delivery Reminder:</strong> Please ensure that a valid government-issued ID and an authorization letter (if you are receiving it on behalf of someone else) are ready upon delivery.
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const appId = urlParams.get('id') || localStorage.getItem('currentApplicationId') || 'PH-324906';
+        
+        document.getElementById('trackAppId').textContent = appId;
+        document.getElementById('trackNumber').textContent = `PH-LBC-${Math.floor(100000 + Math.random() * 900000)}`;
+        
+        // Fetch application details to display the saved delivery address
+        async function loadDeliveryInfo() {
+            try {
+                const response = await fetch(`../api/get-application.php?applicationId=${encodeURIComponent(appId)}`);
+                const result = await response.json();
+                if (response.ok && result.success && result.application) {
+                    const app = result.application;
+                    if (app.delivery_address || app.deliveryAddress) {
+                        document.getElementById('trackAddress').textContent = app.delivery_address || app.deliveryAddress;
+                    } else {
+                        document.getElementById('trackAddress').textContent = 'Registered Home Delivery Address';
+                    }
+                }
+            } catch (err) {
+                document.getElementById('trackAddress').textContent = 'Registered Home Delivery Address';
+            }
+        }
+        loadDeliveryInfo();
+    </script>
+</body>
+</html>
