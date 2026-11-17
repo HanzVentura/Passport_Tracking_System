@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passport FAQs - Passport Tracking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --shadow-subtle: 0 4px 8px rgba(15, 23, 42, 0.04);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .topbar {
+            min-height: 74px;
+            padding: 14px max(24px, calc((100% - 1120px) / 2));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: var(--text-main);
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .back-link:hover { color: var(--primary-hover); }
+        main {
+            width: min(100% - 40px, 920px);
+            margin: 38px auto 64px;
+        }
+        .hero {
+            padding: 34px;
+            border-radius: var(--radius-md);
+            color: #fff;
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.13);
+        }
+        .eyebrow {
+            margin: 0 0 9px;
+            color: #dbeafe;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        h1 { margin: 0; font-size: clamp(25px, 4vw, 34px); letter-spacing: -.04em; }
+        .hero p:last-child {
+            max-width: 650px;
+            margin: 10px 0 0;
+            color: #eff6ff;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 20px 0 24px;
+            padding: 16px 18px;
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-sm);
+            background: #eff6ff;
+            color: #1e3a8a;
+            font-size: 13px;
+            line-height: 1.65;
+        }
+        .notice i { margin-top: 3px; }
+        .notice a { color: #3730a3; font-weight: 700; }
+        .search-box {
+            position: relative;
+            margin: 24px 0 16px;
+        }
+        .search-box i {
+            position: absolute;
+            top: 50%;
+            left: 17px;
+            color: #94a3b8;
+            transform: translateY(-50%);
+        }
+        .search-box input {
+            width: 100%;
+            min-height: 52px;
+            padding: 13px 16px 13px 46px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            outline: none;
+            background: #fff;
+            color: var(--text-main);
+            font: inherit;
+            font-size: 14px;
+            box-shadow: var(--shadow-subtle);
+        }
+        .search-box input:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, .1);
+        }
+        .category-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin: 0 0 22px;
+        }
+        .category-filter {
+            padding: 9px 13px;
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            background: #fff;
+            color: #475569;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .18s ease, color .18s ease, border-color .18s ease;
+        }
+        .category-filter:hover { border-color: #a5b4fc; color: var(--primary); }
+        .category-filter[aria-pressed="true"] {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: #fff;
+        }
+        .faq-section {
+            margin: 24px 0;
+            scroll-margin-top: 20px;
+        }
+        .faq-section h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 12px;
+            font-size: 17px;
+            letter-spacing: -.02em;
+        }
+        .faq-section h2 i { color: var(--primary); font-size: 15px; }
+        .faq-item {
+            margin: 9px 0;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--card-bg);
+            box-shadow: var(--shadow-subtle);
+        }
+        .faq-question {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 17px 19px;
+            border: 0;
+            background: transparent;
+            color: var(--text-main);
+            text-align: left;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.55;
+            cursor: pointer;
+        }
+        .faq-question:hover { color: var(--primary); }
+        .faq-question i {
+            flex: 0 0 auto;
+            color: var(--primary);
+            transition: transform .22s ease;
+        }
+        .faq-question[aria-expanded="true"] i { transform: rotate(180deg); }
+        .faq-answer {
+            height: 0;
+            overflow: hidden;
+            transition: height .24s ease;
+        }
+        .faq-answer-inner {
+            padding: 0 19px 18px;
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.75;
+        }
+        .faq-answer-inner p { margin: 0; }
+        .faq-answer-inner a { color: var(--primary); font-weight: 700; }
+        .empty-state {
+            padding: 28px 20px;
+            border: 1px dashed #cbd5e1;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 14px;
+        }
+        .empty-state[hidden], .faq-section[hidden], .faq-item[hidden] { display: none; }
+        .footer-note {
+            margin-top: 34px;
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.7;
+            text-align: center;
+        }
+        @media (max-width: 620px) {
+            .topbar { padding: 13px 18px; }
+            .brand { font-size: 13px; }
+            main { width: min(100% - 28px, 920px); margin-top: 22px; }
+            .hero { padding: 25px 22px; }
+            .faq-question { padding: 15px; }
+            .faq-answer-inner { padding: 0 15px 16px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="dashboard.html" aria-label="Passport Tracking dashboard">
+            <span class="brand-icon"><i class="fa-solid fa-passport" aria-hidden="true"></i></span>
+            <span>Passport Tracking</span>
+        </a>
+        <a class="back-link" id="backLink" href="index.html">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            <span id="backLinkText">Back to Sign In</span>
+        </a>
+    </header>
+
+    <main>
+        <section class="hero" aria-labelledby="pageTitle">
+            <p class="eyebrow">Help &amp; information</p>
+            <h1 id="pageTitle">Passport FAQs</h1>
+            <p>Quick answers about passport applications, renewals, lost or damaged passports, appointments, and pickup.</p>
+        </section>
+
+        <aside class="notice">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            <div>
+                <strong>For guidance only.</strong> This site is not the Department of Foreign Affairs (DFA). Requirements and procedures can change and may depend on your case. Confirm the latest checklist, appointment rules, and fees through the
+                <a href="https://consular.dfa.gov.ph/" target="_blank" rel="noopener noreferrer">official DFA Consular Affairs website</a>
+                or the <a href="https://passport.gov.ph/" target="_blank" rel="noopener noreferrer">official passport appointment portal</a>.
+            </div>
+        </aside>
+
+        <label class="search-box" for="faqSearch">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input id="faqSearch" type="search" placeholder="Search FAQs (e.g. first-time, ID, lost, renewal)" autocomplete="off">
+        </label>
+
+        <nav class="category-list" aria-label="Filter FAQs by category">
+            <button class="category-filter" type="button" data-filter="all" aria-pressed="true">All questions</button>
+            <button class="category-filter" type="button" data-filter="first-time" aria-pressed="false">First-Time Applications</button>
+            <button class="category-filter" type="button" data-filter="renewal" aria-pressed="false">Passport Renewal</button>
+            <button class="category-filter" type="button" data-filter="lost-damaged" aria-pressed="false">Lost or Damaged Passports</button>
+            <button class="category-filter" type="button" data-filter="appointments" aria-pressed="false">Appointments &amp; Pickups</button>
+        </nav>
+
+        <div id="faqSections">
+            <section class="faq-section" data-category="first-time" aria-labelledby="firstTimeHeading">
+                <h2 id="firstTimeHeading"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> First-Time Applications</h2>
+                <article class="faq-item">
+                    <button class="faq-question" type="button" aria-expanded="false" aria-controls="answer-first-requirements">
+                        <span>What should I prepare for a first-time passport application?</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="faq-answer" id="answer-first-requirements" hidden><div class="faq-answer-inner">
+                        <p>Start with a confirmed appointment, your completed application form, your PSA-issued birth certificate, and a valid government-issued ID. Bring the required originals and photocopies. Check the current DFA checklist for your applicant type before your appointment, since additional documents may apply.</p>
+                    </div></div>
+                </article>
+                <article class="faq-item">
+                    <button class="faq-question" type="button" aria-expanded="false" aria-controls="answer-accepted-ids">
+                        <span>Which IDs can I bring?</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="faq-answer" id="answer-accepted-ids" hidden><div class="faq-answer-inner">
+                        <p>The DFA's accepted-ID list can change. Examples commonly listed include a PhilID/ePhilID, driver's license, SSS or GSIS ID, UMID, PRC ID, and Postal ID. Bring a valid original ID and a photocopy, and verify that your specific ID is currently accepted on the <a href="https://consular.dfa.gov.ph/" target="_blank" rel="noopener noreferrer">official DFA website</a> before you go.</p>
+                    </div></div>
+                </article>
+            </section>
+
+            <section class="faq-section" data-category="renewal" aria-labelledby="renewalHeading">
+                <h2 id="renewalHeading"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Passport Renewal</h2>
+                <article class="faq-item">
+                    <button class="faq-question" type="button" aria-expanded="false" aria-controls="answer-renewal-documents">
+                        <span>What do I need to renew an ePassport?</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="faq-answer" id="answer-renewal-documents" hidden><div class="faq-answer-inner">
+                        <p>Generally, prepare a confirmed appointment, the completed application form, and your current or most recently issued ePassport with a photocopy of its data page. Bring any additional documents listed for your situation in the DFA renewal checklist.</p>
+                    </div></div>
+                </article>
+                <article class="faq-item">
+                    <button class="faq-question" type="button" aria-expanded="false" aria-controls="answer-renewal-timing">
+                        <span>When should I renew before traveling?</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="faq-answer" id="answer-renewal-timing" hidden><div class="faq-answer-inner">
+                        <p>Renew well ahead of your trip so there is time for an appointment and processing. Many destinations and airlines require at least six months of passport validity, but rules vary. Check the entry requirements of every destination and transit country, and do not rely on an estimated processing period as a guarantee.</p>
+                    </div></div>
+                </article>
+            </section>
+
+            <section class="faq-section" data-category="lost-damaged" aria-labelledby="lostHeading">
+                <h2 id="lostHeading"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Lost or Damaged Passports</h2>
+                <article class="faq-item">
+                    <button class="faq-question" type="button" aria-expanded="false" aria-controls="answer-lost-passport">
+                        <span>What should I do if my passport is lost or stolen?</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="faq-answer" id="answer-lost-passport" hidden><div class="faq-answer-inner">
+                        <p>Report the loss to the appropriate authorities and follow the DFA's lost-passport process. A police report and a notarized Affidavit of Loss may be required. Book the appropriate appointment and check the DFA checklist for your case; the required documents can depend on whether the passport was still valid and the circumstances of the loss.</p>
+                    </div></div>
+                </article>
+                <article class="faq-item">
+                    <button class="faq-question" type="button" aria-expanded="false" aria-controls="answer-damaged-passport">
+                        <span>What if my passport is damaged?</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="faq-answer" id="answer-damaged-passport" hidden><div class="faq-answer-inner">
+                        <p>Do not assume a damaged passport can be handled as a routine renewal. Contact or consult the DFA for the applicable damaged-passport requirements before booking. Keep the damaged passport and prepare any supporting documents specified for your case.</p>
+                    </div></div>
+                </article>
+            </section>
+
+            <section class="faq-section" data-category="appointments" aria-labelledby="appointmentsHeading">
+                <h2 id="appointmentsHeading"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Appointments &amp; Pickups</h2>
+                <article class="faq-item">
+                    <button class="faq-question" type="button" aria-expanded="false" aria-controls="answer-appointment">
+                        <span>Does an appointment guarantee that my passport will be issued?</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="faq-answer" id="answer-appointment" hidden><div class="faq-answer-inner">
+                        <p>No. An appointment reserves a time to submit your application; the DFA still needs to review your documents and application. Bring the required documents and follow the instructions in your official appointment confirmation.</p>
+                    </div></div>
+                </article>
+                <article class="faq-item">
+                    <button class="faq-question" type="button" aria-expanded="false" aria-controls="answer-authorized-pickup">
+                        <span>Can someone else pick up my passport?</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="faq-answer" id="answer-authorized-pickup" hidden><div class="faq-answer-inner">
+                        <p>Authorized pickup may be allowed in some cases, subject to DFA rules. The representative may need an authorization letter or Special Power of Attorney, the applicant's original receipt, and valid IDs for both parties. Requirements can differ for minors and other circumstances, so confirm the current pickup rules with the releasing office.</p>
+                    </div></div>
+                </article>
+                <article class="faq-item">
+                    <button class="faq-question" type="button" aria-expanded="false" aria-controls="answer-biometrics">
+                        <span>What should I keep in mind for my photo and biometrics?</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="faq-answer" id="answer-biometrics" hidden><div class="faq-answer-inner">
+                        <p>Follow the appearance and photo instructions in your appointment confirmation and those provided by the DFA staff. Keep your face clearly visible and be ready to remove items that obstruct the photo or biometric capture. Check the latest official guidance for specific clothing, eyewear, and accessory rules.</p>
+                    </div></div>
+                </article>
+            </section>
+        </div>
+
+        <div class="empty-state" id="emptyState" hidden>No questions match that search. Try another keyword or choose “All questions.”</div>
+        <p class="footer-note">For case-specific advice, application appointments, fees, and official status updates, use DFA channels. This FAQ is general information and is not an official DFA publication.</p>
+    </main>
+
+    <script>
+        const searchInput = document.getElementById('faqSearch');
+        const filterButtons = document.querySelectorAll('.category-filter');
+        const faqSections = document.querySelectorAll('.faq-section');
+        const faqItems = document.querySelectorAll('.faq-item');
+        let activeFilter = 'all';
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('from') === 'dashboard') {
+            document.getElementById('backLink').href = 'dashboard.html';
+            document.getElementById('backLinkText').textContent = 'Back to Dashboard';
+        }
+
+        function closeAnswer(button, panel) {
+            button.setAttribute('aria-expanded', 'false');
+            panel.style.height = `${panel.scrollHeight}px`;
+            requestAnimationFrame(() => { panel.style.height = '0px'; });
+            panel.addEventListener('transitionend', function onClose(event) {
+                if (event.propertyName !== 'height' || button.getAttribute('aria-expanded') === 'true') return;
+                panel.hidden = true;
+                panel.removeEventListener('transitionend', onClose);
+            });
+        }
+
+        function openAnswer(button, panel) {
+            panel.hidden = false;
+            button.setAttribute('aria-expanded', 'true');
+            panel.style.height = '0px';
+            requestAnimationFrame(() => { panel.style.height = `${panel.scrollHeight}px`; });
+            panel.addEventListener('transitionend', function onOpen(event) {
+                if (event.propertyName !== 'height' || button.getAttribute('aria-expanded') !== 'true') return;
+                panel.style.height = 'auto';
+                panel.removeEventListener('transitionend', onOpen);
+            });
+        }
+
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const panel = document.getElementById(button.getAttribute('aria-controls'));
+                if (button.getAttribute('aria-expanded') === 'true') {
+                    closeAnswer(button, panel);
+                } else {
+                    openAnswer(button, panel);
+                }
+            });
+        });
+
+        function applyFilters() {
+            const query = searchInput.value.trim().toLocaleLowerCase();
+            let visibleCount = 0;
+
+            faqItems.forEach(item => {
+                const section = item.closest('.faq-section');
+                const matchesCategory = activeFilter === 'all' || section.dataset.category === activeFilter;
+                const matchesSearch = !query || item.textContent.toLocaleLowerCase().includes(query);
+                const visible = matchesCategory && matchesSearch;
+                item.hidden = !visible;
+                if (visible) visibleCount += 1;
+                if (!visible) {
+                    const button = item.querySelector('.faq-question');
+                    const panel = item.querySelector('.faq-answer');
+                    if (button.getAttribute('aria-expanded') === 'true') closeAnswer(button, panel);
+                }
+            });
+
+            faqSections.forEach(section => {
+                section.hidden = !Array.from(section.querySelectorAll('.faq-item')).some(item => !item.hidden);
+            });
+            document.getElementById('emptyState').hidden = visibleCount > 0;
+        }
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                activeFilter = button.dataset.filter;
+                filterButtons.forEach(filter => filter.setAttribute('aria-pressed', String(filter === button)));
+                applyFilters();
+            });
+        });
+        searchInput.addEventListener('input', applyFilters);
+    </script>
+</body>
+</html>
