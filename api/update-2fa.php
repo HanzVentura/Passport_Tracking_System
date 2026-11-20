@@ -1,6 +1,8 @@
 <?php
 session_start();
 header('Content-Type: application/json');
+require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/audit-helper.php';
 
 // Check if user is logged in (matching the session naming convention used by login.php)
 $userId = $_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? null;
@@ -27,7 +29,6 @@ if ($enabled) {
 
 try {
     // Connect to MySQL database via centralized connection
-    require_once __DIR__ . '/../db.php';
 
     $stmt = $pdo->prepare(
         'UPDATE users SET two_factor_enabled = :enabled, passcode = :pin WHERE id = :user_id'
@@ -37,6 +38,18 @@ try {
         ':pin' => $plainPasscode,
         ':user_id' => $userId
     ]);
+    $actorEmail = $_SESSION['user_email'] ?? null;
+    logAudit(
+        $pdo,
+        $enabled ? '2FA_ENABLED' : '2FA_DISABLED',
+        'user',
+        $actorEmail,
+        $enabled ? 'disabled' : 'enabled',
+        $enabled ? 'enabled' : 'disabled',
+        'Two-factor authentication settings changed.',
+        $actorEmail,
+        'member'
+    );
     
     echo json_encode(['success' => true, 'message' => '2FA settings updated successfully!']);
 } catch (Exception $e) {

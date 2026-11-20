@@ -2,6 +2,7 @@
 // Handles rescheduling or canceling existing passport applications
 header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/audit-helper.php';
 
 $input = json_decode(file_get_contents('php://input'), true);
 $action = $input['action'] ?? '';
@@ -24,6 +25,7 @@ try {
             $stmt = $pdo->prepare("DELETE FROM applications WHERE email = ?");
             $stmt->execute([$email]);
         }
+        logAudit($pdo, 'APPLICATION_CANCELLED', 'application', $applicationId ?: null, null, 'Cancelled', 'Application canceled and removed.', $email, 'member');
 
         echo json_encode([
             'success' => true,
@@ -51,6 +53,17 @@ try {
             $stmt = $pdo->prepare("UPDATE applications SET appointment_date = ?, appointment_time = ?, appointment_location = COALESCE(?, appointment_location), status = 'Appointment Rescheduled', updated_at = CURRENT_TIMESTAMP WHERE email = ?");
             $stmt->execute([$newDate, $newTime, $newLocation, $email]);
         }
+        logAudit(
+            $pdo,
+            'APPLICATION_RESCHEDULED',
+            'application',
+            $applicationId ?: null,
+            null,
+            $newDate . ' ' . $newTime,
+            'Appointment rescheduled.',
+            $email ?: null,
+            'member'
+        );
 
         echo json_encode([
             'success' => true,

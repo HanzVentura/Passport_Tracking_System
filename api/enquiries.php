@@ -3,6 +3,7 @@
 header('Content-Type: application/json');
 // Connect to MySQL database via centralized connection
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/audit-helper.php';
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Handles POST requests to submit a new enquiry or update/reply
@@ -41,6 +42,7 @@ if ($method === 'POST') {
                 $updateStmt = $pdo->prepare("UPDATE enquiries SET status = ? WHERE id = ?");
                 $updateStmt->execute([$status, $enquiryId]);
             }
+            logAudit($pdo, 'ENQUIRY_UPDATED', 'enquiry', (string)$enquiryId, null, $status, $newReply ? 'Administrator reply added.' : 'Enquiry status changed.', $input['actorEmail'] ?? null, $input['actorRole'] ?? 'admin');
             
             echo json_encode(['success' => true, 'message' => 'Enquiry updated successfully.']);
             exit;
@@ -66,6 +68,7 @@ if ($method === 'POST') {
         $stmt->execute([$email, $applicationId, $subject, $message]);
        
         http_response_code(201);
+        logAudit($pdo, 'ENQUIRY_SUBMITTED', 'enquiry', (string)$pdo->lastInsertId(), null, 'Open', 'Support enquiry submitted.', $email, 'member');
         echo json_encode([
             'success' => true,
             'enquiry' => [

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/audit-helper.php';
 
 try {
     $input = json_decode(file_get_contents('php://input'), true);
@@ -55,6 +56,7 @@ try {
 
     $_SESSION['currentApplicationId'] = $application_id;
     $_SESSION['userEmail'] = $email;
+    logAudit($pdo, 'APPLICATION_SUBMITTED', 'application', $application_id, null, 'Form Submitted', 'Passport application submitted.', $email, 'member');
 
     if ($isJson) {
         echo json_encode([

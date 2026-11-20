@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/audit-helper.php';
 
 try {
     $input = json_decode(file_get_contents('php://input'), true);
@@ -41,6 +42,17 @@ try {
 
     $update = $pdo->prepare("UPDATE applications SET status = 'Form Submitted', payment_status = 'Paid', processing_type = ?, amount = ?, payment_method = ?, receiving_option = ?, delivery_address = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
     $update->execute([$processingType, $amount, $paymentMethod, $receivingOption, $deliveryAddress, $targetAppId]);
+    logAudit(
+        $pdo,
+        'PAYMENT_RECORDED',
+        'application',
+        $targetAppId,
+        $existingApp['payment_status'] ?? 'Pending',
+        'Paid',
+        'Payment recorded via ' . $paymentMethod . '; processing: ' . $processingType . '; receiving: ' . $receivingOption . '.',
+        $existingApp['email'] ?? $email,
+        'member'
+    );
 
     echo json_encode([
         'success' => true,

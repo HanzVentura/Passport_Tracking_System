@@ -2,6 +2,7 @@
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/audit-helper.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 $fullName = $data['fullName'] ?? $data['full_name'] ?? $data['fullname'] ?? '';
@@ -29,6 +30,8 @@ try {
 
     $_SESSION['user_id'] = $pdo->lastInsertId();
     $_SESSION['user_email'] = $email;
+    $_SESSION['user_role'] = 'member';
+    logAudit($pdo, 'ACCOUNT_CREATED', 'user', $email, null, null, 'New member account created.', $email, 'member');
 
     echo json_encode(['success' => true, 'message' => 'Account created successfully!']);
 } catch (Exception $e) {

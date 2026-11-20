@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/audit-helper.php';
 $input = json_decode(file_get_contents('php://input'), true);
 $action = $input['action'] ?? $_GET['action'] ?? '';
 // If no action is specified in GET request, default to listing all applications for admin convenience
@@ -137,6 +138,17 @@ if ($action === 'update_status' || (isset($input['status']) && isset($input['app
         // Valid transition - proceed with update
         $stmt = $pdo->prepare("UPDATE applications SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
         $stmt->execute([$newStatus, $applicationId]);
+        logAudit(
+            $pdo,
+            'APPLICATION_STATUS_UPDATED',
+            'application',
+            $applicationId,
+            $currentStatus,
+            $newStatus,
+            'Application status advanced by administrator.',
+            $input['actorEmail'] ?? null,
+            $input['actorRole'] ?? 'admin'
+        );
 
         echo json_encode([
             'success' => true,
