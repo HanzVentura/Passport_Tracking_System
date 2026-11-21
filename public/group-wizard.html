@@ -529,10 +529,10 @@
                                     <label>Application Type *</label>
                                     <select class="form-control" name="application_type" id="applicationTypeSelect" required>
                                         <option value="">- SELECT APPLICATION TYPE -</option>
-                                        <option value="FIRST TIME PASSPORT">First-Time Passport</option>
-                                        <option value="PASSPORT RENEWAL">Passport Renewal</option>
-                                        <option value="LOST PASSPORT">Replacement of Lost Passport</option>
-                                        <option value="DAMAGED PASSPORT">Replacement of Damaged Passport</option>
+                                        <option value="First Time Passport">First-Time Passport</option>
+                                        <option value="Passport Renewal">Passport Renewal</option>
+                                        <option value="Lost Passport">Replacement of Lost Passport</option>
+                                        <option value="Damaged Passport">Replacement of Damaged Passport</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -651,6 +651,25 @@
             }
         }
         document.addEventListener('DOMContentLoaded', loadUserData);
+
+        /**
+         * Normalize application type for member-facing display (Title Case)
+         * Converts legacy ALL CAPS DB values to Title Case
+         * @param {string} rawType - Raw type from database
+         * @returns {string} Normalized Title Case display value
+         */
+        function normalizeAppTypeForDisplay(rawType) {
+            const type = (rawType || '').toLowerCase().trim();
+            if (type.includes('first') || type.includes('new first-time')) return 'First Time Passport';
+            if (type.includes('renewal')) return 'Passport Renewal';
+            if (type.includes('lost')) return 'Lost Passport';
+            if (type.includes('damaged')) return 'Damaged Passport';
+            if (type.includes('group')) return 'Group Passport Application';
+            if (type === '' || type === 'passport application') return 'First Time Passport';
+            // Already Title Case or unknown - capitalize first letter of each word
+            return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
         function bindFileInput(inputId, nameId) {
             const input = document.getElementById(inputId);
             const span = document.getElementById(nameId);
@@ -670,16 +689,16 @@
             const appType = document.getElementById('applicationTypeSelect').value;
             const labelEl = document.getElementById('dynamicDocLabel');
             const noticeEl = document.getElementById('docRequirementsNotice');
-            if (appType === 'FIRST TIME PASSPORT') {
+            if (appType === 'First Time Passport') {
                 labelEl.textContent = 'PSA Birth Certificate (Original & Copy) *';
                 noticeEl.textContent = 'First-time applicants are required to upload a PSA Birth Certificate along with valid government ID and digital photo.';
-            } else if (appType === 'PASSPORT RENEWAL') {
+            } else if (appType === 'Passport Renewal') {
                 labelEl.textContent = 'Current / Old Philippine Passport *';
                 noticeEl.textContent = 'Passport renewal applicants must upload their current or most recently issued passport.';
-            } else if (appType === 'LOST PASSPORT') {
+            } else if (appType === 'Lost Passport') {
                 labelEl.textContent = 'Notarized Affidavit of Loss & Police Report *';
                 noticeEl.textContent = 'For lost passports, please upload your notarized Affidavit of Loss and official Police Report.';
-            } else if (appType === 'DAMAGED PASSPORT') {
+            } else if (appType === 'Damaged Passport') {
                 labelEl.textContent = 'Damaged Passport & Affidavit of Mutilation *';
                 noticeEl.textContent = 'For damaged passports, please upload a clear photo of the damaged passport and your Affidavit of Mutilation.';
             } else {
@@ -865,7 +884,7 @@
                         <h4 style="font-size: 15px; color: var(--primary); margin-bottom: 12px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; font-weight: 700; text-transform: uppercase;">Applicant ${i}: ${fullName}</h4>
                         <div style="font-size: 13px; line-height: 1.8; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; color: #334155;">
                             <div>
-                                <div><strong>Application Type:</strong> ${app.application_type || '-'}</div>
+                                <div><strong>Application Type:</strong> ${normalizeAppTypeForDisplay(app.application_type || '-')}</div>
                                 <div><strong>Email:</strong> ${app.email || '-'}</div>
                                 <div><strong>Mobile:</strong> ${app.mobile || '-'}</div>
                             </div>
@@ -983,6 +1002,9 @@
             const userEmail = localStorage.getItem('userEmail') || app1.email || 'group@applicant.com';
             const randomGrpId = `PH-GRP-${Math.floor(100000 + Math.random() * 900000)}`;
 
+            // Read the actual application type from applicant_1's form select
+            const applicationType = app1.application_type || 'Group Passport Application';
+
             try {
                 const response = await fetch('../api/submit-group-application.php', {
                     method: 'POST',
@@ -990,7 +1012,7 @@
                     body: JSON.stringify({
                         email: userEmail,
                         applicationId: randomGrpId,
-                        applicationType: 'Group Passport Application',
+                        applicationType: applicationType,
                         status: 'Form Submitted',
                         appointmentDate: app1.app_date_selection || '2027-01-01',
                         appointmentTime: app1.app_time_selection || '15:00',

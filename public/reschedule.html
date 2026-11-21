@@ -154,6 +154,24 @@
 
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+        /**
+         * Normalize application type for member-facing display (Title Case)
+         * Converts legacy ALL CAPS DB values to Title Case
+         * @param {string} rawType - Raw type from database
+         * @returns {string} Normalized Title Case display value
+         */
+        function normalizeAppTypeForDisplay(rawType) {
+            const type = (rawType || '').toLowerCase().trim();
+            if (type.includes('first') || type.includes('new first-time')) return 'First Time Passport';
+            if (type.includes('renewal')) return 'Passport Renewal';
+            if (type.includes('lost')) return 'Lost Passport';
+            if (type.includes('damaged')) return 'Damaged Passport';
+            if (type.includes('group')) return 'Group Passport Application';
+            if (type === '' || type === 'passport application') return 'First Time Passport';
+            // Already Title Case or unknown - capitalize first letter of each word
+            return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
         function renderCalendar(year, month) {
             const grid = document.getElementById('calendar-dates-grid');
             grid.innerHTML = '';
@@ -250,7 +268,8 @@
                     userEmail = app.email || userEmail;
 
                     document.getElementById('display-id').textContent = currentAppId;
-                    document.getElementById('display-type').textContent = app.application_type || app.applicationType;
+                    const rawAppType = app.application_type || app.applicationType;
+                    document.getElementById('display-type').textContent = normalizeAppTypeForDisplay(rawAppType);
                     document.getElementById('display-date').textContent = app.appointmentDate || app.appointment_date || 'Not set';
                     document.getElementById('display-time').textContent = app.appointmentTime || app.appointment_time || '09:00 AM';
                     document.getElementById('display-location').textContent = app.appointmentLocation || app.appointment_location || 'DFA NCR Central - Lingkod Pinoy Center';
