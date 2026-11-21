@@ -7,9 +7,9 @@ require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/audit-helper.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
-$email = $data['email'] ?? '';
+$email = trim($data['email'] ?? '');
 $password = $data['password'] ?? '';
-$passcode = $data['passcode'] ?? '';
+$passcode = trim($data['passcode'] ?? '');
 
 if (empty($email) || empty($password)) {
     echo json_encode(['success' => false, 'message' => 'Please fill in all fields.']);
@@ -47,13 +47,20 @@ try {
         }
     }
 
-    // If 2FA is disabled OR passcode matches successfully:
+    // Regular user session setup
+    unset($_SESSION['is_admin'], $_SESSION['admin_name']);
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['user_email'] = $user['email'];
     $_SESSION['user_role'] = 'member';
+    
     logAudit($pdo, 'LOGIN_SUCCESS', 'user', $user['email'], null, null, 'User logged in successfully.', $user['email'], 'member');
    
-    echo json_encode(['success' => true, 'message' => 'Login successful! Redirecting...']);
+    echo json_encode([
+        'success' => true,
+        'message' => 'Login successful! Redirecting...',
+        'role' => 'member',
+        'redirect' => 'dashboard.html'
+    ]);
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }
