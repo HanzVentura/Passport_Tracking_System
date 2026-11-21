@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Passport Tracking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --shadow-elevated: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 55%, var(--bg-light) 55%, var(--bg-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: var(--text-main);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 430px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 36px 32px;
+            box-shadow: var(--shadow-elevated);
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #eef2ff;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 6px 12px;
+            border-radius: 999px;
+            margin-bottom: 16px;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .alert-box {
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 18px;
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 7px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-main);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper .form-input {
+            padding-right: 44px;
+        }
+
+        .toggle-visibility-btn {
+            position: absolute;
+            right: 10px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px;
+            font-size: 14px;
+        }
+
+        .toggle-visibility-btn:hover {
+            color: var(--text-main);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .card-footer-link {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .card-footer-link a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-footer-link a:hover {
+            color: var(--primary);
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 28px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="login-card">
+        <div class="brand-badge">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Administration Portal</span>
+        </div>
+
+        <h1 class="login-title">Admin Sign In</h1>
+        <p class="login-subtitle">Authenticate with your authorized administrator credentials to manage passport records.</p>
+
+        <p id="admin-login-error" class="alert-box hidden" role="alert"></p>
+
+        <form id="adminLoginForm" novalidate>
+            <div class="form-group">
+                <label class="form-label" for="admin-email">Admin Email Address</label>
+                <input
+                    type="email"
+                    id="admin-email"
+                    name="admin-email"
+                    class="form-input"
+                    maxlength="254"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="admin-password">Password</label>
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="admin-password"
+                        name="admin-password"
+                        class="form-input"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button
+                        type="button"
+                        class="toggle-visibility-btn"
+                        data-target="admin-password"
+                        aria-label="Toggle password visibility"
+                    >
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="admin-2fa-container" class="form-group hidden">
+                <label class="form-label" for="admin-passcode">6-Digit 2FA Passcode</label>
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="admin-passcode"
+                        name="admin-passcode"
+                        class="form-input"
+                        maxlength="6"
+                        inputmode="numeric"
+                        placeholder="------"
+                        autocomplete="one-time-code"
+                    >
+                    <button
+                        type="button"
+                        class="toggle-visibility-btn"
+                        data-target="admin-passcode"
+                        aria-label="Toggle passcode visibility"
+                    >
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" id="admin-login-btn" class="btn-submit">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>Sign In to Admin Portal</span>
+            </button>
+        </form>
+
+        <div class="card-footer-link">
+            <a href="index.html">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Applicant Login</span>
+            </a>
+        </div>
+    </main>
+
+    <script src="admin-login.js"></script>
+</body>
+</html>
