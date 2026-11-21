@@ -43,6 +43,25 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
+    // 4. Audit trail
+    $pdo->exec("CREATE TABLE IF NOT EXISTS audit_logs (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        action_name VARCHAR(100) NOT NULL,
+        entity_type VARCHAR(100) NOT NULL,
+        entity_id VARCHAR(100) DEFAULT NULL,
+        actor_email VARCHAR(255) DEFAULT NULL,
+        actor_role VARCHAR(50) DEFAULT NULL,
+        old_value VARCHAR(255) DEFAULT NULL,
+        new_value VARCHAR(255) DEFAULT NULL,
+        details TEXT DEFAULT NULL,
+        ip_address VARCHAR(45) DEFAULT NULL,
+        user_agent VARCHAR(255) DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_audit_action (action_name),
+        INDEX idx_audit_entity (entity_type, entity_id),
+        INDEX idx_audit_created (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
     echo "<h2 style='color: green;'>Success! MySQL tables created successfully with full 6-step workflow support.</h2>";
 } catch (Throwable $e) {
     echo "<h2 style='color: red;'>Error: " . $e->getMessage() . "</h2>";

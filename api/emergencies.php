@@ -2,6 +2,7 @@
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/audit-helper.php';
 
 // Ensure emergencies table exists
 try {
@@ -61,6 +62,7 @@ if ($method === 'POST') {
                 $statusStmt = $pdo->prepare("UPDATE emergencies SET status = ? WHERE id = ?");
                 $statusStmt->execute([$newStatus, $emergencyId]);
             }
+            logAudit($pdo, 'EMERGENCY_UPDATED', 'emergency', (string)$emergencyId, null, $newStatus ?: null, $newReply ? 'Administrator emergency reply added.' : 'Emergency status changed.', $data['actorEmail'] ?? null, $data['actorRole'] ?? 'admin');
 
             echo json_encode(['success' => true, 'message' => 'Emergency updated successfully.']);
         } catch (Exception $e) {
@@ -82,6 +84,7 @@ if ($method === 'POST') {
     try {
         $stmt = $pdo->prepare("INSERT INTO emergencies (email, appId, subject, message, reply, status) VALUES (?, ?, ?, ?, 'Awaiting consular officer response...', 'Open')");
         $stmt->execute([$email, $appId, $subject, $message]);
+        logAudit($pdo, 'EMERGENCY_SUBMITTED', 'emergency', (string)$pdo->lastInsertId(), null, 'Open', 'Emergency request submitted.', $email, 'member');
 
         echo json_encode(['success' => true, 'message' => 'Emergency request filed successfully.']);
     } catch (Exception $e) {

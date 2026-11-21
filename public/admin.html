@@ -387,6 +387,7 @@
                 <li class="active" onclick="switchTab('enquiriesTab', this)"><a href="#"><i class="fa-solid fa-circle-question"></i> Manage Enquiries</a></li>
                 <li onclick="switchTab('emergenciesTab', this)"><a href="#"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Reports</a></li>
                 <li onclick="switchTab('statusTab', this)"><a href="#"><i class="fa-solid fa-list-check"></i> Application Status</a></li>
+                <li onclick="switchTab('auditTab', this)"><a href="#"><i class="fa-solid fa-clock-rotate-left"></i> Audit Trail</a></li>
             </ul>
         </div>
         <div class="sidebar-bottom">
@@ -487,6 +488,50 @@
                     </table>
                 </div>
             </div>
+
+            <!-- TAB 4: AUDIT TRAIL -->
+            <div id="auditTab" class="tab-view">
+                <div class="card">
+                    <div class="section-title">Audit Trail</div>
+                    <div class="section-subtitle">Immutable log of security, application, payment, support, and administrative actions.</div>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px;">
+                        <input id="auditSearch" type="search" placeholder="Search actor, application, action, or details" style="flex:1; min-width:220px; padding:10px 12px; border:1px solid var(--border-color); border-radius:8px;">
+                        <select id="auditActionFilter" style="padding:10px 12px; border:1px solid var(--border-color); border-radius:8px; background:#fff;">
+                            <option value="">All actions</option>
+                            <option value="LOGIN_SUCCESS">Login success</option>
+                            <option value="LOGIN_FAILED">Login failed</option>
+                            <option value="ACCOUNT_CREATED">Account created</option>
+                            <option value="APPLICATION_SUBMITTED">Application submitted</option>
+                            <option value="APPLICATION_STATUS_UPDATED">Status updated</option>
+                            <option value="APPLICATION_RESCHEDULED">Rescheduled</option>
+                            <option value="APPLICATION_CANCELLED">Cancelled</option>
+                            <option value="PAYMENT_RECORDED">Payment recorded</option>
+                            <option value="ENQUIRY_UPDATED">Enquiry updated</option>
+                            <option value="EMERGENCY_UPDATED">Emergency updated</option>
+                            <option value="2FA_ENABLED">2FA enabled</option>
+                            <option value="2FA_DISABLED">2FA disabled</option>
+                        </select>
+                        <button class="btn-action btn-status-open" type="button" onclick="loadAuditTrail()">Refresh</button>
+                        <button class="btn-action" type="button" onclick="exportAuditTrail()" style="background:#0f172a; color:#fff;">Export CSV</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date / Time</th>
+                                <th>Action</th>
+                                <th>Actor</th>
+                                <th>Record</th>
+                                <th>Change</th>
+                                <th>Details</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditTrailTable">
+                            <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px;">Loading audit trail...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -500,9 +545,86 @@
             const titles = {
                 'enquiriesTab': 'ADMINISTRATION OVERSIGHT PORTAL - MANAGE ENQUIRIES',
                 'emergenciesTab': 'ADMINISTRATION OVERSIGHT PORTAL - EMERGENCY REPORTS',
-                'statusTab': 'ADMINISTRATION OVERSIGHT PORTAL - APPLICATION STATUS'
+                'statusTab': 'ADMINISTRATION OVERSIGHT PORTAL - APPLICATION STATUS',
+                'auditTab': 'ADMINISTRATION OVERSIGHT PORTAL - AUDIT TRAIL'
             };
             document.getElementById('headerTitle').innerText = titles[tabId];
+            if (tabId === 'auditTab') loadAuditTrail();
+        }
+
+        let auditTrailData = [];
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function getAdminAuditIdentity() {
+            return {
+                actorEmail: localStorage.getItem('userEmail') || 'hanzchristian.ventura@neu.edu.ph',
+                actorRole: 'admin'
+            };
+        }
+
+        async function loadAuditTrail() {
+            const tableBody = document.getElementById('auditTrailTable');
+            const action = document.getElementById('auditActionFilter')?.value || '';
+            const search = document.getElementById('auditSearch')?.value.trim() || '';
+            const params = new URLSearchParams({ limit: '500' });
+            if (action) params.set('action', action);
+            if (search) params.set('search', search);
+
+            try {
+                const response = await fetch('../api/audit-log.php?' + params.toString());
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.message || 'Unable to load audit trail.');
+                auditTrailData = result.logs || [];
+                if (!auditTrailData.length) {
+                    tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px;">No audit entries found.</td></tr>';
+                    return;
+                }
+                tableBody.innerHTML = auditTrailData.map(log => {
+                    const change = log.old_value || log.new_value
+                        ? `${escapeHtml(log.old_value || '-')} &rarr; ${escapeHtml(log.new_value || '-')}`
+                        : '-';
+                    return `
+                        <tr>
+                            <td>${escapeHtml(log.created_at)}</td>
+                            <td><strong>${escapeHtml(log.action_name)}</strong></td>
+                            <td>${escapeHtml(log.actor_email || '-')}<br><span style="font-size:11px;color:var(--text-muted);">${escapeHtml(log.actor_role || '-')}</span></td>
+                            <td>${escapeHtml(log.entity_type)}<br><strong>${escapeHtml(log.entity_id || '-')}</strong></td>
+                            <td>${change}</td>
+                            <td style="max-width:260px; white-space:pre-wrap;">${escapeHtml(log.details || '-')}</td>
+                            <td>${escapeHtml(log.ip_address || '-')}</td>
+                        </tr>`;
+                }).join('');
+            } catch (e) {
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#dc2626; padding:24px;">${escapeHtml(e.message)}</td></tr>`;
+            }
+        }
+
+        function exportAuditTrail() {
+            if (!auditTrailData.length) {
+                alert('No audit entries to export.');
+                return;
+            }
+            const columns = ['created_at', 'action_name', 'actor_email', 'actor_role', 'entity_type', 'entity_id', 'old_value', 'new_value', 'details', 'ip_address'];
+            const csvCell = value => '"' + String(value ?? '').replaceAll('"', '""') + '"';
+            const csv = [
+                columns.join(','),
+                ...auditTrailData.map(log => columns.map(column => csvCell(log[column])).join(','))
+            ].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `audit-trail-${new Date().toISOString().slice(0, 10)}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
         }
 
         async function loadAdminData() {
@@ -564,7 +686,7 @@
                 const res = await fetch('../api/enquiries.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ enquiryId, reply: `Admin:\n${replyText}` })
+                    body: JSON.stringify({ enquiryId, reply: `Admin:\n${replyText}`, ...getAdminAuditIdentity() })
                 });
                 const result = await res.json();
                 if (!res.ok || !result.success) throw new Error(result.message);
@@ -580,7 +702,7 @@
                 await fetch('../api/enquiries.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ enquiryId, status: newStatus })
+                    body: JSON.stringify({ enquiryId, status: newStatus, ...getAdminAuditIdentity() })
                 });
                 loadAdminEnquiries();
             } catch (e) {
@@ -631,7 +753,7 @@
                 const res = await fetch('../api/emergencies.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ emergencyId, reply: `Consular Officer:\n${replyText}` })
+                    body: JSON.stringify({ emergencyId, reply: `Consular Officer:\n${replyText}`, ...getAdminAuditIdentity() })
                 });
                 const result = await res.json();
                 if (!res.ok || !result.success) throw new Error(result.message);
@@ -647,7 +769,7 @@
                 await fetch('../api/emergencies.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ emergencyId, status: newStatus })
+                    body: JSON.stringify({ emergencyId, status: newStatus, ...getAdminAuditIdentity() })
                 });
                 loadAdminEmergencies();
             } catch (e) {
@@ -822,7 +944,7 @@
                 const res = await fetch('../api/applications.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ applicationId: appId, status: newStatus })
+                    body: JSON.stringify({ applicationId: appId, status: newStatus, ...getAdminAuditIdentity() })
                 });
                 const result = await res.json();
                 if (!res.ok || !result.success) throw new Error(result.message);
