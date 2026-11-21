@@ -672,10 +672,10 @@
                                     <label>Application Type *</label>
                                     <select class="form-control" name="application_type" id="applicationTypeSelect" required>
                                         <option value="">- SELECT APPLICATION TYPE -</option>
-                                        <option value="FIRST TIME PASSPORT">First-Time Passport</option>
-                                        <option value="PASSPORT RENEWAL">Passport Renewal</option>
-                                        <option value="LOST PASSPORT">Replacement of Lost Passport</option>
-                                        <option value="DAMAGED PASSPORT">Replacement of Damaged Passport</option>
+                                        <option value="First Time Passport">First-Time Passport</option>
+                                        <option value="Passport Renewal">Passport Renewal</option>
+                                        <option value="Lost Passport">Replacement of Lost Passport</option>
+                                        <option value="Damaged Passport">Replacement of Damaged Passport</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -830,6 +830,24 @@
         }
         document.addEventListener('DOMContentLoaded', loadUserData);
 
+        /**
+         * Normalize application type for member-facing display (Title Case)
+         * Converts legacy ALL CAPS DB values to Title Case
+         * @param {string} rawType - Raw type from database
+         * @returns {string} Normalized Title Case display value
+         */
+        function normalizeAppTypeForDisplay(rawType) {
+            const type = (rawType || '').toLowerCase().trim();
+            if (type.includes('first') || type.includes('new first-time')) return 'First Time Passport';
+            if (type.includes('renewal')) return 'Passport Renewal';
+            if (type.includes('lost')) return 'Lost Passport';
+            if (type.includes('damaged')) return 'Damaged Passport';
+            if (type.includes('group')) return 'Group Passport Application';
+            if (type === '' || type === 'passport application') return 'First Time Passport';
+            // Already Title Case or unknown - capitalize first letter of each word
+            return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
         function bindFileInput(inputId, nameId) {
             const input = document.getElementById(inputId);
             const span = document.getElementById(nameId);
@@ -849,16 +867,16 @@
             const appType = document.getElementById('applicationTypeSelect').value;
             const labelEl = document.getElementById('dynamicDocLabel');
             const noticeEl = document.getElementById('docRequirementsNotice');
-            if (appType === 'FIRST TIME PASSPORT') {
+            if (appType === 'First Time Passport') {
                 labelEl.textContent = 'PSA Birth Certificate (Original & Copy) *';
                 noticeEl.textContent = 'First-time applicants are required to upload a PSA Birth Certificate along with valid government ID and digital photo.';
-            } else if (appType === 'PASSPORT RENEWAL') {
+            } else if (appType === 'Passport Renewal') {
                 labelEl.textContent = 'Current / Old Philippine Passport *';
                 noticeEl.textContent = 'Passport renewal applicants must upload their current or most recently issued passport.';
-            } else if (appType === 'LOST PASSPORT') {
+            } else if (appType === 'Lost Passport') {
                 labelEl.textContent = 'Notarized Affidavit of Loss & Police Report *';
                 noticeEl.textContent = 'For lost passports, please upload your notarized Affidavit of Loss and official Police Report.';
-            } else if (appType === 'DAMAGED PASSPORT') {
+            } else if (appType === 'Damaged Passport') {
                 labelEl.textContent = 'Damaged Passport & Affidavit of Mutilation *';
                 noticeEl.textContent = 'For damaged passports, please upload a clear photo of the damaged passport and your Affidavit of Mutilation.';
             } else {
@@ -1049,7 +1067,7 @@
             document.getElementById('rev-mobile').innerText = getVal('mobile');
             document.getElementById('rev-fathername').innerText = `${getVal('father_givenname')} ${getVal('father_lastname')}`;
             document.getElementById('rev-mothername').innerText = `${getVal('mother_givenname')} ${getVal('mother_lastname')}`;
-            document.getElementById('rev-applicationtype').innerText = getVal('application_type');
+            document.getElementById('rev-applicationtype').innerText = normalizeAppTypeForDisplay(getVal('application_type'));
             document.getElementById('rev-address').innerText = getVal('address');
             document.getElementById('rev-cityprovince').innerText = `${getVal('address_city')}, ${getVal('address_province')}`;
             document.getElementById('rev-emergency').innerText = `${getVal('emergency_contact')} (${getVal('emergency_number')})`;

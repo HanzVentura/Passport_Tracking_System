@@ -704,14 +704,32 @@
                 icon.className = isActive ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle';
             });
         }
+        /**
+         * Normalize application type for member-facing display (Title Case)
+         * Converts legacy ALL CAPS DB values to Title Case
+         * @param {string} rawType - Raw type from database
+         * @returns {string} Normalized Title Case display value
+         */
+        function normalizeAppTypeForDisplay(rawType) {
+            const type = (rawType || '').toLowerCase().trim();
+            if (type.includes('first') || type.includes('new first-time')) return 'First Time Passport';
+            if (type.includes('renewal')) return 'Passport Renewal';
+            if (type.includes('lost')) return 'Lost Passport';
+            if (type.includes('damaged')) return 'Damaged Passport';
+            if (type.includes('group')) return 'Group Passport Application';
+            if (type === '' || type === 'passport application') return 'First Time Passport';
+            // Already Title Case or unknown - capitalize first letter of each word
+            return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
         function displaySavedApplication(application) {
             currentAppData = application;
             const appId = application.application_id || application.applicationId;
             document.getElementById('dispAppId').innerText = appId;
             localStorage.setItem('currentApplicationId', appId);
             localStorage.setItem('activeAppId', appId);
-           
-            document.getElementById('dispAppType').innerText = application.application_type || application.applicationType || 'New First-Time Application';
+
+            const rawAppType = application.application_type || application.applicationType || 'New First-Time Application';
+            document.getElementById('dispAppType').innerText = normalizeAppTypeForDisplay(rawAppType);
             const currentStatus = application.status || 'Form Submitted';
             document.getElementById('dispAppStatus').innerText = currentStatus;
             updateStatusTracker(currentStatus);
@@ -793,7 +811,8 @@
             if (!currentAppData) return;
             const app = currentAppData;
             const appId = app.application_id || app.applicationId || 'N/A';
-            const appType = app.application_type || app.applicationType || 'New First-Time Application';
+            const rawAppType = app.application_type || app.applicationType || 'New First-Time Application';
+            const appType = normalizeAppTypeForDisplay(rawAppType);
             const status = app.status || 'Form Submitted';
             const payment = app.payment_status || app.paymentStatus || 'Verified (Online)';
             const subDate = app.createdAt || app.created_at ? new Date(app.createdAt || app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A';

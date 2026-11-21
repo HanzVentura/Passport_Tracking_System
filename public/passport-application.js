@@ -13,7 +13,7 @@ const applicationLabels = {
         citizenshipPlaceholder: 'Certificate / Barcode No.'
     },
     renewal: {
-        title: 'PASSPORT RENEWAL',
+        title: 'Passport Renewal',
         category: 'Passport Renewal',
         description: 'Provide the details and documents needed to renew your existing Philippine passport.',
         identityDescription: 'Please upload a clear copy of your valid government-issued ID.',
@@ -150,14 +150,18 @@ function validateAndProceed() {
 }
 async function completePayment() {
     const randomId = `PH-${Math.floor(100000 + Math.random() * 900000)}`;
-   
+
     const userEmail = localStorage.getItem('userEmail') || document.getElementById('email')?.value;
-   
+
     if (!userEmail) {
         alert('Please provide your email or log in before saving your application.');
         return;
     }
-   
+
+    // Read the actual application type from the form select (not labels.category)
+    const applicationTypeSelect = document.getElementById('applicationTypeSelect');
+    const applicationType = applicationTypeSelect ? applicationTypeSelect.value : labels.category;
+
     try {
         const response = await fetch('../api/submit-application.php', {
             method: 'POST',
@@ -165,7 +169,7 @@ async function completePayment() {
             body: JSON.stringify({
                 email: userEmail,
                 applicationId: randomId,
-                applicationType: labels.category,
+                applicationType: applicationType,
                 status: 'Form Submitted',
                 appointmentDate: localStorage.getItem('selectedAppointmentDate') || '2027-01-01',
                 appointmentTime: localStorage.getItem('selectedAppointmentTime') || '15:00',
