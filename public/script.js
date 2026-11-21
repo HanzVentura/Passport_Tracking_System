@@ -148,12 +148,7 @@ async function handleLoginSubmit(event) {
     const passcodeField = document.getElementById('passcode');
     const passcodeVal = passcodeField ? passcodeField.value.trim() : '';
     const twoFaContainer = document.getElementById('2fa-container');
-    if (emailInput === 'hanzchristian.ventura@neu.edu.ph' && passInput === 'hanzchristian.ventura@neu.edu.ph') {
-        localStorage.setItem('userEmail', emailInput);
-        localStorage.setItem('userRole', 'admin');
-        window.location.href = 'admin.html';
-        return;
-    }
+    
     try {
         const response = await fetch('../api/login.php', {
             method: 'POST',
