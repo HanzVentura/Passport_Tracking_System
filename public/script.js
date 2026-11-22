@@ -176,12 +176,12 @@ async function handleLoginSubmit(event) {
         } else {
             loginErrorMessage.style.color = '#dc2626';
             loginErrorMessage.textContent = result.message;
-            loginErrorMessage.classList.add('hidden');
+            loginErrorMessage.classList.remove('hidden');
         }
     } catch (err) {
         loginErrorMessage.style.color = '#dc2626';
         loginErrorMessage.textContent = 'Connection error. Make sure server is running.';
-        loginErrorMessage.classList.add('hidden');
+        loginErrorMessage.classList.remove('hidden');
     }
 }
 loginForm.addEventListener('submit', handleLoginSubmit);
