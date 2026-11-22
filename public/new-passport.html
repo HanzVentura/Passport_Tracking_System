@@ -336,6 +336,21 @@
         .upload-box { display: flex; align-items: center; gap: 12px; margin-top: 8px; padding: 12px; background: #f9fafb; border: 1px dashed #cbd5e1; border-radius: 8px; }
         .btn-upload { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
         .upload-file-name { font-size: 13px; color: #6b7280; overflow-wrap: anywhere; }
+        /* Guidance Banner */
+        .guidance-banner {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 16px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .guidance-banner i { margin-top: 2px; font-size: 15px; }
     </style>
 </head>
 <body data-application-type="new">
@@ -365,7 +380,7 @@
                 </div>
                 <i class="fa-solid fa-passport" style="font-size: 40px; opacity: 0.8;"></i>
             </div>
-           
+
             <div class="dashboard-container">
                 <div class="wizard-steps" id="wizardHeader" style="display: none;">
                     <div class="wizard-step active" id="wStep1"><div class="step-badge">1</div><span>Site</span></div>
@@ -379,7 +394,7 @@
                 <form id="passportForm" action="../api/submit-application.php" method="POST" enctype="multipart/form-data" novalidate>
                     <input type="hidden" name="appointment_mode" id="appointmentMode" value="individual">
                     <input type="hidden" name="appointment_location" id="appointmentLocationFull">
-                   
+
                     <!-- STEP 0: Terms & Mode Selection -->
                     <section class="step-pane active" id="step0">
                         <div class="form-section-card">
@@ -492,7 +507,7 @@
                                 <div>Your selected time slot is reserved temporarily for 30 minutes upon completion.</div>
                             </div>
                             <input type="hidden" name="app_date" id="selectedDateVal" required>
-                           
+
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Appointment Date *</label>
@@ -537,7 +552,7 @@
                                 <input type="checkbox" id="infoAgree" required style="width: 18px; height: 18px; accent-color: var(--primary);">
                                 <label for="infoAgree" style="margin: 0; color: #991b1b; font-weight: 700; font-size: 13px;">I verify and confirm my details are accurate.</label>
                             </div>
-                           
+
                             <div class="form-row">
                                 <div class="form-group"><label>Phone Number</label><input type="text" class="form-control" name="phone"></div>
                                 <div class="form-group"><label>Mobile Number *</label><input type="text" class="form-control" name="mobile" required></div>
@@ -546,14 +561,14 @@
                                 <div class="form-group"><label>Email Address *</label><input type="email" class="form-control" name="email" required></div>
                                 <div class="form-group"><label>Confirm Email Address *</label><input type="email" class="form-control" required></div>
                             </div>
-                           
+
                             <div class="form-row">
                                 <div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="lastname" required></div>
                                 <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="givenname" required></div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group"><label>Middle Name</label><input type="text" class="form-control" name="middlename"></div>
-                                <div class="form-group"><label>Date of Birth *</label><input type="date" class="form-control" name="dob" required></div>
+                                <div class="form-group"><label>Date of Birth *</label><input type="date" class="form-control" name="dob" id="dobInput" required></div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
@@ -576,7 +591,7 @@
                                     </select>
                                 </div>
                             </div>
-                           
+
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Birth Legitimacy *</label>
@@ -663,7 +678,7 @@
                             <button type="button" class="btn-primary" onclick="goToStep(5)">Next <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
-                    <!-- STEP 5: Application & Contact -->
+                    <!-- STEP 5: Application & Contact (R.A. 11983 Compliant) -->
                     <section class="step-pane" id="step5">
                         <div class="form-section-card">
                             <div class="section-title"><i class="fa-solid fa-file-lines" style="color:var(--primary);"></i> Application & Contact Information</div>
@@ -672,10 +687,6 @@
                                     <label>Application Type *</label>
                                     <select class="form-control" name="application_type" id="applicationTypeSelect" required>
                                         <option value="">- SELECT APPLICATION TYPE -</option>
-                                        <option value="First Time Passport">First-Time Passport</option>
-                                        <option value="Passport Renewal">Passport Renewal</option>
-                                        <option value="Lost Passport">Replacement of Lost Passport</option>
-                                        <option value="Damaged Passport">Replacement of Damaged Passport</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -690,6 +701,13 @@
                                     </select>
                                 </div>
                             </div>
+                            <!-- Credential Updating Sub-Reason (Conditional) -->
+                            <div class="form-group" id="credentialReasonContainer" style="display: none;">
+                                <label>Reason for Credential Update *</label>
+                                <select class="form-control" name="credential_reason" id="credentialReasonSelect" required>
+                                    <option value="">- SELECT REASON -</option>
+                                </select>
+                            </div>
                             <div class="form-row">
                                 <div class="form-group"><label>Foreign Passport Holder *</label><select class="form-control" name="foreign_passport" required><option>No</option><option>Yes</option></select></div>
                                 <div class="form-group" id="othersBasisContainer" style="display: none;">
@@ -697,7 +715,7 @@
                                     <input type="text" class="form-control" name="citizenship_basis_others">
                                 </div>
                             </div>
-                           
+
                             <h4 style="margin: 20px 0 12px; font-size: 14px; color: var(--text-main);">Current Contact Details</h4>
                             <div class="form-group full-width"><label>Current Address *</label><input type="text" class="form-control" name="address" required></div>
                             <div class="form-row">
@@ -715,56 +733,31 @@
                         </div>
                         <div class="action-buttons">
                             <button type="button" class="btn-secondary" onclick="goToStep(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                            <button type="button" class="btn-primary" onclick="goToStep(6)">Next: Documents <i class="fa-solid fa-arrow-right"></i></button>
+                            <button type="button" class="btn-primary" onclick="validateAndGoToStep6()">Next: Documents <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
-                    <!-- STEP 6: Document Pre-Verification & Upload -->
+                    <!-- STEP 6: Document Pre-Verification & Upload (Dynamic) -->
                     <section class="step-pane" id="step6">
                         <div class="form-section-card">
                             <div class="section-title"><i class="fa-solid fa-cloud-arrow-up" style="color:var(--primary);"></i> Document Pre-Verification & Upload</div>
-                            <div class="alert-box info">
-                                <i class="fa-solid fa-circle-info" style="margin-top:2px;"></i>
+                            <div class="guidance-banner" id="docGuidanceBanner">
+                                <i class="fa-solid fa-circle-info"></i>
                                 <div id="docRequirementsNotice">Upload clear scanned copies or photos of your supporting documents for automated pre-screening before your appointment.</div>
                             </div>
-                            
-                            <!-- Universal Valid ID Upload -->
-                            <div class="form-group">
-                                <label>Valid Government-Issued ID *</label>
-                                <div class="upload-box">
-                                    <label class="btn-upload" for="validIdFile"><i class="fa-solid fa-upload"></i> Browse ID</label>
-                                    <input type="file" id="validIdFile" name="valid_id_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
-                                    <span class="upload-file-name" id="validIdFileName">No file chosen</span>
-                                </div>
-                            </div>
-                            <!-- Universal Passport Photo Upload -->
-                            <div class="form-group">
-                                <label>Digital Passport Photo *</label>
-                                <div class="upload-box">
-                                    <label class="btn-upload" for="passportPhotoFile"><i class="fa-solid fa-camera"></i> Browse Photo</label>
-                                    <input type="file" id="passportPhotoFile" name="passport_photo_file" accept=".jpg,.jpeg,.png" style="display: none;" required>
-                                    <span class="upload-file-name" id="passportPhotoFileName">No file chosen</span>
-                                </div>
-                            </div>
-                            <!-- Dynamic Application Type Specific Document -->
-                            <div class="form-group" id="dynamicDocGroup">
-                                <label id="dynamicDocLabel">Supporting Document *</label>
-                                <div class="upload-box">
-                                    <label class="btn-upload" for="specificDocFile"><i class="fa-solid file"></i> Browse Document</label>
-                                    <input type="file" id="specificDocFile" name="specific_doc_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
-                                    <span class="upload-file-name" id="specificDocFileName">No file chosen</span>
-                                </div>
-                            </div>
+
+                            <!-- Dynamic Document Slots -->
+                            <div id="dynamicDocSlots"></div>
                         </div>
                         <div class="action-buttons">
                             <button type="button" class="btn-secondary" onclick="goToStep(5)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                            <button type="button" class="btn-primary" onclick="goToStep(7)">Review Details <i class="fa-solid fa-arrow-right"></i></button>
+                            <button type="button" class="btn-primary" onclick="validateAndGoToStep7()">Review Details <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
                     <!-- STEP 7: Review -->
                     <section class="step-pane" id="step7">
                         <div class="form-section-card">
                             <div class="section-title"><i class="fa-solid fa-clipboard-check" style="color:var(--primary);"></i> Information Review & Confirmation</div>
-                           
+
                             <div class="review-grid">
                                 <div class="summary-card">
                                     <h4>Appointment Details</h4>
@@ -793,8 +786,13 @@
                                 <div class="summary-card">
                                     <h4>Application Summary</h4>
                                     <div><strong>Type:</strong> <span id="rev-applicationtype">-</span></div>
+                                    <div><strong>Credential Reason:</strong> <span id="rev-credentialreason" style="display: none;">-</span></div>
                                     <div><strong>Address:</strong> <span id="rev-address">-</span>, <span id="rev-cityprovince">-</span></div>
                                     <div><strong>Emergency Contact:</strong> <span id="rev-emergency">-</span></div>
+                                </div>
+                                <div class="summary-card" id="rev-documents-card" style="grid-column: span 2;">
+                                    <h4>Uploaded Documents</h4>
+                                    <div id="rev-documents-list" style="font-size: 13px; line-height: 1.8; color: #334155;">No documents uploaded yet.</div>
                                 </div>
                             </div>
                             <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-top: 30px; background: #f8fafc; padding: 15px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
@@ -802,7 +800,7 @@
                                 <label for="finalAgree" style="margin: 0; font-weight: 600; font-size: 13px; color: var(--text-main);">I confirm that all information provided is completely accurate, truthful, and final.</label>
                             </div>
                         </div>
-                       
+
                         <div class="action-buttons">
                             <button type="button" class="btn-secondary" onclick="goToStep(6)"><i class="fa-solid fa-arrow-left"></i> Back</button>
                             <button type="button" class="btn-primary" onclick="completePayment()" style="background-color: #10b981;"><i class="fa-solid fa-check"></i> Save & Submit Application</button>
@@ -848,71 +846,11 @@
             return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         }
 
-        function bindFileInput(inputId, nameId) {
-            const input = document.getElementById(inputId);
-            const span = document.getElementById(nameId);
-            if (input && span) {
-                input.addEventListener('change', (e) => {
-                    span.textContent = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
-                    span.style.color = e.target.files[0] ? '#10b981' : '#6b7280';
-                });
-            }
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            bindFileInput('validIdFile', 'validIdFileName');
-            bindFileInput('passportPhotoFile', 'passportPhotoFileName');
-            bindFileInput('specificDocFile', 'specificDocFileName');
-        });
-        function updateDocumentRequirements() {
-            const appType = document.getElementById('applicationTypeSelect').value;
-            const labelEl = document.getElementById('dynamicDocLabel');
-            const noticeEl = document.getElementById('docRequirementsNotice');
-            if (appType === 'First Time Passport') {
-                labelEl.textContent = 'PSA Birth Certificate (Original & Copy) *';
-                noticeEl.textContent = 'First-time applicants are required to upload a PSA Birth Certificate along with valid government ID and digital photo.';
-            } else if (appType === 'Passport Renewal') {
-                labelEl.textContent = 'Current / Old Philippine Passport *';
-                noticeEl.textContent = 'Passport renewal applicants must upload their current or most recently issued passport.';
-            } else if (appType === 'Lost Passport') {
-                labelEl.textContent = 'Notarized Affidavit of Loss & Police Report *';
-                noticeEl.textContent = 'For lost passports, please upload your notarized Affidavit of Loss and official Police Report.';
-            } else if (appType === 'Damaged Passport') {
-                labelEl.textContent = 'Damaged Passport & Affidavit of Mutilation *';
-                noticeEl.textContent = 'For damaged passports, please upload a clear photo of the damaged passport and your Affidavit of Mutilation.';
-            } else {
-                labelEl.textContent = 'Supporting Document *';
-                noticeEl.textContent = 'Please select an application type in Step 5 to view specific required documents.';
-            }
-        }
-        document.getElementById('applicationTypeSelect')?.addEventListener('change', updateDocumentRequirements);
-        
-        document.addEventListener('input', function (e) {
-            if (e.target && e.target.name === 'dob') {
-                const dobVal = new Date(e.target.value);
-                if (!isNaN(dobVal.getTime())) {
-                    const today = new Date(2026, 8, 20);
-                    let age = today.getFullYear() - dobVal.getFullYear();
-                    const m = today.getMonth() - dobVal.getMonth();
-                    if (m < 0 || (m === 0 && today.getDate() < dobVal.getDate())) age--;
-                    const minorContainer = document.getElementById('minorFieldsContainer');
-                    if (minorContainer) {
-                        if (age < 18) {
-                            minorContainer.style.display = 'block';
-                            minorContainer.querySelectorAll('input').forEach(input => input.required = true);
-                        } else {
-                            minorContainer.style.display = 'none';
-                            minorContainer.querySelectorAll('input').forEach(input => input.required = false);
-                        }
-                    }
-                }
-            }
-        });
-
         let currentYear = 2026;
         let currentMonth = 8;
         let selectedDateStr = '';
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-       
+
         function getSlotsForDate(dayNum) {
             return [
                 { time: "08:00 AM - 09:00 AM", status: "available", slots: 5 },
@@ -971,6 +909,8 @@
                 opt.textContent = slot.status === 'booked' ? `${slot.time} (Fully Booked)` : `${slot.time} (${slot.slots} Slots Available)`;
                 timeSelect.appendChild(opt);
             });
+            // Trigger document re-render since appointment date changed
+            refreshDocumentSlots();
         }
         document.addEventListener('DOMContentLoaded', () => renderCalendar());
 
@@ -1045,6 +985,22 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function goToStep(step) {
+            // Validate before advancing
+            if (step === 6) {
+                const validation = validateStep5BeforeAdvance();
+                if (!validation.valid) {
+                    alert(validation.message);
+                    return;
+                }
+            }
+            if (step === 7) {
+                const validation = validateStep6BeforeAdvance();
+                if (!validation.valid) {
+                    alert(validation.message);
+                    return;
+                }
+                populateReviewSummary();
+            }
             if (step === 2 && !selectedDateStr) renderCalendar();
             document.querySelectorAll('.step-pane').forEach(p => p.classList.remove('active'));
             document.getElementById('step' + step).classList.add('active');
@@ -1052,9 +1008,54 @@
                 const w = document.getElementById('wStep' + i);
                 if (w) w.classList.toggle('active', i === step);
             }
-            if (step === 7) populateReviewSummary();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // Validation wrappers for navigation
+        function validateStep5BeforeAdvance() {
+            return window.DFA_RULES_ENGINE.validateStep5('applicationTypeSelect', 'credentialReasonSelect');
+        }
+        function validateStep6BeforeAdvance() {
+            return window.DFA_RULES_ENGINE.validateStep6('dynamicDocSlots');
+        }
+        function validateAndGoToStep6() {
+            const validation = validateStep5BeforeAdvance();
+            if (!validation.valid) {
+                alert(validation.message);
+                return;
+            }
+            refreshDocumentSlots();
+            goToStep(6);
+        }
+        function validateAndGoToStep7() {
+            const validation = validateStep6BeforeAdvance();
+            if (!validation.valid) {
+                alert(validation.message);
+                return;
+            }
+            goToStep(7);
+        }
+
+        // Refresh document slots when Step 5 or Step 2/3 data changes
+        function refreshDocumentSlots() {
+            const appType = document.getElementById('applicationTypeSelect').value;
+            const credentialReason = document.getElementById('credentialReasonSelect').value;
+            const dob = document.getElementById('dobInput').value;
+            const appointmentDate = document.getElementById('selectedDateVal').value;
+
+            const age = window.DFA_RULES_ENGINE.calculateAge(dob, appointmentDate);
+
+            // Clear stale files when application type or credential reason changes
+            window.DFA_RULES_ENGINE.clearDynamicDocSlots('dynamicDocSlots');
+
+            // Render new document slots
+            window.DFA_RULES_ENGINE.renderDynamicDocSlots('dynamicDocSlots', appType, credentialReason, age);
+
+            // Update guidance banner
+            window.DFA_RULES_ENGINE.updateGuidanceBanner('docRequirementsNotice', appType, credentialReason, age);
+        }
+
+        // Populate review summary
         function populateReviewSummary() {
             const getVal = (name) => document.querySelector(`[name="${name}"]`)?.value || '-';
             document.getElementById('rev-site').innerText = document.querySelector('select[name="site"]') ? document.querySelector('select[name="site"]').options[document.querySelector('select[name="site"]').selectedIndex].text : '-';
@@ -1067,10 +1068,118 @@
             document.getElementById('rev-mobile').innerText = getVal('mobile');
             document.getElementById('rev-fathername').innerText = `${getVal('father_givenname')} ${getVal('father_lastname')}`;
             document.getElementById('rev-mothername').innerText = `${getVal('mother_givenname')} ${getVal('mother_lastname')}`;
-            document.getElementById('rev-applicationtype').innerText = normalizeAppTypeForDisplay(getVal('application_type'));
+
+            // Resolved application type
+            const appType = getVal('application_type');
+            const credReason = getVal('credential_reason');
+            const resolvedType = window.DFA_RULES_ENGINE.resolveApplicationType(appType, credReason);
+            document.getElementById('rev-applicationtype').innerText = normalizeAppTypeForDisplay(resolvedType);
+
+            // Credential reason display
+            const credReasonEl = document.getElementById('rev-credentialreason');
+            if (appType === 'Credential Updating (Change of Personal Details)' && credReason) {
+                const reasonLabel = window.DFA_RULES_ENGINE.CREDENTIAL_UPDATING_REASONS.find(r => r.value === credReason);
+                credReasonEl.textContent = reasonLabel ? reasonLabel.label : credReason;
+                credReasonEl.style.display = 'block';
+            } else {
+                credReasonEl.style.display = 'none';
+            }
+
             document.getElementById('rev-address').innerText = getVal('address');
             document.getElementById('rev-cityprovince').innerText = `${getVal('address_city')}, ${getVal('address_province')}`;
             document.getElementById('rev-emergency').innerText = `${getVal('emergency_contact')} (${getVal('emergency_number')})`;
+
+            // Documents review
+            const docLabels = window.DFA_RULES_ENGINE.getDocumentLabels('dynamicDocSlots');
+            const docListEl = document.getElementById('rev-documents-list');
+            if (docLabels.length > 0) {
+                let html = '';
+                docLabels.forEach(doc => {
+                    const isUploaded = doc.fileName && doc.fileName !== 'No file attached (to be presented on-site)';
+                    const statusColor = isUploaded ? '#10b981' : '#6b7280';
+                    const statusText = isUploaded ? '✓ Uploaded' : '○ To be presented on-site';
+                    html += `<div><strong>${doc.label}:</strong> <span style="color:${statusColor};">${doc.fileName} (${statusText})</span></div>`;
+                });
+                docListEl.innerHTML = html;
+            } else {
+                docListEl.innerHTML = 'No documents required for this application type.';
+            }
+
+            // Minor companion
+            const companionName = getVal('companion_name');
+            const companionRel = getVal('companion_relationship');
+            const companionCard = document.getElementById('rev-companion-card');
+            if (companionName && companionName !== '-') {
+                document.getElementById('rev-companion-name').innerText = companionName;
+                document.getElementById('rev-companion-rel').innerText = companionRel;
+                companionCard.style.display = 'block';
+            } else {
+                companionCard.style.display = 'none';
+            }
+        }
+
+        // Event listeners for dynamic updates
+        document.addEventListener('DOMContentLoaded', () => {
+            // Application type change
+            document.getElementById('applicationTypeSelect')?.addEventListener('change', () => {
+                refreshDocumentSlots();
+                // Show/hide credential reason dropdown
+                const credContainer = document.getElementById('credentialReasonContainer');
+                const credSelect = document.getElementById('credentialReasonSelect');
+                const appType = document.getElementById('applicationTypeSelect').value;
+                if (appType === 'Credential Updating (Change of Personal Details)') {
+                    credContainer.style.display = 'block';
+                    credSelect.required = true;
+                } else {
+                    credContainer.style.display = 'none';
+                    credSelect.required = false;
+                    credSelect.value = '';
+                }
+            });
+
+            // Credential reason change
+            document.getElementById('credentialReasonSelect')?.addEventListener('change', () => {
+                refreshDocumentSlots();
+            });
+
+            // DOB change - triggers minor fields and document refresh
+            document.getElementById('dobInput')?.addEventListener('change', () => {
+                const dobVal = document.getElementById('dobInput').value;
+                if (dobVal) {
+                    const dob = new Date(dobVal);
+                    const today = new Date(2026, 8, 20);
+                    let age = today.getFullYear() - dob.getFullYear();
+                    const m = today.getMonth() - dob.getMonth();
+                    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+                    const minorContainer = document.getElementById('minorFieldsContainer');
+                    if (minorContainer) {
+                        if (age < 18) {
+                            minorContainer.style.display = 'block';
+                            minorContainer.querySelectorAll('input').forEach(input => input.required = true);
+                        } else {
+                            minorContainer.style.display = 'none';
+                            minorContainer.querySelectorAll('input').forEach(input => input.required = false);
+                        }
+                    }
+                    refreshDocumentSlots();
+                }
+            });
+
+            // Appointment date change (handled in selectDate)
+            // Citizenship basis others
+            document.getElementById('citizenshipBasisSelect')?.addEventListener('change', (e) => {
+                document.getElementById('othersBasisContainer').style.display = e.target.value === 'OTHERS' ? 'block' : 'none';
+            });
+        });
+
+        function updateSiteInfo() {
+            const selectEl = document.getElementById('siteSelect');
+            const selectedSite = selectEl.value;
+            document.getElementById('appointmentLocationFull').value = selectEl.selectedIndex > 0 ? selectEl.options[selectEl.selectedIndex].text : '';
+            const info = dfaOfficeData[selectedSite] || { name: "-", address: "-", contact: "-" };
+            document.getElementById('officeName').value = info.name;
+            document.getElementById('officeAddress').value = info.address;
+            document.getElementById('officeContact').value = info.contact;
         }
     </script>
 </body>
