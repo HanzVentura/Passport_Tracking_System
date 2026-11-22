@@ -872,6 +872,33 @@
         }
 
         /**
+         * Normalize application type for consistent display in admin table
+         * @param {string} rawType - Raw type from database
+         * @returns {string} Normalized display label
+         */
+        function normalizeApplicationType(rawType) {
+            const type = (rawType || '').toLowerCase().trim();
+            // Renewal variants
+            if (type.includes('renewal')) {
+                return 'Renewal Application';
+            }
+            // Group variants
+            if (type.includes('group')) {
+                return 'Group Passport Application';
+            }
+            // New/First-time variants (including legacy empty/null)
+            if (type.includes('first') || type.includes('new') || type === '' || type === 'passport application') {
+                return 'New First-Time Application';
+            }
+            // Lost/Damaged/Replacement variants
+            if (type.includes('lost') || type.includes('damaged') || type.includes('replacement')) {
+                return 'Replacement Application';
+            }
+            // Fallback: return original with first letter capitalized
+            return rawType.charAt(0).toUpperCase() + rawType.slice(1);
+        }
+
+        /**
          * Generates HTML for pipeline action buttons with three-state visual architecture
          * @param {string} appId - Application ID
          * @param {string} currentStatus - Current status of the application
@@ -910,7 +937,9 @@
                     const row = document.createElement('tr');
                     const appId = app.application_id || app.applicationId;
                     const email = app.email;
-                    const type = app.application_type || app.applicationType || 'Passport Application';
+                    const rawType = app.application_type || app.applicationType || 'Passport Application';
+                    // Normalize display labels for admin table
+                    const type = normalizeApplicationType(rawType);
                     const payment = app.payment_status || app.paymentStatus || 'Paid';
                     const status = app.status || 'Form Submitted';
 

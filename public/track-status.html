@@ -152,7 +152,25 @@
     <script>
         let currentAppData = null;
         const steps = ['Form Submitted', 'Biometrics Received', 'Under Consular Review', 'In Printing', 'Dispatched'];
-       
+
+        /**
+         * Normalize application type for member-facing display (Title Case)
+         * Converts legacy ALL CAPS DB values to Title Case
+         * @param {string} rawType - Raw type from database
+         * @returns {string} Normalized Title Case display value
+         */
+        function normalizeAppTypeForDisplay(rawType) {
+            const type = (rawType || '').toLowerCase().trim();
+            if (type.includes('first') || type.includes('new first-time')) return 'First Time Passport';
+            if (type.includes('renewal')) return 'Passport Renewal';
+            if (type.includes('lost')) return 'Lost Passport';
+            if (type.includes('damaged')) return 'Damaged Passport';
+            if (type.includes('group')) return 'Group Passport Application';
+            if (type === '' || type === 'passport application') return 'First Time Passport';
+            // Already Title Case or unknown - capitalize first letter of each word
+            return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
         const dfaOfficeData = {
             "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City" },
             "ANTIPOLO": { name: "DFA Regional Consular Office – Antipolo", address: "3F SM Cherry Foodarama, Marikina-Infanta Highway, Antipolo City, Rizal" },
@@ -214,7 +232,8 @@
                     const app = currentAppData;
                    
                     document.getElementById('resAppId').textContent = app.application_id || app.applicationId || appId;
-                    document.getElementById('resType').textContent = app.application_type || app.applicationType || 'New First-Time Application';
+                    const rawAppType = app.application_type || app.applicationType || 'New First-Time Application';
+                    document.getElementById('resType').textContent = normalizeAppTypeForDisplay(rawAppType);
                     document.getElementById('resStatus').textContent = app.status || 'Form Submitted';
                     document.getElementById('resDate').textContent = (app.createdAt || app.created_at) ? new Date(app.createdAt || app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '---';
                     document.getElementById('resEstDate').textContent = `Est. Completion: ${app.estimatedCompletionDate || '---'}`;
@@ -281,7 +300,8 @@
             if (!currentAppData) return;
             const app = currentAppData;
             const appId = app.application_id || app.applicationId || 'N/A';
-            const appType = app.application_type || app.applicationType || 'New First-Time Application';
+            const rawAppType = app.application_type || app.applicationType || 'New First-Time Application';
+            const appType = normalizeAppTypeForDisplay(rawAppType);
             const status = app.status || 'Form Submitted';
             const payment = 'Verified (Online)';
             const subDate = (app.createdAt || app.created_at) ? new Date(app.createdAt || app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A';

@@ -136,27 +136,45 @@
                 ? `₱${amount.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
                 : '₱950.00';
         }
+        /**
+         * Normalize application type for member-facing display (Title Case)
+         * Converts legacy ALL CAPS DB values to Title Case
+         * @param {string} rawType - Raw type from database
+         * @returns {string} Normalized Title Case display value
+         */
+        function normalizeAppTypeForDisplay(rawType) {
+            const type = (rawType || '').toLowerCase().trim();
+            if (type.includes('first') || type.includes('new first-time')) return 'First Time Passport';
+            if (type.includes('renewal')) return 'Passport Renewal';
+            if (type.includes('lost')) return 'Lost Passport';
+            if (type.includes('damaged')) return 'Damaged Passport';
+            if (type.includes('group')) return 'Group Passport Application';
+            if (type === '' || type === 'passport application') return 'First Time Passport';
+            // Already Title Case or unknown - capitalize first letter of each word
+            return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
         function renderReceipt(application) {
             if (!application) return;
-           
+
             const paymentStatus = (application.payment_status || application.paymentStatus || '').toLowerCase();
             const appStatus = (application.status || '').toLowerCase();
-           
+
             if (paymentStatus !== 'paid' && appStatus !== 'paid' && appStatus !== 'biometrics received') {
                 return;
             }
-            const applicationType = application.applicationType
+            const rawAppType = application.applicationType
                 || application.application_type
                 || localStorage.getItem('applicationType')
                 || 'Passport Application';
+            const applicationType = normalizeAppTypeForDisplay(rawAppType);
             const appId = application.applicationId || application.application_id;
-           
+
             let rawProcessing = application.processing_type || application.processingType || 'regular';
             let processingType = 'Regular Processing';
             if (rawProcessing.toLowerCase().includes('expedited') || rawProcessing.toLowerCase().includes('rush')) {
                 processingType = 'Expedited / Rush Processing';
             }
-           
+
             receiptRows.innerHTML = `<tr>
                 <td><strong>${applicationType}</strong></td>
                 <td>${appId}</td>

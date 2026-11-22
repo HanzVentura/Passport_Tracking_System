@@ -18,7 +18,7 @@ try {
     }
 
     $application_id = $isJson ? ($input['applicationId'] ?? 'PH-GRP-' . rand(100000, 999999)) : ('PH-GRP-' . rand(100000, 999999));
-    $application_type = 'Group Passport Application';
+    $application_type = $isJson ? ($input['applicationType'] ?? 'Group Passport Application') : (!empty($_POST['application_type']) ? $_POST['application_type'] : 'Group Passport Application');
     $status = 'Form Submitted';
     $processing_type = 'Regular Processing';
     $amount = 950.00;
