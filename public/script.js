@@ -63,6 +63,16 @@ if (showSignupBtn && signupSection && loginSection && mainLayout) {
         mainLayout.classList.remove('reverse-layout');
     });
 }
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('view') === 'signup' || window.location.hash === '#signup') {
+    if (signupSection && loginSection && mainLayout) {
+        loginSection.classList.add('hidden');
+        signupSection.classList.remove('hidden');
+        mainLayout.classList.remove('reverse-layout');
+    }
+}
+
 // --- SHOW/HIDE PASSWORD TOGGLE LOGIC ---
 const togglePasswordButtons = document.querySelectorAll('.toggle-password');
 togglePasswordButtons.forEach(button => {
