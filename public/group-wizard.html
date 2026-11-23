@@ -403,7 +403,7 @@
                             </div>
                         </div>
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="goToStep(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-secondary" onclick="window.GroupBooking.goToStep(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
                             <button type="button" class="btn-primary" onclick="groupHandleNext(3)">Next: Start Applicant Details <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
@@ -530,7 +530,7 @@
                             </div>
                         </div>
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="goToStep(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-secondary" onclick="window.GroupBooking.goToStep(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
                             <button type="button" class="btn-primary" onclick="groupHandleNext(5)">Next <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
@@ -590,7 +590,7 @@
                             </div>
                         </div>
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="goToStep(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-secondary" onclick="window.GroupBooking.goToStep(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
                             <button type="button" class="btn-primary" onclick="groupValidateAndGoToStep6()">Next: Documents <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
@@ -607,8 +607,8 @@
                             <div id="dynamicDocSlotsGroup"></div>
                         </div>
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="goToStep(5)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                            <button type="button" class="btn-primary" onclick="groupValidateAndGoToStep7()">Review Details <i class="fa-solid fa-arrow-right"></i></button>
+                            <button type="button" class="btn-secondary" onclick="window.GroupBooking.goToStep(5)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" id="step6NextBtn" onclick="window.GroupBooking.handleStep6Next()">Review Details <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
                     <!-- STEP 7: Review -->
@@ -626,7 +626,7 @@
                         </div>
 
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="goToStep(6)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-secondary" onclick="window.GroupBooking.handleBackFromStep7()"><i class="fa-solid fa-arrow-left"></i> Back</button>
                             <button type="submit" class="btn-primary" style="background-color: #10b981;"><i class="fa-solid fa-check"></i> Save & Submit Group</button>
                         </div>
                     </section>
@@ -634,7 +634,11 @@
             </div>
         </main>
     </div>
+    <script src="passport-application.js"></script>
     <script>
+        // Global store for per-applicant File objects (cannot be stored in localStorage)
+        window.applicantFiles = {};
+
         async function loadUserData() {
             try {
                 const response = await fetch('../api/user-data.php');
@@ -727,17 +731,16 @@
                 opt.textContent = slot.status === 'booked' ? `${slot.time} (Fully Booked)` : `${slot.time} (${slot.slots} Slots)`;
                 timeSelect.appendChild(opt);
             });
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
-            if (!groupData['applicant_1']) groupData['applicant_1'] = {};
-            groupData['applicant_1']['site_selection'] = document.getElementById('siteSelect')?.value || '';
-            groupData['applicant_1']['app_date_selection'] = dateStr;
-            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+            // Sync to GroupBooking state
+            if (window.GroupBooking && window.GroupBooking.commitApplicantToState) {
+                window.GroupBooking.commitApplicantToState(0);
+            }
         }
         function updateTimeSelection() {
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
-            if (!groupData['applicant_1']) groupData['applicant_1'] = {};
-            groupData['applicant_1']['app_time_selection'] = document.getElementById('appTimeSelect').value;
-            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+            // Sync to GroupBooking state
+            if (window.GroupBooking && window.GroupBooking.commitApplicantToState) {
+                window.GroupBooking.commitApplicantToState(0);
+            }
         }
         document.addEventListener('DOMContentLoaded', () => renderCalendar());
         const dfaOfficeData = {
@@ -794,54 +797,32 @@
                 document.getElementById('officeContact').value = info.contact;
             }
         }
-        function goToStep(stepNumber) {
-            document.querySelectorAll('.step-pane').forEach(pane => pane.classList.remove('active'));
-            document.getElementById('step' + stepNumber).classList.add('active');
-            for (let i = 1; i <= 7; i++) {
-                const wStep = document.getElementById('wStep' + i);
-                if (wStep) wStep.classList.toggle('active', i === stepNumber);
-            }
-            if (stepNumber === 7) populateReviewSummary();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        let currentStep = parseInt(urlParams.get('step')) || 1;
-        let currentApplicant = parseInt(urlParams.get('applicant')) || 1;
-        const totalApplicants = parseInt(localStorage.getItem('groupCount')) || 2;
-
+        // Initialize GroupBooking state on load
         document.addEventListener('DOMContentLoaded', () => {
+            // Get group count from URL or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const groupCount = parseInt(urlParams.get('count')) || parseInt(localStorage.getItem('groupCount')) || 2;
+
+            // Initialize GroupBooking state (FR-1)
+            window.GroupBooking.initGroupBookingState(groupCount);
+
+            // Determine current applicant and step from URL
+            let currentStep = parseInt(urlParams.get('step')) || 1;
+            let currentApplicant = parseInt(urlParams.get('applicant')) || 1;
+
+            // Applicants 2+ start at Step 3 (Personal Info) since Steps 1-2 are shared
             if (currentApplicant > 1 && currentStep < 3) currentStep = 3;
-            goToStep(currentStep);
-            updateApplicantBadge();
 
-            if (currentApplicant > 1) {
-                let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
-                let app1 = groupData['applicant_1'] || {};
-                let currApp = groupData[`applicant_${currentApplicant}`] || {};
+            // Hydrate form for current applicant (FR-2/FR-5)
+            window.GroupBooking.hydrateApplicantForm(currentApplicant - 1);
 
-                currApp['site_selection'] = app1['site_selection'] || '';
-                currApp['app_date_selection'] = app1['app_date_selection'] || '';
-                currApp['app_time_selection'] = app1['app_time_selection'] || '';
-
-                groupData[`applicant_${currentApplicant}`] = currApp;
-                localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
-            }
+            // Navigate to current step (with FR-3 guard for Step 7)
+            window.GroupBooking.goToStep(currentStep);
 
             // Initialize group-specific event listeners
             initializeGroupEventListeners();
         });
-
-        function updateApplicantBadge() {
-            const badgeDiv = document.getElementById('groupApplicantBadge') || document.createElement('div');
-            badgeDiv.id = 'groupApplicantBadge';
-            badgeDiv.style.cssText = 'background: #eff6ff; color: #1e40af; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; margin-bottom: 24px; border: 1px solid #dbeafe; box-shadow: 0 2px 4px rgba(0,0,0,0.02);';
-            badgeDiv.textContent = `Group Booking: Filling out details for Applicant ${currentApplicant} of ${totalApplicants}`;
-            const container = document.querySelector('.dashboard-container');
-            if (container && !document.getElementById('groupApplicantBadge')) {
-                container.insertBefore(badgeDiv, container.firstChild);
-            }
-        }
 
         // Initialize group-specific event listeners
         function initializeGroupEventListeners() {
@@ -898,18 +879,48 @@
 
         // Refresh document slots for current applicant in group
         function refreshGroupDocumentSlots() {
-            const appType = document.getElementById('applicationTypeSelectGroup').value;
-            const credentialReason = document.getElementById('credentialReasonSelectGroup').value;
-            const dob = document.getElementById('dobInput').value;
-            const appointmentDate = document.getElementById('selectedDateVal').value;
+            const state = window.groupBookingState;
+            if (!state || !state.isInitialized) return;
+
+            const index = state.currentApplicantIndex;
+            const prefix = `applicant_${index + 1}_`;
+            const appData = state.groupApplicantsData[index] || {};
+
+            const appType = appData.application_type || document.getElementById('applicationTypeSelectGroup')?.value || '';
+            const credentialReason = appData.credential_reason || document.getElementById('credentialReasonSelectGroup')?.value || '';
+            const dob = appData.dob || document.getElementById('dobInput')?.value || '';
+            const appointmentDate = appData.app_date_selection || document.getElementById('selectedDateVal')?.value || '';
 
             const age = window.DFA_RULES_ENGINE.calculateAge(dob, appointmentDate);
 
             // Clear stale files when application type or credential reason changes
-            window.DFA_RULES_ENGINE.clearDynamicDocSlots('dynamicDocSlotsGroup', `applicant_${currentApplicant}_`);
+            window.DFA_RULES_ENGINE.clearDynamicDocSlots('dynamicDocSlotsGroup', prefix);
+
+            // Clear stored File objects for this applicant when type/reason changes
+            if (window.applicantFiles[prefix]) {
+                delete window.applicantFiles[prefix];
+            }
 
             // Render new document slots with applicant prefix
-            window.DFA_RULES_ENGINE.renderDynamicDocSlots('dynamicDocSlotsGroup', appType, credentialReason, age, `applicant_${currentApplicant}_`);
+            window.DFA_RULES_ENGINE.renderDynamicDocSlots('dynamicDocSlotsGroup', appType, credentialReason, age, prefix);
+
+            // Bind file change events to store File objects per applicant
+            const container = document.getElementById('dynamicDocSlotsGroup');
+            if (container) {
+                container.querySelectorAll('input[type="file"]').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        if (!window.applicantFiles[prefix]) {
+                            window.applicantFiles[prefix] = {};
+                        }
+                        const docKey = input.name; // Already prefixed (e.g., "applicant_1_psa_birth_cert")
+                        if (e.target.files[0]) {
+                            window.applicantFiles[prefix][docKey] = e.target.files[0];
+                        } else {
+                            delete window.applicantFiles[prefix][docKey];
+                        }
+                    });
+                });
+            }
 
             // Update guidance banner
             window.DFA_RULES_ENGINE.updateGuidanceBanner('docRequirementsNoticeGroup', appType, credentialReason, age);
@@ -929,7 +940,7 @@
                 return;
             }
             refreshGroupDocumentSlots();
-            goToStep(6);
+            window.GroupBooking.goToStep(6);
         }
         function groupValidateAndGoToStep7() {
             const validation = groupValidateStep6BeforeAdvance();
@@ -937,163 +948,63 @@
                 alert(validation.message);
                 return;
             }
-            goToStep(7);
+            window.GroupBooking.goToStep(7);
         }
 
         function groupHandleNext(targetStep) {
-            saveCurrentApplicantData();
+            // Commit current applicant data (FR-2)
+            window.GroupBooking.commitApplicantToState(window.groupBookingState.currentApplicantIndex);
+
             if (targetStep > 6) {
-                if (currentApplicant < totalApplicants) {
-                    currentApplicant++;
-                    currentStep = 3;
-                    window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
-                    return;
-                } else {
-                    currentStep = 7;
-                }
+                // Use GroupBooking's sequential applicant loop (FR-2)
+                window.GroupBooking.handleStep6Next();
             } else {
-                currentStep = targetStep;
+                window.GroupBooking.goToStep(targetStep);
             }
-            goToStep(currentStep);
         }
         function groupHandleBack(targetStep) {
-            if (targetStep < 3 && currentApplicant > 1) {
-                currentApplicant--;
-                currentStep = 6;
-                window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
-                return;
-            }
-            goToStep(targetStep);
-        }
-        function saveCurrentApplicantData() {
-            const formData = new FormData(document.getElementById('passportForm'));
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
-
-            let sharedSite = document.getElementById('siteSelect')?.value || '';
-            let sharedDate = document.getElementById('selectedDateVal')?.value || '';
-            let sharedTime = document.getElementById('appTimeSelect')?.value || '';
-
-            let appData = groupData[`applicant_${currentApplicant}`] || {};
-            formData.forEach((value, key) => {
-                appData[key] = value;
-            });
-
-            if (currentApplicant === 1) {
-                if (sharedSite) appData['site_selection'] = sharedSite;
-                if (sharedDate) appData['app_date_selection'] = sharedDate;
-                if (sharedTime) appData['app_time_selection'] = sharedTime;
-            } else {
-                let app1 = groupData['applicant_1'] || {};
-                appData['site_selection'] = app1['site_selection'] || sharedSite;
-                appData['app_date_selection'] = app1['app_date_selection'] || sharedDate;
-                appData['app_time_selection'] = app1['app_time_selection'] || sharedTime;
-            }
-
-            groupData[`applicant_${currentApplicant}`] = appData;
-            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
-        }
-
-        // Populate review summary for all applicants
-        function populateReviewSummary() {
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
-            let app1 = groupData['applicant_1'] || {};
-            const reviewGrid = document.getElementById('groupReviewGrid');
-            if (!reviewGrid) return;
-            let htmlContent = '';
-            for (let i = 1; i <= totalApplicants; i++) {
-                let app = groupData[`applicant_${i}`] || {};
-                let fullName = `${app.givenname || ''} ${app.lastname || ''}`.trim() || '-';
-
-                let site = app.site_selection || app1.site_selection || '-';
-                let date = app.app_date_selection || app1.app_date_selection || '-';
-                let time = app.app_time_selection || app1.app_time_selection || '-';
-
-                // Resolved application type for this applicant
-                const appType = app.application_type || '-';
-                const credReason = app.credential_reason || '';
-                const resolvedType = window.DFA_RULES_ENGINE.resolveApplicationType(appType, credReason);
-
-                // Document labels for this applicant
-                const docLabels = window.DFA_RULES_ENGINE.getDocumentLabels(`dynamicDocSlotsGroup`); // Note: this gets current applicant's docs
-                // For review, we need to show each applicant's docs - we'll compute from stored data
-                let docHtml = '<div style="font-size: 13px; line-height: 1.8; color: #334155;">Documents will be shown after validation.</div>';
-
-                htmlContent += `
-                    <div class="summary-card" style="background: #f8fafc; border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-sm); grid-column: span 2; margin-bottom: 15px;">
-                        <h4 style="font-size: 15px; color: var(--primary); margin-bottom: 12px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; font-weight: 700; text-transform: uppercase;">Applicant ${i}: ${fullName}</h4>
-                        <div style="font-size: 13px; line-height: 1.8; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; color: #334155;">
-                            <div>
-                                <div><strong>Application Type:</strong> ${normalizeAppTypeForDisplay(resolvedType)}</div>
-                                <div><strong>Email:</strong> ${app.email || '-'}</div>
-                                <div><strong>Mobile:</strong> ${app.mobile || '-'}</div>
-                            </div>
-                            <div>
-                                <div><strong>DOB:</strong> ${app.dob || '-'}</div>
-                                <div><strong>Site:</strong> ${site}</div>
-                                <div><strong>Date/Time:</strong> ${date} (${time})</div>
-                            </div>
-                        </div>
-                        <div id="rev-documents-applicant-${i}" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); font-size: 12px; color: #64748b;">
-                            <strong>Required Documents:</strong> Select application type to see requirements.
-                        </div>
-                    </div>
-                `;
-            }
-            reviewGrid.innerHTML = htmlContent;
-
-            // Now populate document requirements for each applicant in review
-            for (let i = 1; i <= totalApplicants; i++) {
-                let app = groupData[`applicant_${i}`] || {};
-                const appType = app.application_type || 'First-Time Passport';
-                const credReason = app.credential_reason || '';
-                const dob = app.dob || '';
-                const apptDate = app.app_date_selection || app1.app_date_selection || '';
-                const age = window.DFA_RULES_ENGINE.calculateAge(dob, apptDate);
-                const docs = window.DFA_RULES_ENGINE.getRequiredDocuments(appType, credReason, age);
-
-                const docEl = document.getElementById(`rev-documents-applicant-${i}`);
-                if (docEl && docs.length > 0) {
-                    let html = '<ul style="margin: 8px 0 0 0; padding-left: 20px;">';
-                    docs.forEach(doc => {
-                        html += `<li>${doc.label} ${doc.required ? '<span style="color:#ef4444;">*</span>' : ''} <span style="color:#6b7280; font-weight:400;">(to be presented on-site if not uploaded)</span></li>`;
-                    });
-                    html += '</ul>';
-                    docEl.innerHTML = html;
-                }
+            // Use GroupBooking's back navigation (FR-5)
+            const handled = window.GroupBooking.handleBackFromApplicantEntry(targetStep);
+            if (!handled) {
+                window.GroupBooking.goToStep(targetStep);
             }
         }
 
         document.getElementById('passportForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            saveCurrentApplicantData();
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
-            let app1 = groupData['applicant_1'] || {};
+
+            // Commit final applicant data
+            window.GroupBooking.commitApplicantToState(window.groupBookingState.currentApplicantIndex);
+
+            const state = window.groupBookingState;
+            const app1 = state.groupApplicantsData[0] || {};
 
             document.getElementById('hiddenSite').value = app1.site_selection || '';
             document.getElementById('hiddenAppDate').value = app1.app_date_selection || '';
             document.getElementById('hiddenAppTime').value = app1.app_time_selection || '';
-            document.getElementById('groupDataPayload').value = JSON.stringify(groupData);
+            document.getElementById('groupDataPayload').value = JSON.stringify(state.groupApplicantsData);
 
             const userEmail = localStorage.getItem('userEmail') || app1.email || 'group@applicant.com';
-            const randomGrpId = `PH-GRP-${Math.floor(100000 + Math.random() * 900000)}`;
 
-            // Read the actual application type from applicant_1's form select
-            const applicationType = app1.application_type || 'Group Passport Application';
+            // Build FormData with all applicant data and files
+            const formData = new FormData();
+            formData.append('email', userEmail);
+            formData.append('appointmentLocation', app1.site_selection || 'ANGELES');
+            formData.append('appointmentDate', app1.app_date_selection || '2027-01-01');
+            formData.append('appointmentTime', app1.app_time_selection || '15:00');
+            formData.append('group_data_payload', JSON.stringify(state.groupApplicantsData));
+
+            // Append per-applicant File objects from window.applicantFiles
+            for (const [prefix, files] of Object.entries(window.applicantFiles)) {
+                for (const [docKey, file] of Object.entries(files)) {
+                    formData.append(docKey, file);
+                }
+            }
 
             try {
                 const response = await fetch('../api/submit-group-application.php', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: userEmail,
-                        applicationId: randomGrpId,
-                        applicationType: applicationType,
-                        status: 'Form Submitted',
-                        appointmentDate: app1.app_date_selection || '2027-01-01',
-                        appointmentTime: app1.app_time_selection || '15:00',
-                        appointmentLocation: app1.site_selection || 'ANGELES',
-                        groupPayload: groupData
-                    })
+                    body: formData
                 });
 
                 const result = await response.json();
@@ -1101,7 +1012,7 @@
                     throw new Error(result.message || 'Unable to save group application.');
                 }
 
-                const savedAppId = result.application_id || result.applicationId || randomGrpId;
+                const savedAppId = result.application_id || result.applicationId || `PH-GRP-${Math.floor(100000 + Math.random() * 900000)}`;
                 localStorage.setItem('currentApplicationId', savedAppId);
                 localStorage.setItem('activeAppId', savedAppId);
 

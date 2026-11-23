@@ -14,21 +14,41 @@ try {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
     // 2. Applications table with 6-step lifecycle support
+    // R.A. 11983 compliant - includes all applicant personal details
     $pdo->exec("CREATE TABLE IF NOT EXISTS applications (
         id INT AUTO_INCREMENT PRIMARY KEY,
         application_id VARCHAR(100) UNIQUE NOT NULL,
         email VARCHAR(255) NOT NULL,
-        application_type VARCHAR(100) NOT NULL,
+        application_type VARCHAR(150) NOT NULL,
         status VARCHAR(100) DEFAULT 'Form Submitted',
         processing_type VARCHAR(100) NOT NULL,
         amount DECIMAL(10,2) NOT NULL,
         payment_status VARCHAR(50) DEFAULT 'Pending',
         payment_method VARCHAR(50) DEFAULT NULL,
+        receiving_option VARCHAR(50) DEFAULT 'In-Person',
+        delivery_address TEXT DEFAULT NULL,
         appointment_date VARCHAR(50) DEFAULT NULL,
         appointment_time VARCHAR(50) DEFAULT NULL,
         appointment_location VARCHAR(255) DEFAULT NULL,
+        givenname VARCHAR(100) DEFAULT NULL,
+        middlename VARCHAR(100) DEFAULT NULL,
+        lastname VARCHAR(100) DEFAULT NULL,
+        extname VARCHAR(50) DEFAULT NULL,
+        dob DATE DEFAULT NULL,
+        sex VARCHAR(20) DEFAULT NULL,
+        civil_status VARCHAR(50) DEFAULT NULL,
+        birth_place VARCHAR(255) DEFAULT NULL,
+        citizenship VARCHAR(100) DEFAULT 'Filipino',
+        passport_type VARCHAR(50) DEFAULT 'Regular',
+        mobile VARCHAR(50) DEFAULT NULL,
+        address TEXT DEFAULT NULL,
+        emergency_contact VARCHAR(255) DEFAULT NULL,
+        emergency_phone VARCHAR(50) DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_applications_email (email),
+        INDEX idx_applications_status (status),
+        INDEX idx_applications_app_id (application_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
     // 3. Enquiries table
