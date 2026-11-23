@@ -1,0 +1,132 @@
+body {
+    --member-sidebar-width: 260px;
+}
+
+.sidebar {
+    width: var(--member-sidebar-width) !important;
+    flex: 0 0 var(--member-sidebar-width) !important;
+    height: 100vh !important;
+    position: sticky !important;
+    top: 0 !important;
+    padding: 24px 0 !important;
+}
+
+.sidebar-top {
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0;
+}
+
+.user-profile-mini {
+    min-height: 58px;
+    padding: 0 24px 20px !important;
+    margin-bottom: 16px !important;
+}
+
+.user-profile-mini i {
+    width: 38px;
+    margin-right: 12px !important;
+    text-align: center;
+}
+
+.nav-links {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+.nav-links li {
+    margin: 0 !important;
+}
+
+.nav-links li a {
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 24px !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    gap: 0;
+    line-height: 20px;
+}
+
+.nav-links li a i {
+    width: 16px !important;
+    margin-right: 12px !important;
+    font-size: 16px !important;
+    flex: 0 0 16px;
+    text-align: center;
+}
+
+.nav-links li.active a,
+.nav-links li a:hover {
+    border-right: 4px solid var(--primary) !important;
+}
+
+.sidebar-bottom {
+    width: 100%;
+    padding: 0 24px !important;
+}
+
+.sidebar-bottom a {
+    min-height: 44px;
+    padding: 12px 0 !important;
+}
+
+.sidebar-bottom a i {
+    width: 16px;
+    margin-right: 12px !important;
+    text-align: center;
+}
+
+@media (max-width: 680px) {
+    body {
+        display: block !important;
+    }
+
+    .sidebar {
+        width: 100% !important;
+        height: auto !important;
+        position: relative !important;
+        flex: none !important;
+        padding: 12px 0 !important;
+    }
+
+    .sidebar-bottom {
+        display: none !important;
+    }
+
+    .user-profile-mini {
+        min-height: auto;
+        padding: 0 16px 12px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .nav-links {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .nav-links li a {
+        min-height: 58px;
+        padding: 8px 4px !important;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 11px !important;
+        line-height: 14px;
+        text-align: center;
+    }
+
+    .nav-links li a i {
+        width: auto !important;
+        margin: 0 !important;
+        flex: none;
+    }
+
+    .nav-links li.active a,
+    .nav-links li a:hover {
+        border-right: 0 !important;
+        border-bottom: 3px solid var(--primary) !important;
+    }
+}
