@@ -1,23 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const openBtn = document.getElementById('openForgotPasswordBtn');
-    const modal = document.getElementById('forgotPasswordModal');
-    const closeBtn = document.getElementById('closeForgotPasswordModal');
-    const backToLoginLink = document.getElementById('fpBackToLoginLink');
-    const doneBtn = document.getElementById('fpDoneBtn');
-
-    const requestStep = document.getElementById('fpRequestStep');
-    const confirmationStep = document.getElementById('fpConfirmationStep');
-    const confirmationText = document.getElementById('fpConfirmationText');
-
-    const form = document.getElementById('forgotPasswordForm');
-    const emailInput = document.getElementById('fpEmailInput');
-    const loginEmailInput = document.getElementById('login-email');
-    const submitBtn = document.getElementById('fpSubmitBtn');
-    const errorMsg = document.getElementById('fpErrorMessage');
-
-    if (!openBtn || !modal || !form) return;
+    function getModalElements() {
+        return {
+            modal: document.getElementById('forgotPasswordModal'),
+            requestStep: document.getElementById('fpRequestStep'),
+            confirmationStep: document.getElementById('fpConfirmationStep'),
+            confirmationText: document.getElementById('fpConfirmationText'),
+            form: document.getElementById('forgotPasswordForm'),
+            emailInput: document.getElementById('fpEmailInput'),
+            loginEmailInput: document.getElementById('login-email'),
+            submitBtn: document.getElementById('fpSubmitBtn'),
+            errorMsg: document.getElementById('fpErrorMessage')
+        };
+    }
 
     function resetModalState() {
+        const { errorMsg, confirmationStep, requestStep, submitBtn } = getModalElements();
         if (errorMsg) {
             errorMsg.textContent = '';
             errorMsg.classList.add('hidden');
@@ -32,47 +29,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openModal(e) {
         if (e) e.preventDefault();
+        const { modal, emailInput, loginEmailInput } = getModalElements();
+        if (!modal) return;
+
         resetModalState();
 
-        // Pre-fill email if user already typed an email in the login input
         if (emailInput && loginEmailInput && loginEmailInput.value.includes('@')) {
             emailInput.value = loginEmailInput.value.trim();
         }
 
         modal.classList.remove('hidden');
+        modal.style.display = 'flex';
         if (emailInput) emailInput.focus();
     }
 
     function closeModal(e) {
         if (e) e.preventDefault();
+        const { modal } = getModalElements();
+        if (!modal) return;
+
         modal.classList.add('hidden');
+        modal.style.display = '';
     }
 
-    openBtn.addEventListener('click', openModal);
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    if (backToLoginLink) backToLoginLink.addEventListener('click', closeModal);
-    if (doneBtn) doneBtn.addEventListener('click', closeModal);
+    // Delegated click listener so Forgot Password & modal controls always stay clickable
+    document.addEventListener('click', (e) => {
+        const openTrigger = e.target.closest('#openForgotPasswordBtn, .forgot-password-link');
+        if (openTrigger) {
+            openModal(e);
+            return;
+        }
 
-    // Close when clicking the dark backdrop outside the card
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeModal();
+        const closeTrigger = e.target.closest('#closeForgotPasswordModal, #fpBackToLoginLink, #fpDoneBtn');
+        if (closeTrigger) {
+            closeModal(e);
+            return;
+        }
+
+        const { modal } = getModalElements();
+        if (modal && e.target === modal) {
+            closeModal(e);
         }
     });
 
-    if (emailInput) {
-        emailInput.addEventListener('input', () => {
+    // Clear error message while typing
+    document.addEventListener('input', (e) => {
+        if (e.target && e.target.id === 'fpEmailInput') {
+            const { errorMsg } = getModalElements();
             if (errorMsg) {
                 errorMsg.textContent = '';
                 errorMsg.classList.add('hidden');
             }
-        });
-    }
+        }
+    });
 
-    form.addEventListener('submit', async (e) => {
+    // Delegated form submission handler
+    document.addEventListener('submit', async (e) => {
+        if (!e.target || e.target.id !== 'forgotPasswordForm') return;
         e.preventDefault();
 
+        const { emailInput, submitBtn, errorMsg, requestStep, confirmationStep, confirmationText } = getModalElements();
         const email = emailInput ? emailInput.value.trim() : '';
+
         if (!email) {
             if (errorMsg) {
                 errorMsg.textContent = 'Please enter your email address.';
@@ -93,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
             });
-
             const result = await response.json();
 
             if (result.success) {

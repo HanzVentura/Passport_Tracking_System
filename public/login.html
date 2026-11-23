@@ -50,7 +50,7 @@
                         </div>
                         <button type="submit" class="btn-signup">Sign Up</button>
                     </form>
-                    
+                   
                     <!-- Professional Full-Width Track Status Button -->
                     <div class="track-link-container">
                         <a href="./index.html" class="track-link-btn">
@@ -58,14 +58,11 @@
                             <span>Track Application Status</span>
                         </a>
                     </div>
-
                     <p class="login-text" style="margin-top: 20px;">Already have an account? <a href="#" id="show-login">Log In</a></p>
-
                     <p class="faq-text" style="margin-top: 12px; text-align: center; font-size: 14px;">
                       <i class="fa-solid fa-circle-question" style="color: #4a90e2;"></i> Have questions?
                       <a href="faq.html" style="color: #4a90e2; font-weight: 600; text-decoration: underline;">Browse Passport FAQ</a>
                     </p>
-
                 </div>
                 <!-- === LOG IN SECTION === -->
                 <div id="login-section">
@@ -95,7 +92,7 @@
                         </div>
                        
                         <div class="forgot-password-container">
-                            <a href="#" class="forgot-password-link">Forgot Password</a>
+                            <a href="#" id="openForgotPasswordBtn" class="forgot-password-link">Forgot Password</a>
                         </div>
                         <button type="submit" class="btn-login-new">Log In</button>
                     </form>
@@ -107,14 +104,11 @@
                             <span>Track Application Status</span>
                         </a>
                     </div>
-
                     <p class="login-text" style="margin-top: 20px;">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
-
                     <p class="faq-text" style="margin-top: 12px; text-align: center; font-size: 14px;">
                       <i class="fa-solid fa-circle-question" style="color: #4a90e2;"></i> Have questions?
                       <a href="faq.html" style="color: #4a90e2; font-weight: 600; text-decoration: underline;">Browse Passport FAQ</a>
                     </p>
-
                 </div>
             </div>
             <div class="clouds-bg"></div>
@@ -139,6 +133,34 @@
             </div>
         </div>
     </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="fpModalTitle" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(2px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: #ffffff; border-radius: 20px; max-width: 440px; width: 100%; padding: 32px 28px; position: relative; box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.25); border: 1px solid #e2e8f0; text-align: left;">
+            <button type="button" id="closeForgotPasswordModal" aria-label="Close modal" style="position: absolute; top: 18px; right: 20px; width: 32px; height: 32px; border-radius: 999px; background: #f1f5f9; border: none; font-size: 18px; color: #475569; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
+            <div id="fpRequestStep">
+                <h2 id="fpModalTitle" style="font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0; letter-spacing: -0.02em;">Forgot Password</h2>
+                <p style="font-size: 14px; color: #64748b; margin: 0 0 22px 0; line-height: 1.55;">Enter your registered email address and we'll send you password reset instructions.</p>
+                <p id="fpErrorMessage" class="error-text hidden" style="margin-bottom: 14px;"></p>
+                <form id="forgotPasswordForm">
+                    <div style="margin-bottom: 18px;">
+                        <label for="fpEmailInput" style="display: block; font-size: 13px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">Email Address</label>
+                        <input type="email" id="fpEmailInput" name="email" required placeholder="you@example.com" style="width: 100%; height: 46px; padding: 0 14px; font-size: 14px; color: #0f172a; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; outline: none; box-sizing: border-box;">
+                    </div>
+                    <button type="submit" id="fpSubmitBtn" style="width: 100%; height: 46px; border: none; border-radius: 10px; background: #4f46e5; color: #ffffff; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);">Send Reset Link</button>
+                </form>
+                <div style="margin-top: 18px; text-align: center;">
+                    <a href="#" id="fpBackToLoginLink" style="font-size: 13px; font-weight: 600; color: #475569; text-decoration: none;">Back to Log In</a>
+                </div>
+            </div>
+            <div id="fpConfirmationStep" class="hidden">
+                <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0; letter-spacing: -0.02em;">Check Your Inbox</h2>
+                <p id="fpConfirmationText" style="font-size: 14px; color: #64748b; margin: 0 0 22px 0; line-height: 1.55;"></p>
+                <button type="button" id="fpDoneBtn" style="width: 100%; height: 46px; border: none; border-radius: 10px; background: #4f46e5; color: #ffffff; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);">Done</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Success Screen Overlay -->
     <div class="success-overlay hidden" id="successScreen">
         <div class="success-box">
@@ -154,5 +176,6 @@
         <div class="clouds-bg"></div>
     </div>
     <script src="script.js"></script>
+    <script src="forgot-password.js"></script>
 </body>
 </html>
