@@ -582,6 +582,26 @@
                         </div>
                     </div>
                 </div>
+                <!-- Application History -->
+                <div class="selection-section-title">Application History</div>
+                <div class="card dashboard-card" style="margin-bottom:24px;">
+                    <div id="applicationHistoryLoading" style="font-size:13px;color:var(--text-muted);">Loading application history...</div>
+                    <div id="applicationHistoryEmpty" style="display:none;font-size:13px;color:var(--text-muted);">No previous applications found.</div>
+                    <div id="applicationHistoryWrap" style="display:none; max-height:260px; overflow:auto;">
+                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:left; padding:10px; background:#f8fafc; border-bottom:1px solid var(--border-color); position:sticky; top:0;">Application</th>
+                                    <th style="text-align:left; padding:10px; background:#f8fafc; border-bottom:1px solid var(--border-color); position:sticky; top:0;">Type</th>
+                                    <th style="text-align:left; padding:10px; background:#f8fafc; border-bottom:1px solid var(--border-color); position:sticky; top:0;">Status</th>
+                                    <th style="text-align:left; padding:10px; background:#f8fafc; border-bottom:1px solid var(--border-color); position:sticky; top:0;">Submitted</th>
+                                    <th style="text-align:left; padding:10px; background:#f8fafc; border-bottom:1px solid var(--border-color); position:sticky; top:0;">Payment</th>
+                                </tr>
+                            </thead>
+                            <tbody id="applicationHistoryTable"></tbody>
+                        </table>
+                    </div>
+                </div>
                 <!-- Start Application Section -->
                 <div class="selection-section-title">Start Application</div>
                 <a class="action-banner-card" href="new-passport.html">
@@ -722,6 +742,54 @@
             // Already Title Case or unknown - capitalize first letter of each word
             return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         }
+
+        async function loadApplicationHistory() {
+            const loading = document.getElementById('applicationHistoryLoading');
+            const empty = document.getElementById('applicationHistoryEmpty');
+            const wrap = document.getElementById('applicationHistoryWrap');
+            const table = document.getElementById('applicationHistoryTable');
+
+            try {
+                const response = await fetch('../api/applications.php?action=list_member', {
+                    credentials: 'same-origin',
+                    cache: 'no-store'
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.message || 'Unable to load application history.');
+
+                const applications = result.applications || [];
+                if (applications.length === 0) {
+                    loading.style.display = 'none';
+                    empty.style.display = 'block';
+                    return;
+                }
+
+                table.innerHTML = applications.map((application) => {
+                    const appId = application.application_id || application.applicationId || '-';
+                    const type = normalizeAppTypeForDisplay(application.application_type || application.applicationType || '-');
+                    const status = application.status || 'Form Submitted';
+                    const submitted = application.created_at
+                        ? new Date(application.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                        : '-';
+                    const payment = application.payment_status === 'Paid' ? 'Paid' : 'Pending';
+                    return `
+                        <tr>
+                            <td style="padding:12px 10px;border-bottom:1px solid #f1f5f9;"><strong>${appId}</strong></td>
+                            <td style="padding:12px 10px;border-bottom:1px solid #f1f5f9;">${type}</td>
+                            <td style="padding:12px 10px;border-bottom:1px solid #f1f5f9;">${status}</td>
+                            <td style="padding:12px 10px;border-bottom:1px solid #f1f5f9;">${submitted}</td>
+                            <td style="padding:12px 10px;border-bottom:1px solid #f1f5f9;">${payment}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                loading.style.display = 'none';
+                wrap.style.display = 'block';
+            } catch (error) {
+                loading.textContent = error.message || 'Unable to load application history.';
+            }
+        }
+
         function displaySavedApplication(application) {
             currentAppData = application;
             const appId = application.application_id || application.applicationId;
@@ -885,6 +953,7 @@
         }
        
         window.addEventListener('DOMContentLoaded', async () => {
+            loadApplicationHistory();
             let sessionEmail = '';
             try {
                 const response = await fetch('../api/user-data.php');

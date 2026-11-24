@@ -9,6 +9,27 @@ $action = $input['action'] ?? $_GET['action'] ?? '';
 if (empty($action) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $action = 'list_all';
 }
+
+// Member application history
+if ($action === 'list_member') {
+    requireMember();
+    try {
+        $email = getSessionEmail();
+        if (!$email) {
+            jsonError('Authentication required.', 401);
+        }
+        $stmt = $pdo->prepare("SELECT * FROM applications WHERE email = ? ORDER BY id DESC");
+        $stmt->execute([$email]);
+        $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'applications' => $applications]);
+        exit;
+    } catch (PDOException $e) {
+        error_log('applications.php member history error: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Unable to load application history.']);
+        exit;
+    }
+}
 // Handle Admin Request to List All Applications
 if ($action === 'list_all') {
     requireAdmin();
@@ -190,8 +211,8 @@ if (!$email || !$applicationId) {
     exit;
 }
 try {
-    $updateStmt = $pdo->prepare("UPDATE applications SET application_id = ?, application_type = ?, status = 'Form Submitted', appointment_date = ?, appointment_time = ?, appointment_location = ?, updated_at = CURRENT_TIMESTAMP WHERE email = ?");
-    $updateStmt->execute([$applicationId, $applicationType, $appointmentDate, $appointmentTime, $appointmentLocation, $email]);
+    $updateStmt = $pdo->prepare("UPDATE applications SET application_type = ?, status = 'Form Submitted', appointment_date = ?, appointment_time = ?, appointment_location = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ? AND email = ?");
+    $updateStmt->execute([$applicationType, $appointmentDate, $appointmentTime, $appointmentLocation, $applicationId, $email]);
    
     if ($updateStmt->rowCount() > 0) {
         echo json_encode([

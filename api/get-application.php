@@ -35,7 +35,7 @@ try {
             $application = $stmt->fetch(PDO::FETCH_ASSOC);
         }
     } else {
-        $stmt = $pdo->prepare("SELECT * FROM applications WHERE email = ? ORDER BY id DESC LIMIT 1");
+        $stmt = $pdo->prepare("SELECT * FROM applications WHERE email = ? AND status != 'Cancelled' ORDER BY id DESC LIMIT 1");
         $stmt->execute([$email]);
         $application = $stmt->fetch(PDO::FETCH_ASSOC);
     }

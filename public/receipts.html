@@ -176,7 +176,7 @@
                 processingType = 'Expedited / Rush Processing';
             }
 
-            receiptRows.innerHTML = `<tr>
+            receiptRows.insertAdjacentHTML('beforeend', `<tr>
                 <td><strong>${applicationType}</strong></td>
                 <td>${appId}</td>
                 <td><span style="font-weight: 600; color: #4f46e5;">${processingType}</span></td>
@@ -184,13 +184,10 @@
                 <td>${formatAmount(application)}</td>
                 <td><span class="status-badge"><i class="fa-solid fa-check"></i>Paid</span></td>
                 <td><button class="print-button" type="button" onclick="printReceipt()"><i class="fa-solid fa-print"></i> Print</button></td>
-            </tr>`;
+            </tr>`);
             receiptMessage.style.display = 'none';
         }
         async function loadReceipts() {
-            const userEmail = localStorage.getItem('userEmail');
-            const activeAppId = localStorage.getItem('activeAppId') || localStorage.getItem('currentApplicationId');
-            
             try {
                 const userResponse = await fetch('../api/user-data.php');
                 const userData = await userResponse.json();
@@ -203,21 +200,27 @@
                 console.error('Unable to load user data:', error);
             }
 
-            if (!userEmail && !activeAppId) {
-                receiptMessage.textContent = 'No active paid transaction found.';
-                return;
-            }
             try {
-                let fetchUrl = `../api/get-application.php`;
-                if (activeAppId) {
-                    fetchUrl += `?applicationId=${encodeURIComponent(activeAppId)}`;
-                } else {
-                    fetchUrl += `?email=${encodeURIComponent(userEmail)}`;
-                }
-                const response = await fetch(fetchUrl);
+                const response = await fetch('../api/applications.php?action=list_member', {
+                    credentials: 'same-origin',
+                    cache: 'no-store'
+                });
                 const result = await response.json();
-                if (!response.ok) throw new Error(result.message || 'Unable to load receipts.');
-                renderReceipt(result.application);
+                if (!response.ok || !result.success) throw new Error(result.message || 'Unable to load receipts.');
+
+                const paidApplications = (result.applications || []).filter((application) => {
+                    const paymentStatus = (application.payment_status || application.paymentStatus || '').toLowerCase();
+                    const status = (application.status || '').toLowerCase();
+                    return paymentStatus === 'paid' || status === 'paid' || status === 'biometrics received';
+                });
+
+                receiptRows.innerHTML = '';
+                if (paidApplications.length === 0) {
+                    receiptMessage.textContent = 'No paid transactions found.';
+                    return;
+                }
+
+                paidApplications.forEach(renderReceipt);
             } catch (error) {
                 receiptMessage.textContent = error.message;
             }

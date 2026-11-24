@@ -71,7 +71,7 @@ try {
             $stmt = $pdo->prepare("UPDATE applications SET status = 'Cancelled', updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
             $stmt->execute([$applicationId]);
         } else {
-            $stmt = $pdo->prepare("UPDATE applications SET status = 'Cancelled', updated_at = CURRENT_TIMESTAMP WHERE email = ?");
+            $stmt = $pdo->prepare("UPDATE applications SET status = 'Cancelled', updated_at = CURRENT_TIMESTAMP WHERE email = ? AND status != 'Cancelled' ORDER BY id DESC LIMIT 1");
             $stmt->execute([$email]);
         }
         logAudit($pdo, 'APPLICATION_CANCELLED', 'application', $applicationId ?: null, null, 'Cancelled', 'Application canceled and removed.', $email, 'member');
