@@ -17,7 +17,11 @@
                 profileMini.insertBefore(avatar, profileMini.querySelector('.user-info'));
             }
             avatar.alt = name ? `${name} profile picture` : 'Profile picture';
-            avatar.src = `../${photoPath.replace(/^\/+/, '')}?v=${Date.now()}`;
+            avatar.src = `${photoPath.replace(/^\/+/, '')}?v=${Date.now()}`;
+            avatar.onerror = function () {
+                avatar.remove();
+                if (icon) icon.style.display = '';
+            };
             avatar.style.display = 'block';
             if (icon) icon.style.display = 'none';
         } else {
