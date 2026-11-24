@@ -1,6 +1,7 @@
 <?php
-session_start();
 header('Content-Type: application/json');
+require_once __DIR__ . '/auth-helper.php';
+startSecureSession();
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/audit-helper.php';
 
@@ -35,6 +36,8 @@ try {
 
     echo json_encode(['success' => true, 'message' => 'Account created successfully!']);
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    error_log('signup.php error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Unable to create account right now.']);
 }
 ?>

@@ -4,16 +4,31 @@ header('Content-Type: application/json');
 // Connect to MySQL database via centralized connection
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/audit-helper.php';
+require_once __DIR__ . '/auth-helper.php';
+startSecureSession();
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Handles POST requests to submit a new enquiry or update/reply
 if ($method === 'POST') {
+    requireLogin();
+    requireCsrfToken();
     $input = json_decode(file_get_contents('php://input'), true);
+    $sessionEmail = getSessionEmail();
+    $isAdmin = ($_SESSION['user_role'] ?? '') === 'admin';
     
     $enquiryId = $input['enquiryId'] ?? null;
     if ($enquiryId) {
+        if (!$isAdmin) {
+            $owner = $pdo->prepare("SELECT email FROM enquiries WHERE id = ?");
+            $owner->execute([$enquiryId]);
+            $row = $owner->fetch(PDO::FETCH_ASSOC);
+            if (!$row || strtolower((string)$row['email']) !== $sessionEmail) {
+                jsonError('You do not own this enquiry.', 403);
+            }
+        }
+
         $newReply = $input['reply'] ?? null;
-        $status = $input['status'] ?? 'Open';
+        $status = $isAdmin ? ($input['status'] ?? 'Open') : 'Open';
         
         try {
             // Fetch existing enquiry to append to conversation history
@@ -42,7 +57,7 @@ if ($method === 'POST') {
                 $updateStmt = $pdo->prepare("UPDATE enquiries SET status = ? WHERE id = ?");
                 $updateStmt->execute([$status, $enquiryId]);
             }
-            logAudit($pdo, 'ENQUIRY_UPDATED', 'enquiry', (string)$enquiryId, null, $status, $newReply ? 'Administrator reply added.' : 'Enquiry status changed.', $input['actorEmail'] ?? null, $input['actorRole'] ?? 'admin');
+            logAudit($pdo, 'ENQUIRY_UPDATED', 'enquiry', (string)$enquiryId, null, $status, $newReply ? 'Enquiry reply added.' : 'Enquiry status changed.', getSessionEmail(), $_SESSION['user_role'] ?? null);
             
             echo json_encode(['success' => true, 'message' => 'Enquiry updated successfully.']);
             exit;
@@ -54,6 +69,10 @@ if ($method === 'POST') {
     }
 
     $email = $input['email'] ?? $_POST['email'] ?? null;
+    $email = $email ? strtolower(trim($email)) : $sessionEmail;
+    if (!$isAdmin && $email !== $sessionEmail) {
+        jsonError('You cannot submit an enquiry for another member.', 403);
+    }
     $applicationId = $input['applicationId'] ?? $input['appId'] ?? $_POST['applicationId'] ?? $_POST['appId'] ?? '';
     $subject = $input['subject'] ?? $_POST['subject'] ?? '';
     $message = $input['message'] ?? $_POST['message'] ?? '';
@@ -64,6 +83,11 @@ if ($method === 'POST') {
         exit;
     }
     try {
+        $appOwner = $pdo->prepare("SELECT id FROM applications WHERE application_id = ? AND email = ?");
+        $appOwner->execute([$applicationId, $sessionEmail]);
+        if (!$isAdmin && !$appOwner->fetch()) {
+            jsonError('The application is not associated with your account.', 403);
+        }
         $stmt = $pdo->prepare("INSERT INTO enquiries (email, application_id, subject, message, status, reply) VALUES (?, ?, ?, ?, 'Open', 'Awaiting administrator response...')");
         $stmt->execute([$email, $applicationId, $subject, $message]);
        
@@ -88,9 +112,17 @@ if ($method === 'POST') {
 }
 // Handles GET requests to list all enquiries
 else if ($method === 'GET') {
+    requireLogin();
     try {
-        $stmt = $pdo->query("SELECT id, email, application_id AS appId, subject, message, status, reply, created_at AS date FROM enquiries ORDER BY id DESC");
-        $enquiries = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $isAdmin = ($_SESSION['user_role'] ?? '') === 'admin';
+        if ($isAdmin) {
+            $stmt = $pdo->query("SELECT id, email, application_id AS appId, subject, message, status, reply, created_at AS date FROM enquiries ORDER BY id DESC");
+            $enquiries = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $stmt = $pdo->prepare("SELECT id, email, application_id AS appId, subject, message, status, reply, created_at AS date FROM enquiries WHERE email = ? ORDER BY id DESC");
+            $stmt->execute([getSessionEmail()]);
+            $enquiries = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
         echo json_encode(['success' => true, 'enquiries' => $enquiries]);
     } catch (PDOException $e) {
         http_response_code(500);

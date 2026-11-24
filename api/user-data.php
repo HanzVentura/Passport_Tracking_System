@@ -1,19 +1,23 @@
 <?php
-session_start();
 header('Content-Type: application/json');
+require_once __DIR__ . '/auth-helper.php';
+startSecureSession();
 require_once __DIR__ . '/../db.php';
 
-$sessionEmail = isset($_SESSION['user_email']) ? trim((string)$_SESSION['user_email']) : '';
+if (!isset($_SESSION['user_email'])) {
+    echo json_encode(['loggedIn' => false]);
+    exit;
+}
 
-if ($sessionEmail === '') {
+$email = $_SESSION['user_email'];
+
+if (($_SESSION['user_role'] ?? '') === 'admin') {
     echo json_encode([
-        'loggedIn' => false,
-        'fullName' => '',
-        'fullname' => '',
-        'nickname' => '',
-        'profile_photo' => '',
-        'email' => '',
-        'user' => null
+        'loggedIn' => true,
+        'fullName' => $_SESSION['admin_name'] ?? 'Administrator',
+        'email' => $email,
+        'two_factor_enabled' => 0,
+        'csrfToken' => getCsrfToken()
     ]);
     exit;
 }
@@ -21,54 +25,39 @@ if ($sessionEmail === '') {
 try {
     $columnsStmt = $pdo->query("SHOW COLUMNS FROM users");
     $columns = $columnsStmt ? $columnsStmt->fetchAll(PDO::FETCH_COLUMN) : [];
-    if (!in_array('nickname', $columns, true)) {
-        $pdo->exec("ALTER TABLE users ADD COLUMN nickname VARCHAR(60) NULL");
-    }
-    if (!in_array('profile_photo', $columns, true)) {
-        $pdo->exec("ALTER TABLE users ADD COLUMN profile_photo VARCHAR(255) NULL");
-    }
+    $nicknameColumn = in_array('nickname', $columns, true) ? 'nickname' : "NULL AS nickname";
+    $photoColumn = in_array('profile_photo', $columns, true) ? 'profile_photo' : "NULL AS profile_photo";
 
-    $stmt = $pdo->prepare("SELECT id, fullname, email, nickname, profile_photo FROM users WHERE email = ? LIMIT 1");
-    $stmt->execute([$sessionEmail]);
+    $stmt = $pdo->prepare("SELECT fullname, email, two_factor_enabled, {$nicknameColumn}, {$photoColumn} FROM users WHERE email = ?");
+    $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$user) {
+    if ($user) {
+        $displayName = trim((string)($user['nickname'] ?? ''));
+        if ($displayName === '') {
+            $displayName = trim((string)$user['fullname']);
+        }
         echo json_encode([
-            'loggedIn' => false,
-            'fullName' => '',
-            'fullname' => '',
-            'nickname' => '',
-            'profile_photo' => '',
-            'email' => $sessionEmail,
-            'user' => null
+            'loggedIn' => true,
+            'fullName' => $displayName,
+            'fullname' => $user['fullname'],
+            'email' => $user['email'],
+            'nickname' => $user['nickname'],
+            'profile_photo' => $user['profile_photo'],
+            'user' => [
+                'fullname' => $user['fullname'],
+                'email' => $user['email'],
+                'nickname' => $user['nickname'],
+                'profile_photo' => $user['profile_photo']
+            ],
+            'two_factor_enabled' => (int)$user['two_factor_enabled'],
+            'csrfToken' => getCsrfToken()
         ]);
-        exit;
+    } else {
+        echo json_encode(['loggedIn' => false]);
     }
-
-    $fullName = trim((string)($user['fullname'] ?? ''));
-    $nickname = trim((string)($user['nickname'] ?? ''));
-    $profilePhoto = trim((string)($user['profile_photo'] ?? ''));
-    $email = trim((string)($user['email'] ?? $sessionEmail));
-
-    echo json_encode([
-        'loggedIn' => true,
-        'fullName' => $fullName,
-        'fullname' => $fullName,
-        'nickname' => $nickname,
-        'profile_photo' => $profilePhoto,
-        'email' => $email,
-        'user' => [
-            'id' => $user['id'],
-            'fullname' => $fullName,
-            'email' => $email,
-            'nickname' => $nickname,
-            'profile_photo' => $profilePhoto
-        ]
-    ]);
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'loggedIn' => false,
-        'message' => 'Failed to load user data: ' . $e->getMessage()
-    ]);
+    error_log('user-data.php error: ' . $e->getMessage());
+    echo json_encode(['loggedIn' => false]);
 }
+?>

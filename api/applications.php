@@ -2,22 +2,47 @@
 header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/audit-helper.php';
+require_once __DIR__ . '/auth-helper.php';
 $input = json_decode(file_get_contents('php://input'), true);
 $action = $input['action'] ?? $_GET['action'] ?? '';
 // If no action is specified in GET request, default to listing all applications for admin convenience
 if (empty($action) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $action = 'list_all';
 }
+
+// Member application history
+if ($action === 'list_member') {
+    requireMember();
+    try {
+        $email = getSessionEmail();
+        if (!$email) {
+            jsonError('Authentication required.', 401);
+        }
+        $stmt = $pdo->prepare("SELECT * FROM applications WHERE email = ? ORDER BY id DESC");
+        $stmt->execute([$email]);
+        $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'applications' => $applications]);
+        exit;
+    } catch (PDOException $e) {
+        error_log('applications.php member history error: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Unable to load application history.']);
+        exit;
+    }
+}
 // Handle Admin Request to List All Applications
 if ($action === 'list_all') {
+    requireAdmin();
+    requireCsrfToken();
     try {
         $stmt = $pdo->query("SELECT * FROM applications WHERE status IS NOT NULL AND status != 'Cancelled' ORDER BY id DESC");
         $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode(['success' => true, 'applications' => $applications]);
         exit;
     } catch (PDOException $e) {
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'DB Error: ' . $e->getMessage()]);
+            error_log('applications.php DB error: ' . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Unable to load applications.']);
         exit;
     }
 }
@@ -92,6 +117,8 @@ function validateStatusTransition($currentStatus, $newStatus, $statusRanks) {
 
 // Handle Admin Status Updates
 if ($action === 'update_status' || (isset($input['status']) && isset($input['applicationId']))) {
+    requireAdmin();
+    requireCsrfToken();
     $applicationId = $input['applicationId'] ?? '';
     $newStatus = $input['status'] ?? '';
 
@@ -146,8 +173,8 @@ if ($action === 'update_status' || (isset($input['status']) && isset($input['app
             $currentStatus,
             $newStatus,
             'Application status advanced by administrator.',
-            $input['actorEmail'] ?? null,
-            $input['actorRole'] ?? 'admin'
+            $_SESSION['user_email'] ?? null,
+            'admin'
         );
 
         echo json_encode([
@@ -160,7 +187,8 @@ if ($action === 'update_status' || (isset($input['status']) && isset($input['app
         exit;
     } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'DB Error: ' . $e->getMessage()]);
+        error_log('applications.php status error: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Unable to update application status.']);
         exit;
     }
 }
@@ -171,14 +199,20 @@ $applicationType = $input['applicationType'] ?? $_POST['applicationType'] ?? 'Ne
 $appointmentDate = $input['appointmentDate'] ?? $_POST['appointmentDate'] ?? null;
 $appointmentTime = $input['appointmentTime'] ?? $_POST['appointmentTime'] ?? null;
 $appointmentLocation = $input['appointmentLocation'] ?? $_POST['appointmentLocation'] ?? null;
+requireMember();
+requireCsrfToken();
+$email = strtolower(trim($email));
+if ($email !== getSessionEmail()) {
+    jsonError('You cannot create or update an application for another member.', 403);
+}
 if (!$email || !$applicationId) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Email and application ID are required.']);
     exit;
 }
 try {
-    $updateStmt = $pdo->prepare("UPDATE applications SET application_id = ?, application_type = ?, status = 'Form Submitted', appointment_date = ?, appointment_time = ?, appointment_location = ?, updated_at = CURRENT_TIMESTAMP WHERE email = ?");
-    $updateStmt->execute([$applicationId, $applicationType, $appointmentDate, $appointmentTime, $appointmentLocation, $email]);
+    $updateStmt = $pdo->prepare("UPDATE applications SET application_type = ?, status = 'Form Submitted', appointment_date = ?, appointment_time = ?, appointment_location = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ? AND email = ?");
+    $updateStmt->execute([$applicationType, $appointmentDate, $appointmentTime, $appointmentLocation, $applicationId, $email]);
    
     if ($updateStmt->rowCount() > 0) {
         echo json_encode([
@@ -204,6 +238,7 @@ try {
     ]);
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'DB Error: ' . $e->getMessage()]);
+    error_log('applications.php write error: ' . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Unable to save application.']);
 }
 ?>

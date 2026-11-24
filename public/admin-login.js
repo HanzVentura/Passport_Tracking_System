@@ -60,9 +60,12 @@ if (adminLoginForm && adminEmailInput && adminPasswordInput) {
         }
 
         try {
+            const csrfToken = await window.getCsrfToken();
+            if (!csrfToken) throw new Error('Unable to initialize security token.');
             const response = await fetch('../api/admin-login.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
                 body: JSON.stringify({ email, password, passcode })
             });
             const result = await response.json();
@@ -74,6 +77,11 @@ if (adminLoginForm && adminEmailInput && adminPasswordInput) {
                 adminPasscodeInput?.focus();
                 showAdminMessage(result.message || 'Two-factor authentication passcode required.', true);
             } else if (result.success) {
+                localStorage.removeItem('activeAppId');
+                localStorage.removeItem('currentApplicationId');
+                localStorage.removeItem('paymentAmount');
+                localStorage.removeItem('paymentProcessingType');
+                localStorage.removeItem('applicationType');
                 localStorage.setItem('userEmail', email);
                 localStorage.setItem('userRole', 'admin');
                 window.location.href = 'admin.html';

@@ -89,10 +89,11 @@
             .quick-links { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="stylesheet" href="member-navigation.css">
 </head>
 <body>
     <aside class="sidebar">
-        <div>
+        <div class="sidebar-top">
             <div class="user-profile-mini">
                 <i class="fa-solid fa-circle-user"></i>
                 <div class="user-info"><div class="name" id="user-name"></div></div>
@@ -176,7 +177,9 @@
         </div>
     </main>
 
+    <script src="csrf.js"></script>
     <script src="script.js"></script>
+    <script src="member-profile.js"></script>
     <script>
         const avatarInput = document.getElementById('avatarInput');
         const choosePhotoBtn = document.getElementById('choosePhotoBtn');
@@ -228,14 +231,10 @@
         }
 
         function refreshCardLabels() {
-            const nick = nicknameInput.value.trim();
-            const activeName = nick || currentUserData.fullname || currentUserData.email || '';
+            const activeName = currentUserData.nickname || currentUserData.fullname || currentUserData.email || '';
             cardDisplayName.textContent = activeName;
             cardDisplayEmail.textContent = currentUserData.email || '---';
             profileBannerTitle.textContent = activeName ? `Good Day, ${activeName}` : 'My Profile';
-            if (activeName && typeof applySidebarName === 'function') {
-                applySidebarName(activeName);
-            }
         }
 
         function applyLoadedProfile(data, fallbackEmail) {

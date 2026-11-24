@@ -1,6 +1,8 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/auth-helper.php';
+requireAdmin();
 
 try {
     $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 200;
@@ -40,7 +42,8 @@ try {
 
     echo json_encode(['success' => true, 'logs' => $logs]);
 } catch (PDOException $e) {
+    error_log('audit-log.php error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Unable to load audit trail.', 'error' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Unable to load audit trail.']);
 }
 ?>

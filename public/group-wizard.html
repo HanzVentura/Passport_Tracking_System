@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Group Passport Application - Passport Tracking System</title>
     <!-- FontAwesome & Google Plus Jakarta Sans Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -236,6 +233,7 @@
                 padding: 20px 16px !important;
             }
 
+            /* Custom wizard step adjustments for mobile */
             .wizard-steps {
                 display: flex;
                 overflow-x: auto;
@@ -255,6 +253,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="member-navigation.css">
 </head>
 <body data-application-type="new">
     <aside class="sidebar">
@@ -268,20 +267,19 @@
                 <li><a href="payments.html"><i class="fa-solid fa-wallet"></i> Payments</a></li>
                 <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
                 <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
-                <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="faq.html?from=dashboard"><i class="fa-solid fa-book-open"></i> Passport FAQs</a></li>
+                <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
+                <li><a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a></li>
                 <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
         </div>
         <div class="sidebar-bottom">
-            <a href="login.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+            <a href="../logout.php"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
         </div>
     </aside>
     <div class="main-container">
         <main class="main-content">
-            <div class="header" id="pageHeaderTitle" style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 20px;">GROUP PASSPORT APPLICATION WIZARD</div>
-            <div id="groupApplicantBadge" style="background: var(--primary-light); color: var(--primary); padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-users"></i> Group Booking: Filling out details for Applicant 1 of 2
-            </div>
+            <div class="header" id="pageHeaderTitle" style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 20px;">GROUP PASSPORT APPLICATION </div>
             <div class="dashboard-container">
 
                 <div class="wizard-steps" id="wizardHeader">
@@ -299,9 +297,6 @@
                     <input type="hidden" name="app_date" id="hiddenAppDate">
                     <input type="hidden" name="app_time" id="hiddenAppTime">
                     <input type="hidden" name="group_data_payload" id="groupDataPayload">
-                    <!-- Canonical schema fields (hidden, defaults) -->
-                    <input type="hidden" name="citizenship" value="Filipino">
-                    <input type="hidden" name="passport_type" value="Regular">
 
                     <!-- STEP 1: Site Location -->
                     <section class="step-pane active" id="step1">
@@ -314,7 +309,7 @@
                             <div class="form-row">
                                 <div class="form-group full-width">
                                     <label>Site *</label>
-                                    <select class="form-control" name="site_selection" id="siteSelect" onchange="updateSiteInfo()">
+                                    <select class="form-control" name="site_selection" id="siteSelect" onchange="updateSiteInfo()" required>
                                         <option value="">- PLEASE SELECT A SITE -</option>
                                         <option value="ANGELES">ANGELES (SM CITY CLARK, ANGELES CITY)</option>
                                         <option value="ANTIPOLO">ANTIPOLO (SM CENTER, ANTIPOLO CITY, RIZAL)</option>
@@ -370,7 +365,7 @@
                         </div>
                         <div class="action-buttons">
                             <a href="group-appointment.html" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back</a>
-                            <button type="button" class="btn-primary" onclick="window.nextStep(2)">Next <i class="fa-solid fa-arrow-right"></i></button>
+                            <button type="button" class="btn-primary" onclick="groupHandleNext(2)">Next <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
                     <!-- STEP 2: Date & Time -->
@@ -388,9 +383,9 @@
                                     <label>Appointment Date *</label>
                                     <div class="dfa-calendar-container">
                                         <div class="cal-header">
-                                            <button type="button" onclick="window.changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                                            <button type="button" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
                                             <span id="calMonthYear">September 2026</span>
-                                            <button type="button" onclick="window.changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                                            <button type="button" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
                                         </div>
                                         <div class="cal-weekdays">
                                             <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
@@ -404,69 +399,73 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Time Slot *</label>
-                                    <select class="form-control" name="app_time_selection" id="appTimeSelect" style="margin-top: 5px;" onchange="window.updateTimeSelection()">
+                                    <select class="form-control" name="app_time_selection" id="appTimeSelect" style="margin-top: 5px;" onchange="updateTimeSelection()" required>
                                         <option value="">- PLEASE SELECT A DATE FIRST -</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="window.GroupBooking.goToStep(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                            <button type="button" class="btn-primary" onclick="window.nextStep(3)">Next: Start Applicant Details <i class="fa-solid fa-arrow-right"></i></button>
+                            <button type="button" class="btn-secondary" onclick="goToStep(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="groupHandleNext(3)">Next: Start Applicant Details <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
                     <!-- STEP 3: Personal Information -->
                     <section class="step-pane" id="step3">
                         <div class="form-section-card">
-                            <div class="section-title" id="step3Title"><i class="fa-solid fa-user" style="color:var(--primary);"></i> Applicant 1 of 2 - Personal Information</div>
+                            <div class="section-title" id="step3Title"><i class="fa-solid fa-user" style="color:var(--primary);"></i> Personal Information</div>
                             <div class="alert-box danger" style="background: #fef2f2; border-color: #fee2e2; color: #991b1b;">
                                 <i class="fa-solid fa-triangle-exclamation" style="margin-top:2px;"></i>
                                 <div><strong>WARNING:</strong> Ensure all details in the name and date of birth fields are correct. Editing is not permitted on site.</div>
                             </div>
                             <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                                <input type="checkbox" id="infoAgree" style="width: 18px; height: 18px; accent-color: var(--primary);">
+                                <input type="checkbox" id="infoAgree" required style="width: 18px; height: 18px; accent-color: var(--primary);">
                                 <label for="infoAgree" style="margin: 0; color: #991b1b; font-weight: 700; font-size: 13px;">I agree to verify my details.</label>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group"><label>Phone Number</label><input type="text" class="form-control" name="phone"></div>
-                                <div class="form-group"><label>Mobile Number *</label><input type="text" class="form-control" name="mobile"></div>
+                                <div class="form-group"><label>Mobile Number *</label><input type="text" class="form-control" name="mobile" required></div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>Email Address *</label><input type="email" class="form-control" name="email"></div>
-                                <div class="form-group"><label>Confirm Email Address *</label><input type="email" class="form-control" id="confirmEmailInput"></div>
+                                <div class="form-group"><label>Email Address *</label><input type="email" class="form-control" name="email" required></div>
+                                <div class="form-group"><label>Confirm Email Address *</label><input type="email" class="form-control" required></div>
                             </div>
 
                             <div class="form-row">
-                                <div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="lastname"></div>
-                                <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="givenname"></div>
+                                <div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="lastname" required></div>
+                                <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="givenname" required></div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group"><label>Middle Name</label><input type="text" class="form-control" name="middlename"></div>
-                                <div class="form-group"><label>Extension Name (Jr., Sr., III, etc.)</label><input type="text" class="form-control" name="extname"></div>
+                                <div class="form-group"><label>Date of Birth *</label><input type="date" class="form-control" name="dob" id="dobInput" required></div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>Date of Birth *</label><input type="date" class="form-control" name="dob" id="dobInput"></div>
-                                <div class="form-group"><label>Gender *</label>
-                                    <select class="form-control" name="sex">
+                                <div class="form-group">
+                                    <label>Gender *</label>
+                                    <select class="form-control" name="gender" required>
                                         <option value="">- SELECT GENDER -</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                     </select>
                                 </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group"><label>Civil Status *</label><select class="form-control" name="civil_status"><option value="">- SELECT CIVIL STATUS -</option><option value="SINGLE">SINGLE</option><option value="MARRIED">MARRIED</option><option value="WIDOWED">WIDOWED</option><option value="SEPARATED">SEPARATED</option><option value="ANNULLED">ANNULLED</option></select></div>
-                                <div class="form-group"><label>Birth Legitimacy *</label><select class="form-control" name="legitimacy"><option value="">- SELECT LEGITIMACY -</option><option value="LEGITIMATE">LEGITIMATE</option><option value="ILLEGITIMATE">ILLEGITIMATE</option></select></div>
+                                <div class="form-group"><label>Civil Status *</label><select class="form-control" name="civil_status" required><option value="">- SELECT CIVIL STATUS -</option><option value="SINGLE">SINGLE</option><option value="MARRIED">MARRIED</option><option value="WIDOWED">WIDOWED</option><option value="SEPARATED">SEPARATED</option><option value="ANNULLED">ANNULLED</option></select></div>
                             </div>
 
                             <div class="form-row">
-                                <div class="form-group"><label>Country of Birth *</label><input type="text" class="form-control" name="birth_country"></div>
-                                <div class="form-group"><label>Province *</label><input type="text" class="form-control" name="birth_province"></div>
+                                <div class="form-group">
+                                    <label>Birth Legitimacy *</label>
+                                    <select class="form-control" name="legitimacy" required>
+                                        <option value="">- SELECT LEGITIMACY -</option>
+                                        <option value="LEGITIMATE">LEGITIMATE</option>
+                                        <option value="ILLEGITIMATE">ILLEGITIMATE</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Country of Birth *</label><input type="text" class="form-control" name="birth_country" required></div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>City/Municipality *</label><input type="text" class="form-control" name="birth_city"></div>
-                                <div class="form-group"><label>Birth Place (auto-combined)</label><input type="text" class="form-control" name="birth_place" readonly style="background: #f8fafc;"></div>
+                                <div class="form-group"><label>Province *</label><input type="text" class="form-control" name="birth_province" required></div>
+                                <div class="form-group"><label>City/Municipality *</label><input type="text" class="form-control" name="birth_city" required></div>
                             </div>
                             <div id="minorFieldsContainer" style="display: none; border-top: 1px dashed var(--border-color); padding-top: 15px; margin-top: 15px;">
                                 <div class="alert-box info" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af; margin-bottom: 15px;">
@@ -480,8 +479,8 @@
                             </div>
                         </div>
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="window.prevStep(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                            <button type="button" class="btn-primary" onclick="window.nextStep(4)">Next <i class="fa-solid fa-arrow-right"></i></button>
+                            <button type="button" class="btn-secondary" onclick="groupHandleBack(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="groupHandleNext(4)">Next <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
                     <!-- STEP 4: Family Information -->
@@ -490,14 +489,14 @@
                             <div class="section-title"><i class="fa-solid fa-users-line" style="color:var(--primary);"></i> Family Information</div>
                             <h4 style="margin-bottom: 10px; font-size: 14px; color: var(--text-main);">Father's Information</h4>
                             <div class="form-row">
-                                <div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="father_lastname"></div>
-                                <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="father_givenname"></div>
+                                <div class="form-group"><label>Last Name *</label><input type="text" class="form-control" name="father_lastname" required></div>
+                                <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="father_givenname" required></div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group"><label>Middle Name</label><input type="text" class="form-control" name="father_middlename"></div>
                                 <div class="form-group">
                                     <label>Country Citizenship *</label>
-                                    <select class="form-control" name="father_citizenship">
+                                    <select class="form-control" name="father_citizenship" required>
                                         <option value="PHILIPPINES">PHILIPPINES</option>
                                         <option value="UNITED STATES">UNITED STATES</option>
                                         <option value="CANADA">CANADA</option>
@@ -512,14 +511,14 @@
                             </div>
                             <h4 style="margin: 20px 0 10px; font-size: 14px; color: var(--text-main);">Mother's Information</h4>
                             <div class="form-row">
-                                <div class="form-group"><label>Maiden Last Name *</label><input type="text" class="form-control" name="mother_lastname"></div>
-                                <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="mother_givenname"></div>
+                                <div class="form-group"><label>Maiden Last Name *</label><input type="text" class="form-control" name="mother_lastname" required></div>
+                                <div class="form-group"><label>Given Name *</label><input type="text" class="form-control" name="mother_givenname" required></div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group"><label>Maiden Middle Name</label><input type="text" class="form-control" name="mother_middlename"></div>
                                 <div class="form-group">
                                     <label>Country Citizenship *</label>
-                                    <select class="form-control" name="mother_citizenship">
+                                    <select class="form-control" name="mother_citizenship" required>
                                         <option value="PHILIPPINES">PHILIPPINES</option>
                                         <option value="UNITED STATES">UNITED STATES</option>
                                         <option value="CANADA">CANADA</option>
@@ -534,8 +533,8 @@
                             </div>
                         </div>
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="window.GroupBooking.goToStep(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                            <button type="button" class="btn-primary" onclick="window.nextStep(5)">Next <i class="fa-solid fa-arrow-right"></i></button>
+                            <button type="button" class="btn-secondary" onclick="goToStep(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="groupHandleNext(5)">Next <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
                     <!-- STEP 5: Application & Contact (R.A. 11983 Compliant) -->
@@ -547,13 +546,13 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Application Type *</label>
-                                    <select class="form-control" name="application_type" id="applicationTypeSelectGroup">
+                                    <select class="form-control" name="application_type" id="applicationTypeSelectGroup" required>
                                         <option value="">- SELECT APPLICATION TYPE -</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Basis of Philippine Citizenship *</label>
-                                    <select class="form-control" name="citizenship_basis" id="citizenshipBasisSelectGroup">
+                                    <select class="form-control" name="citizenship_basis" id="citizenshipBasisSelectGroup" required>
                                         <option value="">- SELECT BASIS -</option>
                                         <option value="BIRTH">BIRTH</option>
                                         <option value="ELECTION">ELECTION</option>
@@ -566,12 +565,12 @@
                             <!-- Credential Updating Sub-Reason (Conditional) -->
                             <div class="form-group" id="credentialReasonContainerGroup" style="display: none;">
                                 <label>Reason for Credential Update *</label>
-                                <select class="form-control" name="credential_reason" id="credentialReasonSelectGroup">
+                                <select class="form-control" name="credential_reason" id="credentialReasonSelectGroup" required>
                                     <option value="">- SELECT REASON -</option>
                                 </select>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>Foreign Passport Holder *</label><select class="form-control" name="foreign_passport"><option>No</option><option>Yes</option></select></div>
+                                <div class="form-group"><label>Foreign Passport Holder *</label><select class="form-control" name="foreign_passport" required><option>No</option><option>Yes</option></select></div>
                                 <div class="form-group" id="othersBasisContainerGroup" style="display: none;">
                                     <label>Others *</label>
                                     <input type="text" class="form-control" name="citizenship_basis_others" placeholder="PLEASE SPECIFY">
@@ -579,22 +578,22 @@
                             </div>
 
                             <h4 style="margin: 20px 0 10px; font-size: 14px; color: var(--text-main);">Contact Information</h4>
-                            <div class="form-group full-width"><label>Current Address *</label><input type="text" class="form-control" name="address"></div>
+                            <div class="form-group full-width"><label>Current Address *</label><input type="text" class="form-control" name="address" required></div>
                             <div class="form-row">
-                                <div class="form-group"><label>City *</label><input type="text" class="form-control" name="address_city"></div>
-                                <div class="form-group"><label>Province/State/Country *</label><input type="text" class="form-control" name="address_province"></div>
+                                <div class="form-group"><label>City *</label><input type="text" class="form-control" name="address_city" required></div>
+                                <div class="form-group"><label>Province/State/Country *</label><input type="text" class="form-control" name="address_province" required></div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>Emergency Contact Person *</label><input type="text" class="form-control" name="emergency_contact"></div>
-                                <div class="form-group"><label>Emergency Contact Number *</label><input type="text" class="form-control" name="emergency_phone"></div>
+                                <div class="form-group"><label>Emergency Contact Person *</label><input type="text" class="form-control" name="emergency_contact" required></div>
+                                <div class="form-group"><label>Emergency Contact Number *</label><input type="text" class="form-control" name="emergency_number" required></div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>Occupation *</label><input type="text" class="form-control" name="occupation"></div>
+                                <div class="form-group"><label>Occupation *</label><input type="text" class="form-control" name="occupation" required></div>
                                 <div class="form-group"><label>Office Number</label><input type="text" class="form-control" name="office_number"></div>
                             </div>
                         </div>
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="window.GroupBooking.goToStep(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-secondary" onclick="goToStep(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
                             <button type="button" class="btn-primary" onclick="groupValidateAndGoToStep6()">Next: Documents <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
@@ -611,8 +610,8 @@
                             <div id="dynamicDocSlotsGroup"></div>
                         </div>
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="window.GroupBooking.goToStep(5)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                            <button type="button" class="btn-primary" id="step6NextBtn" onclick="window.GroupBooking.handleStep6Next()">Review Details <i class="fa-solid fa-arrow-right"></i></button>
+                            <button type="button" class="btn-secondary" onclick="goToStep(5)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-primary" onclick="groupValidateAndGoToStep7()">Review Details <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
                     </section>
                     <!-- STEP 7: Review -->
@@ -624,13 +623,13 @@
                                 <!-- Dynamically populated -->
                             </div>
                             <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-top: 30px; background: #f8fafc; padding: 15px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-                                <input type="checkbox" id="finalAgree" style="width: 18px; height: 18px; accent-color: var(--primary);">
+                                <input type="checkbox" id="finalAgree" required style="width: 18px; height: 18px; accent-color: var(--primary);">
                                 <label for="finalAgree" style="margin: 0; font-weight: 600; font-size: 13px; color: var(--text-main);">I confirm that all information provided for this group is accurate and complete.</label>
                             </div>
                         </div>
 
                         <div class="action-buttons">
-                            <button type="button" class="btn-secondary" onclick="window.GroupBooking.handleBackFromStep7()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn-secondary" onclick="goToStep(6)"><i class="fa-solid fa-arrow-left"></i> Back</button>
                             <button type="submit" class="btn-primary" style="background-color: #10b981;"><i class="fa-solid fa-check"></i> Save & Submit Group</button>
                         </div>
                     </section>
@@ -638,54 +637,276 @@
             </div>
         </main>
     </div>
-    <script src="passport-application.js?v=8"></script>
+    <script src="passport-application.js"></script>
+    <script src="csrf.js"></script>
     <script>
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            })[char]);
+        }
+
+        async function loadUserData() {
+            try {
+                const response = await fetch('../api/user-data.php');
+                const data = await response.json();
+                if (data.loggedIn && data.fullName) {
+                    document.getElementById('user-name').textContent = data.fullName;
+                    if (data.email) localStorage.setItem('userEmail', data.email);
+                }
+            } catch (error) {
+                console.error('Unable to load user data:', error);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadUserData);
+
         /**
-         * Group Wizard - Page-specific initialization
-         * All shared logic (DFA_RULES_ENGINE, GroupBooking, calendar, site data)
-         * is in passport-application.js
+         * Normalize application type for member-facing display (Title Case)
+         * Converts legacy ALL CAPS DB values to Title Case
+         * @param {string} rawType - Raw type from database
+         * @returns {string} Normalized Title Case display value
          */
+        function normalizeAppTypeForDisplay(rawType) {
+            const type = (rawType || '').toLowerCase().trim();
+            if (type.includes('first') || type.includes('new first-time')) return 'First Time Passport';
+            if (type.includes('renewal')) return 'Passport Renewal';
+            if (type.includes('lost')) return 'Lost Passport';
+            if (type.includes('damaged')) return 'Damaged Passport';
+            if (type.includes('group')) return 'Group Passport Application';
+            if (type === '' || type === 'passport application') return 'First Time Passport';
+            // Already Title Case or unknown - capitalize first letter of each word
+            return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
 
-        // Initialize GroupBooking state on load
+        let currentYear = 2026;
+        let currentMonth = 8;
+        let selectedDateStr = '';
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        function getSlotsForDate(dayNum) {
+            return [
+                { time: "08:00 AM - 09:00 AM", status: "available", slots: 5 },
+                { time: "09:00 AM - 10:00 AM", status: "booked" },
+                { time: "10:00 AM - 11:00 AM", status: "available", slots: 3 }
+            ];
+        }
+        function renderCalendar() {
+            const grid = document.getElementById('calGrid');
+            const header = document.getElementById('calMonthYear');
+            if (!grid) return;
+            header.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            grid.innerHTML = '';
+            const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+            const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const todayObj = new Date(2026, 8, 20);
+            for (let i = 0; i < firstDayIndex; i++) grid.appendChild(document.createElement('div'));
+            for (let day = 1; day <= totalDays; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'cal-day';
+                cell.textContent = day;
+                const thisDate = new Date(currentYear, currentMonth, day);
+                const formattedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                if (thisDate < todayObj) {
+                    cell.classList.add('disabled');
+                } else if (day % 4 === 0) {
+                    cell.classList.add('fully-booked');
+                } else {
+                    cell.classList.add('available');
+                    cell.onclick = () => selectDate(formattedDate, day, cell);
+                }
+                if (selectedDateStr === formattedDate) cell.classList.add('selected');
+                grid.appendChild(cell);
+            }
+        }
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar();
+        }
+        function selectDate(dateStr, dayNum, element) {
+            document.querySelectorAll('.cal-day').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedDateStr = dateStr;
+            document.getElementById('selectedDateVal').value = dateStr;
+            const timeSelect = document.getElementById('appTimeSelect');
+            timeSelect.innerHTML = '<option value="">- SELECT TIME SLOT -</option>';
+            getSlotsForDate(dayNum).forEach(slot => {
+                const opt = document.createElement('option');
+                opt.value = slot.time;
+                opt.disabled = slot.status === 'booked';
+                opt.textContent = slot.status === 'booked' ? `${slot.time} (Fully Booked)` : `${slot.time} (${slot.slots} Slots)`;
+                timeSelect.appendChild(opt);
+            });
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            if (!groupData['applicant_1']) groupData['applicant_1'] = {};
+            groupData['applicant_1']['site_selection'] = document.getElementById('siteSelect')?.value || '';
+            groupData['applicant_1']['app_date_selection'] = dateStr;
+            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+        }
+        function updateTimeSelection() {
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            if (!groupData['applicant_1']) groupData['applicant_1'] = {};
+            groupData['applicant_1']['app_time_selection'] = document.getElementById('appTimeSelect').value;
+            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+        }
+        document.addEventListener('DOMContentLoaded', () => renderCalendar());
+        const dfaOfficeData = {
+            "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City", contact: "(045) 304-0194" },
+            "ANTIPOLO": { name: "DFA Regional Consular Office – Antipolo", address: "3F SM Cherry Foodarama, Marikina-Infanta Highway, Antipolo City, Rizal", contact: "(02) 8697-3000" },
+            "ANTIQUE": { name: "DFA Regional Consular Office – Antique", address: "CityMall Antique, National Road, San Jose de Buenavista, Antique", contact: "(036) 540-0123" },
+            "BACOLOD": { name: "DFA Regional Consular Office – Bacolod", address: "3rd Level Robinsons Place Bacolod, Brgy. Mandalangan, Bacolod City", contact: "(034) 441-2675" },
+            "BAGUIO": { name: "DFA Regional Consular Office – Baguio", address: "SM City Baguio Upper Basement, Luneta Hill, Upper Session Road, Baguio City", contact: "(074) 422-1465" },
+            "BALANGA": { name: "DFA Regional Consular Office – Balanga", address: "The Bunker Building, Capitol Compound, Balanga City, Bataan", contact: "(047) 237-0111" },
+            "BUTUAN": { name: "DFA Regional Consular Office – Butuan", address: "3rd Level Robinsons Place Butuan, J.C. Aquino Ave., Butuan City", contact: "(085) 342-5700" },
+            "CAGAYAN DE ORO": { name: "DFA Regional Consular Office – Cagayan de Oro", address: "3F Centrio Mall, cor. Corrales and Recto Sts., Cagayan de Oro City", contact: "(088) 857-6565" },
+            "CALASIAO": { name: "DFA Regional Consular Office – Calasiao", address: "2F Robinsons Place-Pangasinan, Brgy. San Miguel, Calasiao, Pangasinan", contact: "(075) 632-7705" },
+            "CANDON": { name: "DFA Regional Consular Office – Candon", address: "Candon City Arena, Candon City, Ilocos Sur", contact: "(077) 644-0111" },
+            "CEBU": { name: "DFA Regional Consular Office – Cebu", address: "4th Level Pacific Mall-Metro Mandaue, UN Ave. cor. MC Briones St., Mandaue City", contact: "(032) 520-5898" },
+            "CLARIN": { name: "DFA Regional Consular Office – Clarin", address: "Clarin Town Center, Clarin, Misamis Occidental", contact: "(088) 530-5312" },
+            "DFA MANILA": { name: "DFA Manila (ASEANA)", address: "ASEANA Business Park, Bradco Avenue corner Macapagal Boulevard, Parañaque City", contact: "556-0000 / 651-9400" },
+            "DFA NCR CENTRAL": { name: "DFA NCR Central", address: "Lingkod Pinoy Center, Robinsons Galleria, West Lane EDSA cor. Ortigas Ave., Quezon City", contact: "(02) 8631-0806" },
+            "DFA NCR EAST": { name: "DFA NCR East (Megamall)", address: "7F Building C, SM Megamall, EDSA cor. J. Vargas Ave., Mandaluyong City", contact: "(02) 8570-3230" },
+            "DFA NCR NORTH": { name: "DFA NCR North (Novaliches)", address: "Quirino Highway, Novaliches, Quezon City (across SM City Fairview)", contact: "(02) 8834-4000" },
+            "DFA NCR NORTHEAST": { name: "DFA NCR Northeast (Ali Mall)", address: "Level 2, Ali Mall Government Center, Cubao, Quezon City", contact: "(02) 8293-0105" },
+            "DFA NCR SOUTH": { name: "DFA NCR South (Alabang)", address: "4th Floor, Metro Alabang Town Center, Muntinlupa City", contact: "(02) 8551-1051" },
+            "DFA NCR WEST": { name: "DFA NCR West (SM Manila)", address: "5th Floor, SM City Manila, Concepcion St., Manila", contact: "(02) 8536-9994" },
+            "DASMARIÑAS": { name: "DFA Regional Consular Office – Dasmariñas", address: "SM City Dasmariñas, Governor's Drive, Brgy. Sampaloc 1, Dasmariñas City, Cavite", contact: "(046) 432-0000" },
+            "DAVAO": { name: "DFA Regional Consular Office – Davao", address: "3F SM City-Davao Quimpo Boulevard, Ecoland Subdivision, Davao City", contact: "(082) 285-4885" },
+            "DUMAGUETE": { name: "DFA Regional Consular Office – Dumaguete", address: "2F Robinsons Place South Road, Calidangan, Dumaguete City", contact: "(035) 532-0024" },
+            "GENERAL SANTOS": { name: "DFA Regional Consular Office – General Santos", address: "GF Robinsons Place GenSan, Jose Catolico Sr. Ave., General Santos City", contact: "(083) 552-0000" },
+            "ILOCOS NORTE": { name: "DFA Regional Consular Office – Ilocos Norte", address: "Robinsons Place Ilocos Norte, Brgy. San Francisco, San Nicolas, Ilocos Norte", contact: "(077) 843-4000" },
+            "ILOILO": { name: "DFA Regional Consular Office – Iloilo", address: "3F Robinsons Place Iloilo Quezon Wing, Iloilo City", contact: "(033) 336-1737" },
+            "KIDAPAWAN": { name: "DFA Regional Consular Office – Kidapawan", address: "People's Palace, City Hall, Kidapawan City", contact: "(064) 421-3495" },
+            "LA UNION": { name: "DFA Regional Consular Office – La Union", address: "2nd Floor Manna Mall, Marcos Highway corner Diversion Road, San Fernando, La Union", contact: "(072) 607-6510" },
+            "LEGAZPI": { name: "DFA Regional Consular Office – Legazpi", address: "3F Pacific Mall-Legazpi, Landco Business Park, Legazpi City", contact: "(052) 480-3000" },
+            "LIPA": { name: "DFA Regional Consular Office – Lipa", address: "2F Robinsons Place-Lipa, JP Laurel Highway, Lipa City, Batangas", contact: "(043) 722-0578" },
+            "LUCENA": { name: "DFA Regional Consular Office – Lucena", address: "3F Pacific Mall-Lucena, M.L. Tagarao St., Lucena City", contact: "(042) 710-4526" },
+            "MALOLOS": { name: "DFA Regional Consular Office – Malolos", address: "3F Malolos Central Transport Terminal and Commercial Hub by Xentro Mall, Malolos City", contact: "(044) 794-0000" },
+            "OLONGAPO": { name: "DFA Regional Consular Office – Olongapo", address: "SM City Olongapo Central, Gordon Ave., Olongapo City", contact: "(047) 222-0000" },
+            "PAGADIAN": { name: "DFA Regional Consular Office – Pagadian", address: "C3 Mall, Pagadian City, Zamboanga del Sur", contact: "(062) 215-0000" },
+            "PAMPANGA": { name: "DFA Regional Consular Office – Pampanga Starmills", address: "2F Robinsons StarMills, City of San Fernando, Pampanga", contact: "(045) 636-0007" },
+            "PANIQUI, TARLAC": { name: "DFA Regional Consular Office – Paniqui", address: "Waltermart Paniqui, Tarlac", contact: "(045) 931-0000" },
+            "PUERTO PRINCESA": { name: "DFA Regional Consular Office – Puerto Princesa", address: "2nd Level Robinsons Place Palawan, National Highway, Puerto Princesa City", contact: "(048) 434-1773" },
+            "SAN PABLO": { name: "DFA Regional Consular Office – San Pablo", address: "2F SM City San Pablo, Maharlika Highway, San Pablo City, Laguna", contact: "(049) 562-0000" },
+            "SANTIAGO, ISABELA": { name: "DFA Regional Consular Office – Santiago", address: "Robinsons Place Santiago, Maharlika Highway, Santiago City, Isabela", contact: "(078) 305-0000" },
+            "TACLOBAN": { name: "DFA Regional Consular Office – Tacloban", address: "3rd Level, Robinsons North Tacloban, Brgy. Abucay, Tacloban City", contact: "(053) 321-0000" },
+            "TAGBILARAN": { name: "DFA Regional Consular Office – Tagbilaran", address: "Alturas Mall, Tagbilaran City, Bohol", contact: "(038) 411-0000" },
+            "TAGUM": { name: "DFA Regional Consular Office – Tagum", address: "Robinsons Place Tagum, Tagum City, Davao del Norte", contact: "(084) 655-0000" },
+            "TUGUEGARAO": { name: "DFA Regional Consular Office – TugueGarao", address: "Regional Government Center, Carig Sur, TugueGarao City", contact: "(078) 844-0000" },
+            "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City", contact: "(062) 991-0000" }
+        };
+        function updateSiteInfo() {
+            const selectedSite = document.getElementById('siteSelect').value;
+            const info = dfaOfficeData[selectedSite];
+            if (info) {
+                document.getElementById('officeName').value = info.name;
+                document.getElementById('officeAddress').value = info.address;
+                document.getElementById('officeContact').value = info.contact;
+            }
+        }
+        function goToStep(stepNumber) {
+            document.querySelectorAll('.step-pane').forEach(pane => pane.classList.remove('active'));
+            document.getElementById('step' + stepNumber).classList.add('active');
+            for (let i = 1; i <= 7; i++) {
+                const wStep = document.getElementById('wStep' + i);
+                if (wStep) wStep.classList.toggle('active', i === stepNumber);
+            }
+            if (stepNumber === 7) populateReviewSummary();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentStep = parseInt(urlParams.get('step')) || 1;
+        let currentApplicant = parseInt(urlParams.get('applicant')) || 1;
+        const requestedCount = parseInt(urlParams.get('count')) || 0;
+        if (requestedCount >= 2) {
+            localStorage.setItem('groupCount', String(requestedCount));
+        }
+        const totalApplicants = parseInt(localStorage.getItem('groupCount')) || 2;
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Get group count from URL or localStorage
-            const urlParams = new URLSearchParams(window.location.search);
-            const groupCount = parseInt(urlParams.get('count')) || parseInt(localStorage.getItem('groupCount')) || 2;
-
-            // Initialize GroupBooking state (FR-1)
-            window.GroupBooking.initGroupBookingState(groupCount);
-
-            // Determine current applicant and step from URL
-            let currentStep = parseInt(urlParams.get('step')) || 1;
-            let currentApplicant = parseInt(urlParams.get('applicant')) || 1;
-
-            // Applicants 2+ start at Step 3 (Personal Info) since Steps 1-2 are shared
             if (currentApplicant > 1 && currentStep < 3) currentStep = 3;
+            restoreCurrentApplicantData();
+            goToStep(currentStep);
+            updateApplicantBadge();
 
-            // Hydrate form for current applicant (FR-2/FR-5)
-            window.GroupBooking.hydrateApplicantForm(currentApplicant - 1);
+            if (currentApplicant > 1) {
+                let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+                let app1 = groupData['applicant_1'] || {};
+                let currApp = groupData[`applicant_${currentApplicant}`] || {};
 
-            // Navigate to current step (with FR-3 guard for Step 7)
-            window.GroupBooking.goToStep(currentStep);
+                currApp['site_selection'] = app1['site_selection'] || '';
+                currApp['app_date_selection'] = app1['app_date_selection'] || '';
+                currApp['app_time_selection'] = app1['app_time_selection'] || '';
+
+                groupData[`applicant_${currentApplicant}`] = currApp;
+                localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+            }
 
             // Initialize group-specific event listeners
             initializeGroupEventListeners();
         });
 
+        function restoreCurrentApplicantData() {
+            const groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            const app1 = groupData['applicant_1'] || {};
+            const appData = groupData[`applicant_${currentApplicant}`] || {};
+
+            Object.entries(appData).forEach(([key, value]) => {
+                document.querySelectorAll(`[name="${key}"]`).forEach((field) => {
+                    if (field.type === 'checkbox') {
+                        field.checked = field.value === value;
+                    } else if (field.type === 'radio') {
+                        field.checked = field.value === value;
+                    } else {
+                        field.value = value;
+                    }
+                });
+            });
+
+            const siteSelect = document.getElementById('siteSelect');
+            const dateValue = document.getElementById('selectedDateVal');
+            const timeSelect = document.getElementById('appTimeSelect');
+            if (siteSelect) siteSelect.value = app1.site_selection || appData.site_selection || '';
+            if (dateValue) dateValue.value = app1.app_date_selection || appData.app_date_selection || '';
+            if (timeSelect && (app1.app_time_selection || appData.app_time_selection)) {
+                timeSelect.value = app1.app_time_selection || appData.app_time_selection;
+            }
+        }
+
+        function updateApplicantBadge() {
+            const badgeDiv = document.getElementById('groupApplicantBadge') || document.createElement('div');
+            badgeDiv.id = 'groupApplicantBadge';
+            badgeDiv.style.cssText = 'background: #eff6ff; color: #1e40af; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; margin-bottom: 24px; border: 1px solid #dbeafe; box-shadow: 0 2px 4px rgba(0,0,0,0.02);';
+            badgeDiv.textContent = `Group Booking: Filling out details for Applicant ${currentApplicant} of ${totalApplicants}`;
+            const container = document.querySelector('.dashboard-container');
+            if (container && !document.getElementById('groupApplicantBadge')) {
+                container.insertBefore(badgeDiv, container.firstChild);
+            }
+        }
+
         // Initialize group-specific event listeners
         function initializeGroupEventListeners() {
             // Application type change (group)
             document.getElementById('applicationTypeSelectGroup')?.addEventListener('change', () => {
+                refreshGroupDocumentSlots();
+                // Show/hide credential reason dropdown
                 const credContainer = document.getElementById('credentialReasonContainerGroup');
                 const credSelect = document.getElementById('credentialReasonSelectGroup');
                 const appType = document.getElementById('applicationTypeSelectGroup').value;
                 if (appType === 'Credential Updating (Change of Personal Details)') {
                     credContainer.style.display = 'block';
+                    credSelect.required = true;
                 } else {
                     credContainer.style.display = 'none';
+                    credSelect.required = false;
                     credSelect.value = '';
                 }
-                refreshGroupDocumentSlots();
             });
 
             // Credential reason change (group)
@@ -696,41 +917,25 @@
             // DOB change (group) - triggers minor fields and document refresh
             document.getElementById('dobInput')?.addEventListener('change', () => {
                 const dobVal = document.getElementById('dobInput').value;
-                const minorContainer = document.getElementById('minorFieldsContainer');
                 if (dobVal) {
                     const dob = new Date(dobVal);
                     const today = new Date(2026, 8, 20);
                     let age = today.getFullYear() - dob.getFullYear();
                     const m = today.getMonth() - dob.getMonth();
                     if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+                    const minorContainer = document.getElementById('minorFieldsContainer');
                     if (minorContainer) {
-                        minorContainer.style.display = age < 18 ? 'block' : 'none';
+                        if (age < 18) {
+                            minorContainer.style.display = 'block';
+                            minorContainer.querySelectorAll('input').forEach(input => input.required = true);
+                        } else {
+                            minorContainer.style.display = 'none';
+                            minorContainer.querySelectorAll('input').forEach(input => input.required = false);
+                        }
                     }
-                } else if (minorContainer) {
-                    minorContainer.style.display = 'none';
-                }
-                refreshGroupDocumentSlots();
-            });
-
-            // Birth place auto-combine: update readonly birth_place when country/province/city change
-            ['birth_country', 'birth_province', 'birth_city'].forEach(fieldName => {
-                const input = document.querySelector(`[name="${fieldName}"]`);
-                if (input) {
-                    input.addEventListener('input', updateBirthPlace);
-                    input.addEventListener('change', updateBirthPlace);
+                    refreshGroupDocumentSlots();
                 }
             });
-
-            function updateBirthPlace() {
-                const country = document.querySelector('[name="birth_country"]')?.value?.trim() || '';
-                const province = document.querySelector('[name="birth_province"]')?.value?.trim() || '';
-                const city = document.querySelector('[name="birth_city"]')?.value?.trim() || '';
-                const parts = [city, province, country].filter(Boolean);
-                const birthPlaceInput = document.querySelector('[name="birth_place"]');
-                if (birthPlaceInput) {
-                    birthPlaceInput.value = parts.join(', ');
-                }
-            }
 
             // Citizenship basis others
             document.getElementById('citizenshipBasisSelectGroup')?.addEventListener('change', (e) => {
@@ -738,11 +943,23 @@
             });
         }
 
-        // Refresh document slots for current applicant in group (prioritizing live DOM values)
+        // Refresh document slots for current applicant in group
         function refreshGroupDocumentSlots() {
-            const state = window.groupBookingState;
-            if (!state || !state.isInitialized) return;
-            window.GroupBooking.refreshApplicantDocumentSlots(state.currentApplicantIndex);
+            const appType = document.getElementById('applicationTypeSelectGroup').value;
+            const credentialReason = document.getElementById('credentialReasonSelectGroup').value;
+            const dob = document.getElementById('dobInput').value;
+            const appointmentDate = document.getElementById('selectedDateVal').value;
+
+            const age = window.DFA_RULES_ENGINE.calculateAge(dob, appointmentDate);
+
+            // Clear stale files when application type or credential reason changes
+            window.DFA_RULES_ENGINE.clearDynamicDocSlots('dynamicDocSlotsGroup', `applicant_${currentApplicant}_`);
+
+            // Render new document slots with applicant prefix
+            window.DFA_RULES_ENGINE.renderDynamicDocSlots('dynamicDocSlotsGroup', appType, credentialReason, age, `applicant_${currentApplicant}_`);
+
+            // Update guidance banner
+            window.DFA_RULES_ENGINE.updateGuidanceBanner('docRequirementsNoticeGroup', appType, credentialReason, age);
         }
 
         // Validation for group Step 5
@@ -758,15 +975,8 @@
                 alert(validation.message);
                 return;
             }
-            const state = window.groupBookingState;
-            if (state && state.isInitialized) {
-                // Sync current applicant's Step 3-5 fields into state without prematurely marking complete
-                window.GroupBooking.commitApplicantToState(state.currentApplicantIndex, {
-                    markCompleted: Boolean(state.groupApplicantsData[state.currentApplicantIndex]?.completed)
-                });
-            }
             refreshGroupDocumentSlots();
-            window.GroupBooking.goToStep(6);
+            goToStep(6);
         }
         function groupValidateAndGoToStep7() {
             const validation = groupValidateStep6BeforeAdvance();
@@ -774,81 +984,181 @@
                 alert(validation.message);
                 return;
             }
-            window.GroupBooking.goToStep(7);
+            groupHandleNext(7);
         }
 
-        // Form submit handler
-        document.getElementById('passportForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            // Step 7 Pre-Submit Completeness Gate
-            const completenessCheck = window.GroupBooking.validateAllApplicantsComplete();
-            if (!completenessCheck.valid) {
-                alert(completenessCheck.message);
-                if (completenessCheck.incompleteApplicants.length > 0) {
-                    const firstIncomplete = completenessCheck.incompleteApplicants[0] - 1;
-                    window.GroupBooking.hydrateApplicantForm(firstIncomplete);
-                    window.GroupBooking.goToStep(3);
+        function groupHandleNext(targetStep) {
+            saveCurrentApplicantData();
+            if (targetStep > 6) {
+                if (currentApplicant < totalApplicants) {
+                    currentApplicant++;
+                    currentStep = 3;
+                    window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
+                    return;
+                } else {
+                    currentStep = 7;
                 }
+            } else {
+                currentStep = targetStep;
+            }
+            goToStep(currentStep);
+        }
+        function groupHandleBack(targetStep) {
+            if (targetStep < 3 && currentApplicant > 1) {
+                currentApplicant--;
+                currentStep = 6;
+                window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
                 return;
             }
+            goToStep(targetStep);
+        }
+        function saveCurrentApplicantData() {
+            const formData = new FormData(document.getElementById('passportForm'));
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
 
-            // Commit final applicant data so state.groupApplicantsData has all N applicants with canonical snake_case fields
-            window.GroupBooking.commitApplicantToState(window.groupBookingState.currentApplicantIndex, { markCompleted: true });
+            let sharedSite = document.getElementById('siteSelect')?.value || '';
+            let sharedDate = document.getElementById('selectedDateVal')?.value || '';
+            let sharedTime = document.getElementById('appTimeSelect')?.value || '';
 
-            const state = window.groupBookingState;
-            const app1 = state.groupApplicantsData[0] || {};
+            let appData = groupData[`applicant_${currentApplicant}`] || {};
+            formData.forEach((value, key) => {
+                appData[key] = value;
+            });
+
+            if (currentApplicant === 1) {
+                if (sharedSite) appData['site_selection'] = sharedSite;
+                if (sharedDate) appData['app_date_selection'] = sharedDate;
+                if (sharedTime) appData['app_time_selection'] = sharedTime;
+            } else {
+                let app1 = groupData['applicant_1'] || {};
+                appData['site_selection'] = app1['site_selection'] || sharedSite;
+                appData['app_date_selection'] = app1['app_date_selection'] || sharedDate;
+                appData['app_time_selection'] = app1['app_time_selection'] || sharedTime;
+            }
+
+            groupData[`applicant_${currentApplicant}`] = appData;
+            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+        }
+
+        // Populate review summary for all applicants
+        function populateReviewSummary() {
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            let app1 = groupData['applicant_1'] || {};
+            const reviewGrid = document.getElementById('groupReviewGrid');
+            if (!reviewGrid) return;
+            let htmlContent = '';
+            for (let i = 1; i <= totalApplicants; i++) {
+                let app = groupData[`applicant_${i}`] || {};
+                let fullName = `${app.givenname || ''} ${app.lastname || ''}`.trim() || '-';
+
+                let site = app.site_selection || app1.site_selection || '-';
+                let date = app.app_date_selection || app1.app_date_selection || '-';
+                let time = app.app_time_selection || app1.app_time_selection || '-';
+
+                // Resolved application type for this applicant
+                const appType = app.application_type || '-';
+                const credReason = app.credential_reason || '';
+                const resolvedType = window.DFA_RULES_ENGINE.resolveApplicationType(appType, credReason);
+
+                // Document labels for this applicant
+                const docLabels = window.DFA_RULES_ENGINE.getDocumentLabels(`dynamicDocSlotsGroup`); // Note: this gets current applicant's docs
+                // For review, we need to show each applicant's docs - we'll compute from stored data
+                let docHtml = '<div style="font-size: 13px; line-height: 1.8; color: #334155;">Documents will be shown after validation.</div>';
+
+                htmlContent += `
+                    <div class="summary-card" style="background: #f8fafc; border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-sm); grid-column: span 2; margin-bottom: 15px;">
+                        <h4 style="font-size: 15px; color: var(--primary); margin-bottom: 12px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; font-weight: 700; text-transform: uppercase;">Applicant ${i}: ${escapeHtml(fullName)}</h4>
+                        <div style="font-size: 13px; line-height: 1.8; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; color: #334155;">
+                            <div>
+                                <div><strong>Application Type:</strong> ${escapeHtml(normalizeAppTypeForDisplay(resolvedType))}</div>
+                                    <div><strong>Email:</strong> ${escapeHtml(app.email || '-')}</div>
+                                    <div><strong>Mobile:</strong> ${escapeHtml(app.mobile || '-')}</div>
+                            </div>
+                            <div>
+                                <div><strong>DOB:</strong> ${escapeHtml(app.dob || '-')}</div>
+                                <div><strong>Site:</strong> ${escapeHtml(site)}</div>
+                                <div><strong>Date/Time:</strong> ${escapeHtml(date)} (${escapeHtml(time)})</div>
+                            </div>
+                        </div>
+                        <div id="rev-documents-applicant-${i}" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); font-size: 12px; color: #64748b;">
+                            <strong>Required Documents:</strong> Select application type to see requirements.
+                        </div>
+                    </div>
+                `;
+            }
+            reviewGrid.innerHTML = htmlContent;
+
+            // Now populate document requirements for each applicant in review
+            for (let i = 1; i <= totalApplicants; i++) {
+                let app = groupData[`applicant_${i}`] || {};
+                const appType = app.application_type || 'First-Time Passport';
+                const credReason = app.credential_reason || '';
+                const dob = app.dob || '';
+                const apptDate = app.app_date_selection || app1.app_date_selection || '';
+                const age = window.DFA_RULES_ENGINE.calculateAge(dob, apptDate);
+                const docs = window.DFA_RULES_ENGINE.getRequiredDocuments(appType, credReason, age);
+
+                const docEl = document.getElementById(`rev-documents-applicant-${i}`);
+                if (docEl && docs.length > 0) {
+                    let html = '<ul style="margin: 8px 0 0 0; padding-left: 20px;">';
+                    docs.forEach(doc => {
+                    html += `<li>${escapeHtml(doc.label)} ${doc.required ? '<span style="color:#ef4444;">*</span>' : ''} <span style="color:#6b7280; font-weight:400;">(to be presented on-site if not uploaded)</span></li>`;
+                    });
+                    html += '</ul>';
+                    docEl.innerHTML = html;
+                }
+            }
+        }
+
+        document.getElementById('passportForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            saveCurrentApplicantData();
+            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            let app1 = groupData['applicant_1'] || {};
 
             document.getElementById('hiddenSite').value = app1.site_selection || '';
             document.getElementById('hiddenAppDate').value = app1.app_date_selection || '';
             document.getElementById('hiddenAppTime').value = app1.app_time_selection || '';
-            document.getElementById('groupDataPayload').value = JSON.stringify(state.groupApplicantsData);
+            document.getElementById('groupDataPayload').value = JSON.stringify(groupData);
 
             const userEmail = localStorage.getItem('userEmail') || app1.email || 'group@applicant.com';
+            const randomGrpId = `PH-GRP-${Math.floor(100000 + Math.random() * 900000)}`;
 
-            // Use form's FormData to include ALL fields (hidden + visible), then attach per-applicant files
-            const formData = new FormData(this);
-
-            // Override email with userEmail (from session or first applicant)
-            formData.set('email', userEmail);
-
-            // Attach per-applicant File objects from window.applicantFiles without duplicating last applicant's files
-            for (const [prefix, files] of Object.entries(window.applicantFiles)) {
-                for (const [docKey, file] of Object.entries(files)) {
-                    formData.set(docKey, file);
-                }
-            }
+            // Read the actual application type from applicant_1's form select
+            const applicationType = app1.application_type || 'Group Passport Application';
 
             try {
                 const response = await fetch('../api/submit-group-application.php', {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: userEmail,
+                        applicationId: randomGrpId,
+                        applicationType: applicationType,
+                        status: 'Form Submitted',
+                        appointmentDate: app1.app_date_selection || '2027-01-01',
+                        appointmentTime: app1.app_time_selection || '15:00',
+                        appointmentLocation: app1.site_selection || 'ANGELES',
+                        groupPayload: groupData
+                    })
                 });
 
-                const rawText = await response.text();
-                let result;
-                try {
-                    result = JSON.parse(rawText);
-                } catch (parseError) {
-                    const trimmedServerText = rawText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
-                    throw new Error(trimmedServerText || 'Server returned an unexpected non-JSON response.');
-                }
-
+                const result = await response.json();
                 if (!response.ok || !result.success) {
                     throw new Error(result.message || 'Unable to save group application.');
                 }
 
-                const rawSavedId = result.groupCode || result.application_id || result.applicationId || `PH-GRP-${Math.floor(100000 + Math.random() * 900000)}`;
-                const savedAppId = String(rawSavedId).replace(/^(PH-GRP-\d+)-\d+$/, '$1');
+                const savedAppId = result.application_id || result.applicationId || randomGrpId;
                 localStorage.setItem('currentApplicationId', savedAppId);
                 localStorage.setItem('activeAppId', savedAppId);
 
-                window.location.href = 'payments.html?id=' + encodeURIComponent(savedAppId);
+                window.location.href = 'payments.html?id=' + savedAppId;
             } catch (error) {
                 console.error('Group submission error:', error);
                 alert(error.message);
             }
         });
     </script>
+    <script src="member-profile.js"></script>
 </body>
 </html>

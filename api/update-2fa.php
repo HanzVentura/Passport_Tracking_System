@@ -1,6 +1,9 @@
 <?php
-session_start();
 header('Content-Type: application/json');
+require_once __DIR__ . '/auth-helper.php';
+startSecureSession();
+requireMember();
+requireCsrfToken();
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/audit-helper.php';
 
@@ -22,9 +25,9 @@ if ($enabled) {
         echo json_encode(['success' => false, 'message' => 'PIN must be exactly 6 digits.']);
         exit;
     }
-    $plainPasscode = $pin;
+    $storedPasscode = password_hash($pin, PASSWORD_BCRYPT);
 } else {
-    $plainPasscode = null; // Clear passcode if 2FA is disabled
+    $storedPasscode = null;
 }
 
 try {
@@ -35,7 +38,7 @@ try {
     );
     $stmt->execute([
         ':enabled' => $enabled ? 1 : 0,
-        ':pin' => $plainPasscode,
+        ':pin' => $storedPasscode,
         ':user_id' => $userId
     ]);
     $actorEmail = $_SESSION['user_email'] ?? null;
@@ -53,6 +56,8 @@ try {
     
     echo json_encode(['success' => true, 'message' => '2FA settings updated successfully!']);
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    error_log('update-2fa.php error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Unable to update 2FA settings.']);
 }
 ?>

@@ -1,6 +1,7 @@
 <?php
-session_start();
 header('Content-Type: application/json');
+require_once __DIR__ . '/auth-helper.php';
+startSecureSession();
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/audit-helper.php';
 
@@ -21,20 +22,40 @@ try {
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
+    requireLogin();
     try {
-        $stmt = $pdo->query("SELECT * FROM emergencies ORDER BY id DESC");
-        $emergencies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (($_SESSION['user_role'] ?? '') === 'admin') {
+            $stmt = $pdo->query("SELECT * FROM emergencies ORDER BY id DESC");
+            $emergencies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $stmt = $pdo->prepare("SELECT * FROM emergencies WHERE email = ? ORDER BY id DESC");
+            $stmt->execute([getSessionEmail()]);
+            $emergencies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
         echo json_encode(['success' => true, 'emergencies' => $emergencies]);
     } catch (Exception $e) {
-        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        error_log('emergencies.php read error: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Unable to load emergency reports.']);
     }
     exit;
 }
 
 if ($method === 'POST') {
+    requireLogin();
+    requireCsrfToken();
     $data = json_decode(file_get_contents('php://input'), true);
     
     if (isset($data['emergencyId'])) {
+        $isAdmin = ($_SESSION['user_role'] ?? '') === 'admin';
+        if (!$isAdmin) {
+            $owner = $pdo->prepare("SELECT email FROM emergencies WHERE id = ?");
+            $owner->execute([$data['emergencyId']]);
+            $row = $owner->fetch(PDO::FETCH_ASSOC);
+            if (!$row || strtolower((string)$row['email']) !== getSessionEmail()) {
+                jsonError('You do not own this emergency report.', 403);
+            }
+            $newStatus = null;
+        }
         $emergencyId = $data['emergencyId'];
         $newReply = $data['reply'] ?? null;
         $newStatus = $data['status'] ?? null;
@@ -66,13 +87,14 @@ if ($method === 'POST') {
 
             echo json_encode(['success' => true, 'message' => 'Emergency updated successfully.']);
         } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            error_log('emergencies.php update error: ' . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Unable to update emergency report.']);
         }
         exit;
     }
 
-    $email = $data['email'] ?? ($_SESSION['user_email'] ?? '');
-    $appId = $data['applicationId'] ?? ('EMG-' . rand(100000, 999900));
+    $email = getSessionEmail() ?? strtolower(trim((string)($data['email'] ?? '')));
+    $appId = $data['applicationId'] ?? ('EMG-' . random_int(100000, 999900));
     $subject = $data['subject'] ?? 'Urgent Consular Assistance';
     $message = $data['message'] ?? '';
 
@@ -88,7 +110,8 @@ if ($method === 'POST') {
 
         echo json_encode(['success' => true, 'message' => 'Emergency request filed successfully.']);
     } catch (Exception $e) {
-        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        error_log('emergencies.php submit error: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Unable to submit emergency report.']);
     }
     exit;
 }

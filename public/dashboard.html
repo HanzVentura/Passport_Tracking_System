@@ -402,148 +402,25 @@
         .app-view.active-view {
             display: block;
         }
-
-        /* Choose Appointment Type Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(2px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 16px;
-            animation: modalFadeIn 0.2s ease-out;
-        }
-        @keyframes modalFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .modal-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-elevated);
+        .application-history-summary {
             width: 100%;
-            max-width: 480px;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: modalSlideUp 0.25s ease-out;
-            transform-origin: center;
-        }
-        @keyframes modalSlideUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .modal-header h2 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--text-muted);
-            cursor: pointer;
-            line-height: 1;
-            padding: 4px;
-            border-radius: var(--radius-sm);
-            transition: all 0.15s ease;
-        }
-        .modal-close:hover {
-            background: var(--bg-main);
-            color: var(--text-main);
-        }
-        .modal-body {
-            padding: 24px;
-        }
-        .modal-description {
-            margin: 0 0 20px;
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-        .modal-options {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1.1fr 1.4fr 1fr 1fr 28px;
             gap: 12px;
-        }
-        .modal-option {
-            display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 18px 20px;
-            background: var(--bg-main);
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-md);
-            cursor: pointer;
             text-align: left;
-            transition: all 0.2s ease;
-        }
-        .modal-option:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-            transform: translateX(4px);
-        }
-        .modal-option:focus-visible {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-        }
-        .modal-option-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        .modal-option:hover .modal-option-icon {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-        }
-        .modal-option-content {
-            flex: 1;
-            min-width: 0;
-        }
-        .modal-option-content strong {
-            display: block;
-            font-size: 15px;
-            font-weight: 600;
+            border: none;
+            background: #fff;
+            padding: 14px 16px;
+            cursor: pointer;
             color: var(--text-main);
-            margin-bottom: 2px;
         }
-        .modal-option-content span {
+        .application-history-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px 20px;
             font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.4;
         }
-        .modal-option-arrow {
-            color: var(--text-muted);
-            font-size: 16px;
-            transition: all 0.2s ease;
-        }
-        .modal-option:hover .modal-option-arrow {
-            color: var(--primary);
-            transform: translateX(4px);
-        }
-
         /* ==========================================================
         RESPONSIVE DESIGN FIXES FOR DASHBOARD
         ========================================================== */
@@ -621,8 +498,26 @@
         .form-row {
             grid-template-columns: 1fr !important;
         }
+
+    .application-history-summary {
+        grid-template-columns: 1fr 28px;
+        gap: 8px;
+    }
+
+    .application-history-summary span {
+        display: none;
+    }
+
+    .application-history-details {
+        grid-template-columns: 1fr;
+    }
+
+    .application-history-details [style*="grid-column"] {
+        grid-column: 1 !important;
+    }
     }
     </style>
+    <link rel="stylesheet" href="member-navigation.css">
 </head>
 <body>
     <!-- Sidebar Navigation -->
@@ -635,18 +530,18 @@
                 </div>
             </div>
             <ul class="nav-links">
-                <li class="active"><a href="dashboard.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li class="active"><a href="dashboard.html" aria-current="page"><i class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a href="payments.html"><i class="fa-solid fa-wallet"></i> Payments</a></li>
                 <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
                 <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
                 <li><a href="faq.html?from=dashboard"><i class="fa-solid fa-book-open"></i> Passport FAQs</a></li>
                 <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
-                <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a></li>
                 <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
         </div>
         <div class="sidebar-bottom">
-            <a href="login.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+            <a href="../logout.php"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
         </div>
     </div>
     <!-- Main Content Area -->
@@ -723,9 +618,18 @@
                         </div>
                     </div>
                 </div>
+                <!-- Application History -->
+                <div class="selection-section-title">Application History</div>
+                <div class="card dashboard-card" style="margin-bottom:24px;">
+                    <div id="applicationHistoryLoading" style="font-size:13px;color:var(--text-muted);">Loading application history...</div>
+                    <div id="applicationHistoryEmpty" style="display:none;font-size:13px;color:var(--text-muted);">No previous applications found.</div>
+                    <div id="applicationHistoryWrap" style="display:none; max-height:360px; overflow-y:auto;">
+                        <div id="applicationHistoryList"></div>
+                    </div>
+                </div>
                 <!-- Start Application Section -->
                 <div class="selection-section-title">Start Application</div>
-                <a class="action-banner-card" id="startApplicationBtn" href="javascript:void(0);">
+                <a class="action-banner-card" href="new-passport.html">
                     <div class="action-banner-left">
                         <div class="action-banner-icon">
                             <i class="fa-solid fa-globe"></i>
@@ -740,47 +644,16 @@
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
                 </a>
-
-                <!-- Choose Appointment Type Modal -->
-                <div class="modal-overlay" id="appointmentTypeModal" style="display: none;">
-                    <div class="modal-card" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
-                        <div class="modal-header">
-                            <h2 id="modalTitle">Choose Appointment Type</h2>
-                            <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close modal">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <p class="modal-description">How would you like to proceed with your passport application?</p>
-                            <div class="modal-options">
-                                <button type="button" class="modal-option" id="soloAppointmentBtn" data-type="solo">
-                                    <div class="modal-option-icon"><i class="fa-solid fa-user"></i></div>
-                                    <div class="modal-option-content">
-                                        <strong>Solo Appointment (1 Applicant)</strong>
-                                        <span>Apply for a single passport appointment</span>
-                                    </div>
-                                    <i class="fa-solid fa-chevron-right modal-option-arrow"></i>
-                                </button>
-                                <button type="button" class="modal-option" id="groupAppointmentBtn" data-type="group">
-                                    <div class="modal-option-icon"><i class="fa-solid fa-users"></i></div>
-                                    <div class="modal-option-content">
-                                        <strong>Group Appointment (2&ndash;10 Applicants)</strong>
-                                        <span>Book a shared appointment for multiple applicants</span>
-                                    </div>
-                                    <i class="fa-solid fa-chevron-right modal-option-arrow"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <!-- Manage Appointment Section -->
                 <div class="selection-section-title">Manage Appointment</div>
-                <a class="action-banner-card" href="reschedule.html">
+                <a class="action-banner-card" id="manageAppointmentLink" href="reschedule.html">
                     <div class="action-banner-left">
                         <div class="action-banner-icon" style="background: #eff6ff; color: #2563eb;">
                             <i class="fa-solid fa-calendar-days"></i>
                         </div>
                         <div class="action-banner-text">
-                            <h3>Reschedule or Cancel</h3>
-                            <p>Modify your appointment date/time slot or completely cancel an existing application.</p>
+                            <h3 id="manageAppointmentTitle">Reschedule or Cancel</h3>
+                            <p id="manageAppointmentDescription">Modify your appointment date/time slot or completely cancel an existing application.</p>
                         </div>
                     </div>
                     <div class="action-banner-right">
@@ -894,12 +767,145 @@
             // Already Title Case or unknown - capitalize first letter of each word
             return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         }
+
+        async function loadApplicationHistory() {
+            const loading = document.getElementById('applicationHistoryLoading');
+            const empty = document.getElementById('applicationHistoryEmpty');
+            const wrap = document.getElementById('applicationHistoryWrap');
+            const list = document.getElementById('applicationHistoryList');
+
+            const escapeHistoryValue = (value) => String(value ?? '-').replace(/[&<>"']/g, (char) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            })[char]);
+
+            const formatHistoryDate = (value) => {
+                if (!value) return '-';
+                const date = new Date(value);
+                return Number.isNaN(date.getTime())
+                    ? String(value)
+                    : date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            };
+
+            try {
+                const response = await fetch('../api/applications.php?action=list_member', {
+                    credentials: 'same-origin',
+                    cache: 'no-store'
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.message || 'Unable to load application history.');
+
+                const applications = result.applications || [];
+                if (applications.length === 0) {
+                    loading.style.display = 'none';
+                    empty.style.display = 'block';
+                    return;
+                }
+
+                list.innerHTML = applications.map((application, index) => {
+                    const appId = application.application_id || application.applicationId || '-';
+                    const type = normalizeAppTypeForDisplay(application.application_type || application.applicationType || '-');
+                    const status = application.status || 'Form Submitted';
+                    const submitted = formatHistoryDate(application.created_at);
+                    const updated = formatHistoryDate(application.updated_at);
+                    const payment = application.payment_status || 'Pending';
+                    const appointmentDate = formatHistoryDate(application.appointment_date);
+                    const appointmentTime = application.appointment_time || '-';
+                    const location = application.appointment_location || '-';
+                    const processing = application.processing_type || '-';
+                    const receiving = application.receiving_option || '-';
+                    const paymentMethod = application.payment_method || '-';
+                    const amount = application.amount !== null && application.amount !== undefined
+                        ? `PHP ${Number(application.amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                        : '-';
+                    const tracking = application.tracking_number || '-';
+                    const detailsId = `application-history-details-${index}`;
+                    return `
+                        <div style="border:1px solid var(--border-color); border-radius:10px; margin-bottom:10px; background:#fff; overflow:hidden;">
+                            <button type="button"
+                                aria-expanded="false"
+                                aria-controls="${detailsId}"
+                                data-history-toggle="${detailsId}"
+                                class="application-history-summary">
+                                <strong>${escapeHistoryValue(appId)}</strong>
+                                <span>${escapeHistoryValue(type)}</span>
+                                <span style="font-weight:700; color:#4f46e5;">${escapeHistoryValue(status)}</span>
+                                <span>${escapeHistoryValue(payment)}</span>
+                                <i class="fa-solid fa-chevron-down" data-history-chevron style="transition:transform 0.2s;"></i>
+                            </button>
+                            <div id="${detailsId}" data-history-details style="display:none; padding:16px; border-top:1px solid #f1f5f9; background:#f8fafc;">
+                                <div class="application-history-details">
+                                    <div><strong style="color:var(--text-muted); display:block;">Submitted</strong>${escapeHistoryValue(submitted)}</div>
+                                    <div><strong style="color:var(--text-muted); display:block;">Last Updated</strong>${escapeHistoryValue(updated)}</div>
+                                    <div><strong style="color:var(--text-muted); display:block;">Processing</strong>${escapeHistoryValue(processing)}</div>
+                                    <div><strong style="color:var(--text-muted); display:block;">Payment Method</strong>${escapeHistoryValue(paymentMethod)}</div>
+                                    <div><strong style="color:var(--text-muted); display:block;">Amount</strong>${escapeHistoryValue(amount)}</div>
+                                    <div><strong style="color:var(--text-muted); display:block;">Receiving Option</strong>${escapeHistoryValue(receiving)}</div>
+                                    <div><strong style="color:var(--text-muted); display:block;">Appointment Date</strong>${escapeHistoryValue(appointmentDate)}</div>
+                                    <div><strong style="color:var(--text-muted); display:block;">Appointment Time</strong>${escapeHistoryValue(appointmentTime)}</div>
+                                    <div style="grid-column:1/-1;"><strong style="color:var(--text-muted); display:block;">Appointment Location</strong>${escapeHistoryValue(location)}</div>
+                                    <div style="grid-column:1/-1;"><strong style="color:var(--text-muted); display:block;">Tracking Number</strong>${escapeHistoryValue(tracking)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                list.querySelectorAll('[data-history-toggle]').forEach((toggle) => {
+                    toggle.addEventListener('click', () => {
+                        const details = document.getElementById(toggle.dataset.historyToggle);
+                        const chevron = toggle.querySelector('[data-history-chevron]');
+                        const willOpen = details.style.display === 'none';
+
+                        list.querySelectorAll('[data-history-details]').forEach((panel) => {
+                            panel.style.display = 'none';
+                        });
+                        list.querySelectorAll('[data-history-toggle]').forEach((button) => {
+                            button.setAttribute('aria-expanded', 'false');
+                            const icon = button.querySelector('[data-history-chevron]');
+                            if (icon) icon.style.transform = 'rotate(0deg)';
+                        });
+
+                        if (willOpen) {
+                            details.style.display = 'block';
+                            toggle.setAttribute('aria-expanded', 'true');
+                            if (chevron) chevron.style.transform = 'rotate(180deg)';
+                        }
+                    });
+                });
+
+                loading.style.display = 'none';
+                wrap.style.display = 'block';
+            } catch (error) {
+                loading.textContent = error.message || 'Unable to load application history.';
+            }
+        }
+
         function displaySavedApplication(application) {
             currentAppData = application;
             const appId = application.application_id || application.applicationId;
             document.getElementById('dispAppId').innerText = appId;
             localStorage.setItem('currentApplicationId', appId);
             localStorage.setItem('activeAppId', appId);
+            const manageAppointmentLink = document.getElementById('manageAppointmentLink');
+            if (manageAppointmentLink && appId) {
+                manageAppointmentLink.href = `reschedule.html?id=${encodeURIComponent(appId)}`;
+            }
+
+            const normalizedStatus = (application.status || 'Form Submitted').toLowerCase();
+            const terminalStatuses = ['dispatched', 'ready for release', 'ready for claim', 'ready for pickup', 'claimed', 'released', 'completed'];
+            const manageTitle = document.getElementById('manageAppointmentTitle');
+            const manageDescription = document.getElementById('manageAppointmentDescription');
+            if (terminalStatuses.includes(normalizedStatus)) {
+                if (manageTitle) manageTitle.innerText = 'Appointment Changes Locked';
+                if (manageDescription) manageDescription.innerText = 'Your passport is ready for claim or completed. Rescheduling and cancellation are no longer available.';
+            } else {
+                if (manageTitle) manageTitle.innerText = 'Reschedule or Cancel';
+                if (manageDescription) manageDescription.innerText = 'Modify your appointment date/time slot or completely cancel an existing application.';
+            }
 
             const rawAppType = application.application_type || application.applicationType || 'New First-Time Application';
             document.getElementById('dispAppType').innerText = normalizeAppTypeForDisplay(rawAppType);
@@ -1041,20 +1047,42 @@
         }
        
         window.addEventListener('DOMContentLoaded', async () => {
+            loadApplicationHistory();
+            let sessionEmail = '';
             try {
                 const response = await fetch('../api/user-data.php');
                 const data = await response.json();
                 if (data.loggedIn && data.fullName) {
                     document.getElementById('greetingText').textContent = 'Good Day, ' + data.fullName;
                     document.getElementById('user-name').textContent = data.fullName;
+                    sessionEmail = (data.email || '').trim().toLowerCase();
+                    if (sessionEmail) {
+                        const storedEmail = (localStorage.getItem('userEmail') || '').trim().toLowerCase();
+                        if (storedEmail && storedEmail !== sessionEmail) {
+                            [
+                                'activeAppId',
+                                'currentApplicationId',
+                                'paymentAmount',
+                                'paymentProcessingType',
+                                'applicationType',
+                                'selectedAppointmentDate',
+                                'selectedAppointmentTime',
+                                'selectedSite',
+                                'groupCount',
+                                'groupApplicantsData'
+                            ].forEach((key) => localStorage.removeItem(key));
+                        }
+                        localStorage.setItem('userEmail', sessionEmail);
+                        localStorage.setItem('userRole', 'member');
+                    }
                 }
             } catch (error) {
                 console.error('Unable to load user data:', error);
             }
            
             const urlParams = new URLSearchParams(window.location.search);
-            const explicitAppId = urlParams.get('id') || urlParams.get('applicationId') || localStorage.getItem('activeAppId');
-            const userEmail = localStorage.getItem('userEmail');
+            const explicitAppId = urlParams.get('id') || urlParams.get('applicationId');
+            const userEmail = sessionEmail || localStorage.getItem('userEmail');
             let fetchUrl = '../api/get-application.php';
            
             if (explicitAppId) {
@@ -1074,71 +1102,9 @@
                 console.error('Unable to load saved application:', error);
             }
         });
-
-        // Choose Appointment Type Modal Logic
-        (function() {
-            const modal = document.getElementById('appointmentTypeModal');
-            const startBtn = document.getElementById('startApplicationBtn');
-            const closeBtn = document.getElementById('modalCloseBtn');
-            const soloBtn = document.getElementById('soloAppointmentBtn');
-            const groupBtn = document.getElementById('groupAppointmentBtn');
-
-            function openModal() {
-                if (!modal) return;
-                modal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-                // Focus first focusable element for accessibility
-                setTimeout(() => closeBtn?.focus(), 50);
-            }
-
-            function closeModal() {
-                if (!modal) return;
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
-            }
-
-            function handleSoloClick() {
-                // Clear any stale group state
-                localStorage.removeItem('groupCount');
-                localStorage.removeItem('groupApplicantsData');
-                closeModal();
-                window.location.href = 'new-passport.html';
-            }
-
-            function handleGroupClick() {
-                closeModal();
-                window.location.href = 'group-appointment.html';
-            }
-
-            // Event listeners
-            startBtn?.addEventListener('click', (e) => {
-                e.preventDefault();
-                openModal();
-            });
-
-            closeBtn?.addEventListener('click', closeModal);
-
-            soloBtn?.addEventListener('click', handleSoloClick);
-            groupBtn?.addEventListener('click', handleGroupClick);
-
-            // Close on backdrop click
-            modal?.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-
-            // Close on Escape key
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal?.style.display === 'flex') {
-                    closeModal();
-                }
-            });
-
-            // Prevent modal card clicks from bubbling to backdrop
-            modal?.querySelector('.modal-card')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
-        })();
     </script>
-    <script src="script.js?v=3"></script>
+    <script src="csrf.js"></script>
+    <script src="script.js"></script>
+    <script src="member-profile.js"></script>
 </body>
 </html>

@@ -189,6 +189,21 @@
             color: #334155;
             vertical-align: middle;
         }
+        .audit-table-wrap {
+            max-height: 420px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+        }
+        .audit-table-wrap table {
+            min-width: 900px;
+        }
+        .audit-table-wrap thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
         .btn-action {
             padding: 6px 12px;
             border-radius: 6px;
@@ -391,7 +406,7 @@
             </ul>
         </div>
         <div class="sidebar-bottom">
-            <a href="admin-login.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+            <a href="../logout.php"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
         </div>
     </div>
    
@@ -500,6 +515,7 @@
                             <option value="">All actions</option>
                             <option value="LOGIN_SUCCESS">Login success</option>
                             <option value="LOGIN_FAILED">Login failed</option>
+                            <option value="LOGOUT">Logout</option>
                             <option value="ACCOUNT_CREATED">Account created</option>
                             <option value="APPLICATION_SUBMITTED">Application submitted</option>
                             <option value="APPLICATION_STATUS_UPDATED">Status updated</option>
@@ -514,6 +530,7 @@
                         <button class="btn-action btn-status-open" type="button" onclick="loadAuditTrail()">Refresh</button>
                         <button class="btn-action" type="button" onclick="exportAuditTrail()" style="background:#0f172a; color:#fff;">Export CSV</button>
                     </div>
+                    <div class="audit-table-wrap">
                     <table>
                         <thead>
                             <tr>
@@ -530,6 +547,7 @@
                             <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px;">Loading audit trail...</td></tr>
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -986,5 +1004,6 @@
 
         window.addEventListener('DOMContentLoaded', loadAdminData);
     </script>
+    <script src="csrf.js"></script>
 </body>
 </html>

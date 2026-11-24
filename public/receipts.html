@@ -71,6 +71,7 @@
         @media (max-width: 680px) { body { display: block; } .sidebar { width: 100%; height: auto; padding: 12px 0; } .sidebar-bottom { display: none; } .nav-links { display: grid; grid-template-columns: repeat(3, 1fr); } .nav-links li a { justify-content: center; padding: 10px 6px; font-size: 11px; gap: 4px; flex-direction: column; } .nav-links li a i { margin: 0; } .header { padding: 16px 20px; } .dashboard-container { padding: 20px 16px; } .welcome-banner { padding: 20px; } .card { padding: 18px 14px; } }
         @media print { .sidebar, .header, .welcome-banner, .card-subtitle, .print-button { display: none !important; } body, .main-content, .dashboard-container { background: #fff; display: block; min-height: 0; padding: 0; } .card { border: 0; box-shadow: none; padding: 0; } .transaction-table { min-width: 0; } }
     </style>
+    <link rel="stylesheet" href="member-navigation.css">
 </head>
 <body>
     <aside class="sidebar">
@@ -83,11 +84,11 @@
                 <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
                 <li><a href="faq.html?from=dashboard"><i class="fa-solid fa-book-open"></i> Passport FAQs</a></li>
                 <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
-                <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a></li>
                 <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
         </div>
-        <div class="sidebar-bottom"><a href="login.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></div>
+        <div class="sidebar-bottom">        <a href="../logout.php"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></div>
     </aside>
    
     <main class="main-content">
@@ -175,7 +176,7 @@
                 processingType = 'Expedited / Rush Processing';
             }
 
-            receiptRows.innerHTML = `<tr>
+            receiptRows.insertAdjacentHTML('beforeend', `<tr>
                 <td><strong>${applicationType}</strong></td>
                 <td>${appId}</td>
                 <td><span style="font-weight: 600; color: #4f46e5;">${processingType}</span></td>
@@ -183,13 +184,10 @@
                 <td>${formatAmount(application)}</td>
                 <td><span class="status-badge"><i class="fa-solid fa-check"></i>Paid</span></td>
                 <td><button class="print-button" type="button" onclick="printReceipt()"><i class="fa-solid fa-print"></i> Print</button></td>
-            </tr>`;
+            </tr>`);
             receiptMessage.style.display = 'none';
         }
         async function loadReceipts() {
-            const userEmail = localStorage.getItem('userEmail');
-            const activeAppId = localStorage.getItem('activeAppId') || localStorage.getItem('currentApplicationId');
-            
             try {
                 const userResponse = await fetch('../api/user-data.php');
                 const userData = await userResponse.json();
@@ -202,21 +200,27 @@
                 console.error('Unable to load user data:', error);
             }
 
-            if (!userEmail && !activeAppId) {
-                receiptMessage.textContent = 'No active paid transaction found.';
-                return;
-            }
             try {
-                let fetchUrl = `../api/get-application.php`;
-                if (activeAppId) {
-                    fetchUrl += `?applicationId=${encodeURIComponent(activeAppId)}`;
-                } else {
-                    fetchUrl += `?email=${encodeURIComponent(userEmail)}`;
-                }
-                const response = await fetch(fetchUrl);
+                const response = await fetch('../api/applications.php?action=list_member', {
+                    credentials: 'same-origin',
+                    cache: 'no-store'
+                });
                 const result = await response.json();
-                if (!response.ok) throw new Error(result.message || 'Unable to load receipts.');
-                renderReceipt(result.application);
+                if (!response.ok || !result.success) throw new Error(result.message || 'Unable to load receipts.');
+
+                const paidApplications = (result.applications || []).filter((application) => {
+                    const paymentStatus = (application.payment_status || application.paymentStatus || '').toLowerCase();
+                    const status = (application.status || '').toLowerCase();
+                    return paymentStatus === 'paid' || status === 'paid' || status === 'biometrics received';
+                });
+
+                receiptRows.innerHTML = '';
+                if (paidApplications.length === 0) {
+                    receiptMessage.textContent = 'No paid transactions found.';
+                    return;
+                }
+
+                paidApplications.forEach(renderReceipt);
             } catch (error) {
                 receiptMessage.textContent = error.message;
             }
@@ -224,5 +228,6 @@
         loadReceipts();
     </script>
     <script src="script.js"></script>
+    <script src="member-profile.js"></script>
 </body>
 </html>

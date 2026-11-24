@@ -1,6 +1,7 @@
 <?php
-session_start();
 header('Content-Type: application/json');
+require_once __DIR__ . '/auth-helper.php';
+startSecureSession();
 
 // Connect to MySQL database via centralized connection
 require_once __DIR__ . '/../db.php';
@@ -40,7 +41,11 @@ try {
             exit;
         }
         // Validate the entered passcode against the database record
-        if ($passcode !== $user['passcode']) {
+        $storedPasscode = (string)($user['passcode'] ?? '');
+        $passcodeValid = password_get_info($storedPasscode)['algo'] !== null
+            ? password_verify($passcode, $storedPasscode)
+            : hash_equals($storedPasscode, $passcode);
+        if (!$passcodeValid) {
             logAudit($pdo, 'LOGIN_FAILED', 'user', $email, null, null, 'Incorrect 2FA passcode.', $email, 'unknown');
             echo json_encode(['success' => false, 'message' => 'Incorrect 6-digit passcode.']);
             exit;
@@ -62,6 +67,8 @@ try {
         'redirect' => 'dashboard.html'
     ]);
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    error_log('login.php error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Unable to log in right now.']);
 }
 ?>

@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Payments - Passport Tracking</title>
     <!-- FontAwesome & Google Plus Jakarta Sans Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -26,7 +25,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; margin: 0; overflow-x: hidden; }
        
-        .sidebar { width: 260px; flex: 0 0 260px; background: var(--card-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; }
+        .sidebar { width: 260px; flex: 0 0 260px; background-color: var(--card-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; }
+        .sidebar-top { display: flex; flex-direction: column; }
         .user-profile-mini { display: flex; align-items: center; padding: 0 24px 20px; border-bottom: 1px solid #f1f5f9; margin-bottom: 16px; }
         .user-profile-mini i { font-size: 38px; color: var(--primary); margin-right: 12px; }
         .user-info .name { font-weight: 700; font-size: 14px; color: var(--text-main); overflow-wrap: anywhere; }
@@ -34,7 +34,7 @@
         .nav-links { list-style: none; }
         .nav-links li a { display: flex; align-items: center; padding: 12px 24px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: all .2s ease; }
         .nav-links li.active a, .nav-links li a:hover { background: var(--primary-light); color: var(--primary); border-right: 4px solid var(--primary); font-weight: 600; }
-        .nav-links li a i { width: 16px; margin-right: 12px; text-align: center; }
+        .nav-links li a i { margin-right: 12px; width: 16px; font-size: 16px; text-align: center; }
        
         .sidebar-bottom { padding: 0 24px; }
         .sidebar-bottom a { display: flex; align-items: center; padding: 10px 0; color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 600; }
@@ -101,17 +101,6 @@
         .summary-line strong { color: var(--text-main); text-align: right; overflow-wrap: anywhere; font-weight: 600; }
         .total-line { border: 0; padding-top: 18px; font-size: 16px; }
         .total-line strong { color: var(--primary); font-weight: 700; }
-
-        .group-breakdown-box { margin: 14px 0; padding: 14px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); }
-        .group-breakdown-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
-        .group-member-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; font-size: 12px; }
-        .group-member-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .group-member-name { font-weight: 700; color: var(--text-main); display: block; }
-        .group-member-meta { color: var(--text-muted); font-size: 11px; display: block; margin-top: 2px; }
-        .group-member-right { text-align: right; flex-shrink: 0; }
-        .group-member-fee { font-weight: 700; color: var(--primary); display: block; }
-        .status-pill { display: inline-block; margin-top: 3px; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #fef3c7; color: #92400e; }
-        .status-pill.paid { background: #dcfce7; color: #166534; }
        
         .empty-state, .success-state { text-align: center; padding: 24px 8px; }
         .empty-state i, .success-state i { color: #cbd5e1; font-size: 36px; margin-bottom: 12px; }
@@ -124,28 +113,29 @@
         .message.success { display: block; color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; }
        
         @media (max-width: 900px) { .content-grid { grid-template-columns: 1fr; } }
-        @media (max-width: 680px) { body { display: block; } .sidebar { width: 100%; height: auto; padding: 12px 0; } .sidebar-bottom { display: none; } .nav-links { display: grid; grid-template-columns: repeat(3, 1fr); } .nav-links li a { justify-content: center; padding: 10px 6px; font-size: 11px; gap: 4px; flex-direction: column; } .nav-links li a i { margin: 0; } .header { padding: 16px 20px; } .dashboard-container { padding: 20px 16px; } .welcome-banner { padding: 20px; } .form-row, .method-list { grid-template-columns: 1fr; } .form-group.full { grid-column: auto; } .button-row { justify-content: stretch; flex-direction: column-reverse; } .button-row a, .button-row button { width: 100%; text-align: center; } }
+        @media (max-width: 680px) { body { display: block; } .sidebar { width: 100%; height: auto; padding: 12px 0; } .sidebar-bottom { display: none; } .nav-links { display: grid; grid-template-columns: repeat(3, 1fr); } .nav-links li a { justify-content: center; padding: 10px 6px; font-size: 11px; gap: 4px; flex-direction: column; } .nav-links li a i { width: auto; margin: 0; } .nav-links li.active a { border-right: 0; border-bottom: 3px solid var(--primary); } .header { padding: 16px 20px; } .dashboard-container { padding: 20px 16px; } .welcome-banner { padding: 20px; } .form-row, .method-list { grid-template-columns: 1fr; } .form-group.full { grid-column: auto; } .button-row { justify-content: stretch; flex-direction: column-reverse; } .button-row a, .button-row button { width: 100%; text-align: center; } }
     </style>
+    <link rel="stylesheet" href="member-navigation.css">
 </head>
 <body>
     <aside class="sidebar">
-        <div>
+        <div class="sidebar-top">
             <div class="user-profile-mini">
                 <i class="fa-solid fa-circle-user"></i>
                 <div class="user-info"><div class="name" id="user-name">Loading...</div></div>
             </div>
             <ul class="nav-links">
-                <li><a href="dashboard.html"><i class="fa-solid fa-house"></i>Dashboard</a></li>
-                <li class="active"><a href="payments.html"><i class="fa-solid fa-wallet"></i>Payments</a></li>
-                <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i>Receipts</a></li>
-                <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i>Enquiries</a></li>
+                <li><a href="dashboard.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li class="active"><a href="payments.html" aria-current="page"><i class="fa-solid fa-wallet"></i> Payments</a></li>
+                <li><a href="receipts.html"><i class="fa-solid fa-receipt"></i> Receipts</a></li>
+                <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
                 <li><a href="faq.html?from=dashboard"><i class="fa-solid fa-book-open"></i> Passport FAQs</a></li>
                 <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
-                <li><a href="#"><i class="fa-solid fa-user"></i>Profile</a></li>
+                <li><a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a></li>
                 <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
         </div>
-        <div class="sidebar-bottom"><a href="../logout.php"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></div>
+        <div class="sidebar-bottom"><a href="../logout.php"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></div>
     </aside>
    
     <main class="main-content">
@@ -168,14 +158,15 @@
                         <label class="plan-option selected" id="planRegular">
                             <input type="radio" name="processingType" value="Regular Processing" data-amount="950" checked>
                             <span class="plan-copy"><i class="fa-solid fa-circle-check"></i><span><span class="plan-name">Regular Processing</span><span class="plan-time">12 working days</span></span></span>
-                            <span class="plan-price" id="regularPriceDisplay">₱950.00</span>
+                            <span class="plan-price">₱950.00</span>
                         </label>
                         <label class="plan-option" id="planExpedited">
                             <input type="radio" name="processingType" value="Expedited / Rush Processing" data-amount="1200">
                             <span class="plan-copy"><i class="fa-regular fa-circle-check"></i><span><span class="plan-name">Expedited / Rush Processing</span><span class="plan-time">7 working days</span></span></span>
-                            <span class="plan-price" id="expeditedPriceDisplay">₱1,200.00</span>
+                            <span class="plan-price">₱1,200.00</span>
                         </label>
                     </div>
+                    <!-- Delivery vs In-Person Receiving Section -->
                     <span class="section-label">Receiving Option</span>
                     <div class="plan-list" style="margin-bottom: 20px;">
                         <label class="plan-option selected" id="planInPerson">
@@ -221,11 +212,7 @@
                     <div id="summaryDetails" style="display:none;">
                         <div class="summary-line"><span>Application ID</span><strong id="summaryId">---</strong></div>
                         <div class="summary-line"><span>Applicant</span><strong id="summaryApplicant">---</strong></div>
-                        <div class="group-breakdown-box" id="groupBreakdownBox" style="display:none;">
-                            <div class="group-breakdown-title" id="groupBreakdownTitle">GROUP APPLICANTS BREAKDOWN</div>
-                            <div id="groupBreakdownList"></div>
-                        </div>
-                        <div class="summary-line"><span>Current status</span><strong id="summaryStatus">Pending</strong></div>
+                        <div class="summary-line"><span>Current status</span><strong id="summaryStatus">Form Submitted</strong></div>
                         <div class="summary-line"><span>Processing</span><strong id="summaryPlan">Regular Processing</strong></div>
                         <div class="summary-line" id="summaryDeliveryLine" style="display:none;"><span>Receiving / Delivery</span><strong id="summaryDeliveryText">Courier Delivery (₱150.00)</strong></div>
                         <div class="summary-line total-line"><span>Total due</span><strong id="summaryAmount">₱950.00</strong></div>
@@ -236,7 +223,9 @@
         </div>
     </main>
    
+    <script src="csrf.js"></script>
     <script src="script.js"></script>
+    <script src="member-profile.js"></script>
     <script>
         const dfaOfficeData = {
             "ANGELES": { name: "DFA Regional Consular Office – Pampanga (Angeles)", address: "3F MarQuee Mall, Pulung Maragul, Angeles City", contact: "(045) 304-0194" },
@@ -284,24 +273,13 @@
             "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City", contact: "(062) 991-0000" }
         };
 
-        function sanitizeAppId(rawId) {
-            const cleaned = String(rawId || '').trim();
-            if (!cleaned || cleaned === 'undefined' || cleaned === 'null' || cleaned === 'PH-GRP') {
-                return '';
-            }
-            return cleaned;
-        }
-
         const paymentQuery = new URLSearchParams(window.location.search);
-        const queryAppId = sanitizeAppId(paymentQuery.get('id') || paymentQuery.get('application_id') || paymentQuery.get('applicationId'));
-        const storedApplicationId = queryAppId
-            || sanitizeAppId(localStorage.getItem('currentApplicationId'))
-            || sanitizeAppId(localStorage.getItem('activeAppId'));
+        const storedApplicationId = paymentQuery.get('id')
+            || paymentQuery.get('application_id')
+            || localStorage.getItem('currentApplicationId')
+            || localStorage.getItem('activeAppId');
 
         let activeApplication = null;
-        let groupMembersList = [];
-        let applicantCount = 1;
-        let isGroupApplication = false;
         let resolvedUserEmail = localStorage.getItem('userEmail') || '';
         let resolvedUserName = '';
         let typingTimer = null;
@@ -309,35 +287,6 @@
         const form = document.getElementById('paymentForm');
         const message = document.getElementById('formMessage');
         const payButton = document.getElementById('payButton');
-
-        async function fetchJsonSafe(url, options = {}) {
-            const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', ...options });
-            const rawText = await response.text();
-            let data;
-            try {
-                data = JSON.parse(rawText);
-            } catch (parseErr) {
-                const readableSnippet = rawText
-                    .replace(/<[^>]*>/g, ' ')
-                    .replace(/\s+/g, ' ')
-                    .trim()
-                    .slice(0, 320);
-                throw new Error(readableSnippet || 'Server returned an unexpected non-JSON response.');
-            }
-            return { response, data };
-        }
-
-        function formatPeso(amount) {
-            return `₱${Number(amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        }
-
-        function escapeHtml(str) {
-            return String(str ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
 
         function showMessage(text, type) {
             message.style.display = '';
@@ -349,65 +298,6 @@
             if (!addressText || addressText.trim().length < 5) return 150;
             const words = addressText.trim().split(/\s+/).length;
             return 150 + (words * 15);
-        }
-
-        function parseMembersFromApplication(app, responseMembers) {
-            if (Array.isArray(responseMembers) && responseMembers.length > 0) {
-                return responseMembers;
-            }
-            if (Array.isArray(app.group_members) && app.group_members.length > 0) {
-                return app.group_members;
-            }
-            if (typeof app.group_members === 'string' && app.group_members.trim() !== '') {
-                try {
-                    const parsed = JSON.parse(app.group_members);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        return parsed;
-                    }
-                } catch (e) {
-                    console.warn('Unable to parse group_members JSON:', e);
-                }
-            }
-            return [];
-        }
-
-        function renderGroupBreakdown(applicationId, perPersonRate, isAlreadyPaid) {
-            const box = document.getElementById('groupBreakdownBox');
-            const titleEl = document.getElementById('groupBreakdownTitle');
-            const listEl = document.getElementById('groupBreakdownList');
-
-            if (!isGroupApplication || groupMembersList.length === 0) {
-                box.style.display = 'none';
-                return;
-            }
-
-            box.style.display = 'block';
-            titleEl.textContent = `GROUP APPLICANTS BREAKDOWN (${applicantCount})`;
-
-            const statusLabel = isAlreadyPaid ? 'PAID' : 'PENDING';
-            const statusClass = isAlreadyPaid ? 'status-pill paid' : 'status-pill';
-
-            listEl.innerHTML = groupMembersList.map((member, idx) => {
-                const memberRef = member.application_id || `${applicationId}-${idx + 1}`;
-                const fullName = member.full_name
-                    || [member.givenname, member.middlename, member.lastname, member.extname].filter(Boolean).join(' ')
-                    || `Applicant ${idx + 1}`;
-                const memberEmail = member.email || resolvedUserEmail || '';
-
-                return `
-                    <div class="group-member-item">
-                        <div>
-                            <span class="group-member-name">${escapeHtml(memberRef)}</span>
-                            <span class="group-member-meta">${escapeHtml(fullName)}</span>
-                            <span class="group-member-meta">${escapeHtml(memberEmail)}</span>
-                        </div>
-                        <div class="group-member-right">
-                            <span class="group-member-fee">${formatPeso(perPersonRate)}</span>
-                            <span class="${statusClass}">${statusLabel}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
         }
 
         function updateSelectedPlan() {
@@ -428,11 +318,7 @@
                 parent.querySelector('i').className = isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle-check';
             });
 
-            document.getElementById('regularPriceDisplay').textContent = '₱950.00';
-            document.getElementById('expeditedPriceDisplay').textContent = '₱1,200.00';
-
-            const perPersonRate = Number(selectedPlan.dataset.amount);
-            const scaledBaseAmount = perPersonRate * applicantCount;
+            const baseAmount = Number(selectedPlan.dataset.amount);
             let deliveryFee = 0;
             const deliverySection = document.getElementById('deliveryAddressSection');
             const summaryDeliveryLine = document.getElementById('summaryDeliveryLine');
@@ -441,30 +327,21 @@
             if (receivingOption === 'Delivery') {
                 deliverySection.style.display = 'block';
                 deliveryFee = calculateDeliveryFee(addressVal);
-                document.getElementById('deliveryPriceDisplay').textContent = formatPeso(deliveryFee);
+                document.getElementById('deliveryPriceDisplay').textContent = `₱${deliveryFee.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
                
                 summaryDeliveryLine.style.display = 'flex';
-                summaryDeliveryText.textContent = `Courier Delivery (${formatPeso(deliveryFee)})`;
+                summaryDeliveryText.textContent = `Courier Delivery (₱${deliveryFee.toLocaleString('en-PH', { minimumFractionDigits: 2 })})`;
             } else {
                 deliverySection.style.display = 'none';
                 summaryDeliveryLine.style.display = 'none';
             }
 
-            const totalDue = scaledBaseAmount + deliveryFee;
-            document.getElementById('summaryPlan').textContent = isGroupApplication
-                ? `${selectedPlan.value} (${formatPeso(perPersonRate)} × ${applicantCount})`
-                : selectedPlan.value;
-            document.getElementById('summaryAmount').textContent = formatPeso(totalDue);
-
-            if (activeApplication) {
-                const paymentStatus = activeApplication.payment_status || activeApplication.paymentStatus;
-                const currentStatus = activeApplication.status;
-                const isAlreadyPaid = (paymentStatus === 'Paid' || currentStatus === 'Paid' || currentStatus === 'Biometrics Received');
-                renderGroupBreakdown(activeApplication.application_id, perPersonRate, isAlreadyPaid);
-            }
+            const totalDue = baseAmount + deliveryFee;
+            document.getElementById('summaryPlan').textContent = selectedPlan.value;
+            document.getElementById('summaryAmount').textContent = `₱${totalDue.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
         }
 
-        function displayApplication(application, responseMembers = []) {
+        function displayApplication(application) {
             message.style.display = 'none';
             message.textContent = '';
            
@@ -482,21 +359,15 @@
             document.getElementById('backToDashBtn').href = `dashboard.html?id=${encodeURIComponent(applicationId)}`;
             document.getElementById('applicationSummary').style.display = 'none';
             document.getElementById('summaryDetails').style.display = 'block';
+            document.getElementById('summaryId').textContent = applicationId;
 
-            document.getElementById('summaryId').textContent = isGroupApplication
-                ? `${applicationId} (${applicantCount} ${applicantCount === 1 ? 'Applicant' : 'Applicants'})`
-                : applicationId;
-
-            const leadFullName = [application.givenname, application.lastname].filter(Boolean).join(' ').trim();
-            const baseApplicantName = resolvedUserName || leadFullName || application.fullname || application.email || resolvedUserEmail || 'User';
-            document.getElementById('summaryApplicant').textContent = isGroupApplication
-                ? `${baseApplicantName} (Group Booking)`
-                : baseApplicantName;
+            const applicantDisplay = resolvedUserName || application.fullname || application.email || resolvedUserEmail || 'User';
+            document.getElementById('summaryApplicant').textContent = applicantDisplay;
            
             const paymentStatus = application.payment_status || application.paymentStatus;
             const currentStatus = application.status;
             const isAlreadyPaid = (paymentStatus === 'Paid' || currentStatus === 'Paid' || currentStatus === 'Biometrics Received');
-            document.getElementById('summaryStatus').textContent = isAlreadyPaid ? 'Paid' : (paymentStatus || currentStatus || 'Pending');
+            document.getElementById('summaryStatus').textContent = isAlreadyPaid ? 'Paid' : (paymentStatus || currentStatus || 'Unpaid');
            
             const savedProcessing = application.processing_type || application.processingType;
             if (savedProcessing) {
@@ -537,7 +408,9 @@
             const summaryBox = document.getElementById('applicationSummary');
 
             try {
-                const { data: userData } = await fetchJsonSafe('../api/user-data.php');
+                const userResponse = await fetch('../api/user-data.php', { credentials: 'same-origin' });
+                const userData = await userResponse.json();
+
                 const fetchedName = userData.fullName || userData.fullname || (userData.user && userData.user.fullname) || '';
                 const fetchedEmail = userData.email || (userData.user && userData.user.email) || '';
 
@@ -555,32 +428,30 @@
                 } else {
                     userNameEl.textContent = 'User';
                 }
-            } catch (userErr) {
-                console.warn('user-data.php warning:', userErr.message);
-                userNameEl.textContent = resolvedUserName || resolvedUserEmail || 'User';
-            }
 
-            try {
+                const targetId = storedApplicationId;
                 const queryParts = [];
-                if (storedApplicationId) queryParts.push(`applicationId=${encodeURIComponent(storedApplicationId)}`);
+                if (targetId) queryParts.push(`applicationId=${encodeURIComponent(targetId)}`);
                 if (resolvedUserEmail) queryParts.push(`email=${encodeURIComponent(resolvedUserEmail)}`);
 
-                const fetchUrl = queryParts.length > 0
-                    ? `../api/payments.php?${queryParts.join('&')}`
-                    : '../api/payments.php';
+                if (!queryParts.length) {
+                    throw new Error('No active application was found. Start an application from the dashboard first.');
+                }
 
-                const { response, data: result } = await fetchJsonSafe(fetchUrl);
+                const fetchUrl = `../api/get-application.php?${queryParts.join('&')}`;
+                const response = await fetch(fetchUrl, { credentials: 'same-origin' });
+                const result = await response.json();
 
                 if (response.ok && result.success && result.application) {
-                    groupMembersList = parseMembersFromApplication(result.application, result.members || []);
-                    isGroupApplication = String(result.application.application_id || '').startsWith('PH-GRP-') || groupMembersList.length > 1;
-                    applicantCount = groupMembersList.length > 0 ? groupMembersList.length : 1;
-                    displayApplication(result.application, result.members || []);
+                    displayApplication(result.application);
                 } else {
-                    throw new Error(result.message || 'Active application record not found in database.');
+                    throw new Error(result.message || 'No active application was found. Start an application from the dashboard first.');
                 }
             } catch (error) {
-                summaryBox.innerHTML = `<i class="fa-regular fa-file-lines"></i><p>${escapeHtml(error.message || 'Unable to load your active application right now.')}</p>`;
+                if (userNameEl && userNameEl.textContent === 'Loading...') {
+                    userNameEl.textContent = resolvedUserName || resolvedUserEmail || 'User';
+                }
+                summaryBox.innerHTML = `<i class="fa-regular fa-file-lines"></i><p>${error.message || 'Unable to load your active application right now.'}</p>`;
                 payButton.disabled = true;
             }
         }
@@ -607,16 +478,20 @@
             payButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
            
             const selectedPlan = document.querySelector('input[name="processingType"]:checked');
-            const perPersonRate = Number(selectedPlan.dataset.amount);
-            const scaledBaseAmount = perPersonRate * applicantCount;
+            const baseAmount = Number(selectedPlan.dataset.amount);
             const deliveryFee = receivingOption === 'Delivery' ? calculateDeliveryFee(deliveryAddressVal) : 0;
-            const totalPaymentAmount = scaledBaseAmount + deliveryFee;
+            const totalPaymentAmount = baseAmount + deliveryFee;
+            const applicationType = activeApplication.applicationType
+                || activeApplication.application_type
+                || localStorage.getItem('applicationType')
+                || 'Credential Updating';
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
             const currentEmail = document.getElementById('paymentEmail').value.trim() || resolvedUserEmail;
 
             try {
-                const { response, data: result } = await fetchJsonSafe('../api/payments.php', {
+                const response = await fetch('../api/payments.php', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         email: currentEmail,
@@ -629,15 +504,14 @@
                         deliveryFee: deliveryFee
                     })
                 });
+                const result = await response.json();
                 if (!response.ok || !result.success) throw new Error(result.message || 'Unable to process payment.');
                
                 activeApplication.status = result.status;
-                activeApplication.payment_status = 'Paid';
-                activeApplication.paymentStatus = 'Paid';
                 activeApplication.paymentAmount = result.amount ?? totalPaymentAmount;
+                activeApplication.applicationType = applicationType;
                
                 document.getElementById('summaryStatus').textContent = 'Paid';
-                renderGroupBreakdown(activeApplication.application_id, perPersonRate, true);
                
                 const rawLoc = result.appointmentLocation || 'DFA NCR CENTRAL';
                 const officeInfo = dfaOfficeData[rawLoc];

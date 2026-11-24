@@ -272,26 +272,30 @@
         .btn-member-reply:hover {
             background-color: #dc2626;
         }
+
         @media (max-width: 768px) {
             body {
                 display: block !important;
                 height: auto;
                 overflow: auto;
             }
+
             .sidebar {
-                width: 100% !important;
+            width: 100% !important;
                 flex: none;
                 height: auto;
                 padding: 12px 0;
                 border-right: none;
                 border-bottom: 1px solid var(--border-color);
             }
+
             .nav-links {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
                 gap: 4px;
                 padding: 0 12px;
             }
+
             .nav-links li a {
                 flex-direction: column;
                 justify-content: center;
@@ -302,26 +306,32 @@
                 border-bottom: 3px solid transparent;
                 border-radius: 6px;
             }
+
             .nav-links li.active a, .nav-links li a:hover {
                 border-right: none !important;
                 border-bottom-color: var(--primary);
             }
+
             .nav-links li a i {
                 margin-right: 0 !important;
                 margin-bottom: 4px;
                 font-size: 14px;
             }
+
             .main-content {
                 min-height: auto;
             }
+
             .content-container {
                 padding: 20px 16px !important;
             }
+
             .content-grid, .selection-grid, .category-grid, .form-row {
                 grid-template-columns: 1fr !important;
             }
         }
     </style>
+    <link rel="stylesheet" href="member-navigation.css">
 </head>
 <body>
     <!-- Sidebar Navigation -->
@@ -345,19 +355,19 @@
             </ul>
         </div>
         <div class="sidebar-bottom">
-            <a href="login.html"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
+            <a href="../logout.php"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
         </div>
     </div>
-
+   
     <!-- Main Content Area -->
     <div class="main-content">
         <div class="header">EMERGENCY ASSISTANCE</div>
-
+       
         <div class="content-container">
             <div class="card" style="border-left: 4px solid #ef4444;">
                 <div class="section-title" style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Request Urgent Consular Help</div>
                 <div class="section-subtitle">Use this form only for urgent travel emergencies, medical repatriation, or lost passports abroad requiring immediate consular intervention.</div>
-
+               
                 <form onsubmit="handleEmergencySubmit(event)">
                     <div class="form-group">
                         <label>Emergency Type</label>
@@ -410,6 +420,7 @@
             const office = document.getElementById('office').value;
             const details = document.getElementById('details').value;
             if (!details) return;
+
             try {
                 const response = await fetch('../api/emergencies.php', {
                     method: 'POST',
@@ -449,6 +460,7 @@
                 });
                 const result = await response.json();
                 if (!response.ok || !result.success) throw new Error(result.message || 'Failed to send reply.');
+
                 await loadEmergencyReports(userEmail);
                 alert("Reply sent successfully!");
             } catch (error) {
@@ -475,6 +487,7 @@
                     const isResolved = item.status === 'Resolved';
                     const statusClass = isResolved ? 'badge-resolved' : 'badge-pending';
                     const replyContent = item.reply && item.reply !== 'Awaiting consular officer response...' ? item.reply : 'Awaiting consular officer response...';
+
                     row.innerHTML = `
                         <td><strong>${item.appId}</strong></td>
                         <td>${item.subject}</td>
@@ -501,25 +514,21 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             try {
-                const response = await fetch('../api/user-data.php', { credentials: 'same-origin' });
+                const response = await fetch('../api/user-data.php');
                 const data = await response.json();
-                const userObj = (data && data.user) ? data.user : null;
-                const displayName = (userObj?.nickname || data?.nickname || userObj?.fullname || data?.fullName || '').trim();
-                const emailVal = userObj?.email || data?.email;
-                if (data.loggedIn && displayName) {
-                    const nameEl = document.getElementById('user-name');
-                    if (nameEl) nameEl.textContent = displayName;
+                if (data.loggedIn && data.fullName) {
+                    document.getElementById('user-name').textContent = data.fullName;
+                    if (data.email) localStorage.setItem('userEmail', data.email);
                 }
-                if (emailVal) localStorage.setItem('userEmail', emailVal);
             } catch (error) {
                 console.error('Unable to load user data:', error);
             }
+
             const userEmail = localStorage.getItem('userEmail');
             if (userEmail) loadEmergencyReports(userEmail);
         });
     </script>
-    <script src="script.js"></script>
+    <script src="csrf.js"></script>
+    <script src="member-profile.js"></script>
 </body>
 </html>
-
-
