@@ -402,6 +402,67 @@
         .app-view.active-view {
             display: block;
         }
+        .appointment-mode-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(3px);
+        }
+        .appointment-mode-modal.open {
+            display: flex;
+        }
+        .appointment-mode-dialog {
+            width: 100%;
+            max-width: 620px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.28);
+        }
+        .appointment-mode-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 20px;
+        }
+        .appointment-mode-option {
+            min-height: 150px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #fff;
+            color: var(--text-main);
+            padding: 20px;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .appointment-mode-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        .appointment-mode-option i {
+            display: block;
+            color: var(--primary);
+            font-size: 26px;
+            margin-bottom: 14px;
+        }
+        .appointment-mode-option strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+        .appointment-mode-option span {
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
         .application-history-summary {
             width: 100%;
             display: grid;
@@ -514,6 +575,10 @@
 
     .application-history-details [style*="grid-column"] {
         grid-column: 1 !important;
+    }
+
+    .appointment-mode-options {
+        grid-template-columns: 1fr;
     }
     }
     </style>
@@ -629,7 +694,7 @@
                 </div>
                 <!-- Start Application Section -->
                 <div class="selection-section-title">Start Application</div>
-                <a class="action-banner-card" href="new-passport.html">
+                <a class="action-banner-card" id="startApplicationLink" href="#">
                     <div class="action-banner-left">
                         <div class="action-banner-icon">
                             <i class="fa-solid fa-globe"></i>
@@ -661,6 +726,29 @@
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
                 </a>
+            </div>
+        </div>
+    </div>
+    <div class="appointment-mode-modal" id="appointmentModeModal" role="dialog" aria-modal="true" aria-labelledby="appointmentModeTitle">
+        <div class="appointment-mode-dialog">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+                <div>
+                    <h2 id="appointmentModeTitle" style="margin:0 0 6px; font-size:20px;">Choose Appointment Type</h2>
+                    <p style="margin:0; color:var(--text-muted); font-size:13px;">Select whether this application is for one person or multiple applicants.</p>
+                </div>
+                <button type="button" id="closeAppointmentModeModal" aria-label="Close" style="border:none;background:#f1f5f9;color:#475569;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px;">&times;</button>
+            </div>
+            <div class="appointment-mode-options">
+                <button type="button" class="appointment-mode-option" id="chooseIndividualAppointment">
+                    <i class="fa-solid fa-user-check"></i>
+                    <strong>Individual Appointment</strong>
+                    <span>Book one passport application for a single applicant.</span>
+                </button>
+                <button type="button" class="appointment-mode-option" id="chooseGroupAppointment">
+                    <i class="fa-solid fa-users"></i>
+                    <strong>Group Appointment</strong>
+                    <span>Book one shared schedule for multiple passport applicants.</span>
+                </button>
             </div>
         </div>
     </div>
@@ -766,6 +854,20 @@
             if (type === '' || type === 'passport application') return 'First Time Passport';
             // Already Title Case or unknown - capitalize first letter of each word
             return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
+        function openAppointmentModeModal(event) {
+            if (event) event.preventDefault();
+            const modal = document.getElementById('appointmentModeModal');
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('chooseIndividualAppointment').focus();
+        }
+
+        function closeAppointmentModeModal() {
+            const modal = document.getElementById('appointmentModeModal');
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
         }
 
         async function loadApplicationHistory() {
@@ -1050,6 +1152,38 @@
        
         window.addEventListener('DOMContentLoaded', async () => {
             loadApplicationHistory();
+
+            const startApplicationLink = document.getElementById('startApplicationLink');
+            const closeAppointmentModal = document.getElementById('closeAppointmentModeModal');
+            const appointmentModeModal = document.getElementById('appointmentModeModal');
+            const individualButton = document.getElementById('chooseIndividualAppointment');
+            const groupButton = document.getElementById('chooseGroupAppointment');
+
+            if (startApplicationLink) {
+                startApplicationLink.addEventListener('click', openAppointmentModeModal);
+            }
+            if (closeAppointmentModal) {
+                closeAppointmentModal.addEventListener('click', closeAppointmentModeModal);
+            }
+            if (appointmentModeModal) {
+                appointmentModeModal.addEventListener('click', (event) => {
+                    if (event.target === appointmentModeModal) closeAppointmentModeModal();
+                });
+            }
+            if (individualButton) {
+                individualButton.addEventListener('click', () => {
+                    window.location.href = 'new-passport.html';
+                });
+            }
+            if (groupButton) {
+                groupButton.addEventListener('click', () => {
+                    window.location.href = 'group-appointment.html';
+                });
+            }
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') closeAppointmentModeModal();
+            });
+
             let sessionEmail = '';
             try {
                 const response = await fetch('../api/user-data.php');
