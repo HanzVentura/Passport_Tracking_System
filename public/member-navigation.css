@@ -29,6 +29,14 @@ body {
     text-align: center;
 }
 
+.user-profile-mini img {
+    width: 38px;
+    height: 38px;
+    margin-right: 12px !important;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 .nav-links {
     margin: 0 !important;
     padding: 0 !important;

@@ -89,10 +89,11 @@
             .quick-links { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="stylesheet" href="member-navigation.css">
 </head>
 <body>
     <aside class="sidebar">
-        <div>
+        <div class="sidebar-top">
             <div class="user-profile-mini">
                 <i class="fa-solid fa-circle-user"></i>
                 <div class="user-info"><div class="name" id="user-name"></div></div>
@@ -203,6 +204,33 @@
         };
         let pendingFile = null;
         let removePhotoQueued = false;
+
+        function applySidebarName(name) {
+            const nameElement = document.getElementById('user-name');
+            if (nameElement) nameElement.textContent = name || '';
+        }
+
+        function applySidebarAvatar(photoPath, name) {
+            const profileMini = document.querySelector('.user-profile-mini');
+            if (!profileMini) return;
+
+            const icon = profileMini.querySelector('i');
+            let avatar = profileMini.querySelector('#sidebarAvatar');
+            if (photoPath) {
+                if (!avatar) {
+                    avatar = document.createElement('img');
+                    avatar.id = 'sidebarAvatar';
+                    avatar.alt = name ? `${name} profile picture` : 'Profile picture';
+                    profileMini.insertBefore(avatar, profileMini.querySelector('.user-info'));
+                }
+                avatar.src = photoPath.replace(/^\/+/, '') + `?v=${Date.now()}`;
+                avatar.style.display = 'block';
+                if (icon) icon.style.display = 'none';
+            } else {
+                if (avatar) avatar.remove();
+                if (icon) icon.style.display = '';
+            }
+        }
 
         function showProfileMessage(text, type) {
             profileMessage.textContent = text;
