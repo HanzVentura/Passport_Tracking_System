@@ -607,8 +607,8 @@
                             <i class="fa-solid fa-calendar-days"></i>
                         </div>
                         <div class="action-banner-text">
-                            <h3>Reschedule or Cancel</h3>
-                            <p>Modify your appointment date/time slot or completely cancel an existing application.</p>
+                            <h3 id="manageAppointmentTitle">Reschedule or Cancel</h3>
+                            <p id="manageAppointmentDescription">Modify your appointment date/time slot or completely cancel an existing application.</p>
                         </div>
                     </div>
                     <div class="action-banner-right">
@@ -731,6 +731,18 @@
             const manageAppointmentLink = document.getElementById('manageAppointmentLink');
             if (manageAppointmentLink && appId) {
                 manageAppointmentLink.href = `reschedule.html?id=${encodeURIComponent(appId)}`;
+            }
+
+            const normalizedStatus = (application.status || 'Form Submitted').toLowerCase();
+            const terminalStatuses = ['dispatched', 'ready for release', 'ready for claim', 'ready for pickup', 'claimed', 'released', 'completed'];
+            const manageTitle = document.getElementById('manageAppointmentTitle');
+            const manageDescription = document.getElementById('manageAppointmentDescription');
+            if (terminalStatuses.includes(normalizedStatus)) {
+                if (manageTitle) manageTitle.innerText = 'Appointment Changes Locked';
+                if (manageDescription) manageDescription.innerText = 'Your passport is ready for claim or completed. Rescheduling and cancellation are no longer available.';
+            } else {
+                if (manageTitle) manageTitle.innerText = 'Reschedule or Cancel';
+                if (manageDescription) manageDescription.innerText = 'Modify your appointment date/time slot or completely cancel an existing application.';
             }
 
             const rawAppType = application.application_type || application.applicationType || 'New First-Time Application';

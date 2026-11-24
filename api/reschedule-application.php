@@ -16,11 +16,45 @@ if ($email !== getSessionEmail()) {
     jsonError('You cannot modify another member\'s application.', 403);
 }
 if ($applicationId !== '') {
-    $ownerStmt = $pdo->prepare("SELECT email FROM applications WHERE application_id = ?");
+    $ownerStmt = $pdo->prepare("SELECT email, status FROM applications WHERE application_id = ?");
     $ownerStmt->execute([$applicationId]);
     $owner = $ownerStmt->fetch(PDO::FETCH_ASSOC);
     if (!$owner || strtolower((string)$owner['email']) !== getSessionEmail()) {
         jsonError('You do not own this application.', 403);
+    }
+    $lockedStatuses = [
+        'Dispatched',
+        'Ready for Release',
+        'Ready for Claim',
+        'Ready for Pickup',
+        'Claimed',
+        'Released',
+        'Completed'
+    ];
+    if (in_array((string)($owner['status'] ?? ''), $lockedStatuses, true)) {
+        jsonError('This appointment can no longer be rescheduled or cancelled because the passport is ready for claim or completed.', 409);
+    }
+}
+
+if ($applicationId === '' && $email !== '') {
+    $statusStmt = $pdo->prepare(
+        "SELECT status FROM applications
+         WHERE email = ? AND status NOT IN ('Cancelled')
+         ORDER BY id DESC LIMIT 1"
+    );
+    $statusStmt->execute([$email]);
+    $latestStatus = (string)($statusStmt->fetchColumn() ?: '');
+    $lockedStatuses = [
+        'Dispatched',
+        'Ready for Release',
+        'Ready for Claim',
+        'Ready for Pickup',
+        'Claimed',
+        'Released',
+        'Completed'
+    ];
+    if (in_array($latestStatus, $lockedStatuses, true)) {
+        jsonError('This appointment can no longer be rescheduled or cancelled because the passport is ready for claim or completed.', 409);
     }
 }
 

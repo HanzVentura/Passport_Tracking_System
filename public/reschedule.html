@@ -70,9 +70,18 @@
 
         <!-- Action Forms Container -->
         <div id="action-container" style="display: none; grid-template-columns: 1fr; gap: 24px;">
+            <div id="appointmentLockedNotice" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:24px;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                    <i class="fa-solid fa-circle-check" style="color:#2563eb; font-size:18px;"></i>
+                    <h3 style="font-size:16px; color:#1e3a8a; margin:0;">Appointment Changes Locked</h3>
+                </div>
+                <p id="appointmentLockedMessage" style="font-size:13px; color:#1e40af; margin:0; line-height:1.6;">
+                    Your passport is ready for claiming or has completed processing. The appointment can no longer be rescheduled or cancelled.
+                </p>
+            </div>
            
             <!-- Reschedule Form Card with Interactive Calendar -->
-            <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <div id="reschedule-card" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
                     <i class="fa-solid fa-calendar-days" style="color: #4f46e5; font-size: 18px;"></i>
                     <h3 style="font-size: 16px; color: #1e293b; margin: 0;">Appointment Date and Time</h3>
@@ -133,7 +142,7 @@
             </div>
 
             <!-- Cancellation Card -->
-            <div style="background: #fff; border: 1px solid #fecaca; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <div id="cancel-card" style="background: #fff; border: 1px solid #fecaca; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
                 <h3 style="font-size: 16px; color: #dc2626; margin-top: 0; margin-bottom: 8px;">Cancel Application</h3>
                 <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">Warning: Canceling will permanently delete your active application record and clear it from your dashboard.</p>
                 <button type="button" id="cancel-btn" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 12px 20px; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 14px; width: 100%;">
@@ -175,6 +184,19 @@
 
         function gridDateCell(dateString) {
             return Array.from(document.querySelectorAll('.calendar-date')).find((cell) => cell.dataset.date === dateString);
+        }
+
+        function isTerminalApplicationStatus(status) {
+            const normalized = (status || '').toLowerCase();
+            return [
+                'dispatched',
+                'ready for release',
+                'ready for claim',
+                'ready for pickup',
+                'claimed',
+                'released',
+                'completed'
+            ].includes(normalized);
         }
 
         function renderCalendar(year, month) {
@@ -348,6 +370,17 @@
                     document.getElementById('loading-details').style.display = 'none';
                     document.getElementById('app-details').style.display = 'block';
                     document.getElementById('action-container').style.display = 'grid';
+                    if (isTerminalApplicationStatus(app.status || app.application_status)) {
+                        document.getElementById('reschedule-card').style.display = 'none';
+                        document.getElementById('cancel-card').style.display = 'none';
+                        document.getElementById('appointmentLockedNotice').style.display = 'block';
+                        document.getElementById('appointmentLockedMessage').textContent =
+                            `Your passport is ${app.status || 'ready for claim'} and appointment changes are no longer allowed.`;
+                    } else {
+                        document.getElementById('appointmentLockedNotice').style.display = 'none';
+                        document.getElementById('reschedule-card').style.display = 'block';
+                        document.getElementById('cancel-card').style.display = 'block';
+                    }
                 } else {
                     document.getElementById('loading-details').textContent = 'No active application found to manage.';
                 }
