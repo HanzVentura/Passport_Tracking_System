@@ -3,365 +3,292 @@ ob_start();
 ini_set('display_errors', '0');
 error_reporting(E_ALL);
 
-session_start();
-require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/audit-helper.php';
+register_shutdown_function(static function (): void {
+    $err = error_get_last();
+    if ($err !== null && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR], true)) {
+        if (ob_get_length()) {
+            ob_clean();
+        }
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        echo json_encode([
+            'success' => false,
+            'message' => 'Server Fatal Error: ' . $err['message'] . ' (line ' . $err['line'] . ')'
+        ], JSON_UNESCAPED_UNICODE);
+    }
+});
 
-function sendJsonResponse(int $statusCode, array $payload): void
+session_start();
+header('Content-Type: application/json; charset=utf-8');
+
+require_once __DIR__ . '/../db.php';
+if (file_exists(__DIR__ . '/audit-helper.php')) {
+    require_once __DIR__ . '/audit-helper.php';
+}
+
+function sendJson(int $statusCode, array $payload): void
 {
     if (ob_get_length()) {
         ob_clean();
     }
     http_response_code($statusCode);
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($payload);
+    echo json_encode($payload, JSON_UNESCAPED_UNICODE);
     exit;
 }
 
+function tableHasColumn(PDO $pdo, string $table, string $column): bool
+{
+    try {
+        $stmt = $pdo->prepare("SHOW COLUMNS FROM `{$table}` LIKE ?");
+        $stmt->execute([$column]);
+        return (bool)$stmt->fetch();
+    } catch (Throwable $e) {
+        return false;
+    }
+}
+
+function parseGroupMembersFromRows(array $rows): array
+{
+    $firstRow = $rows[0];
+    $raw = $firstRow['group_members'] ?? null;
+
+    if (is_string($raw) && trim($raw) !== '') {
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded) && count($decoded) > 0) {
+            return array_values($decoded);
+        }
+    } elseif (is_array($raw) && count($raw) > 0) {
+        return array_values($raw);
+    }
+
+    // Fallback if legacy multi-row PH-GRP-XXXXXX-1 / -2 records exist
+    if (count($rows) > 1) {
+        $members = [];
+        foreach ($rows as $idx => $r) {
+            $fullName = trim(implode(' ', array_filter([
+                $r['givenname'] ?? '',
+                $r['middlename'] ?? '',
+                $r['lastname'] ?? '',
+                $r['extname'] ?? ''
+            ])));
+            $members[] = [
+                'member_index' => $idx + 1,
+                'application_id' => $r['application_id'] ?? '',
+                'full_name' => $fullName !== '' ? $fullName : ('Applicant ' . ($idx + 1)),
+                'email' => $r['email'] ?? '',
+                'application_type' => $r['application_type'] ?? 'Passport Application',
+                'payment_status' => $r['payment_status'] ?? 'Pending'
+            ];
+        }
+        return $members;
+    }
+
+    return [];
+}
+
 try {
-    $method = $_SERVER['REQUEST_METHOD'] ?? 'POST';
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
     if ($method === 'GET') {
-        $applicationId = trim($_GET['applicationId'] ?? $_GET['id'] ?? $_GET['application_id'] ?? '');
-        $email = trim($_GET['email'] ?? ($_SESSION['user_email'] ?? ($_SESSION['userEmail'] ?? '')));
+        $applicationId = trim((string)($_GET['applicationId'] ?? $_GET['application_id'] ?? $_GET['id'] ?? ''));
+        $email = trim((string)($_GET['email'] ?? ($_SESSION['user_email'] ?? $_SESSION['userEmail'] ?? '')));
+
+        if ($applicationId === '' || $applicationId === 'PH-GRP' || $applicationId === 'undefined' || $applicationId === 'null') {
+            $applicationId = !empty($_SESSION['currentApplicationId'])
+                ? trim((string)$_SESSION['currentApplicationId'])
+                : '';
+        }
 
         if ($applicationId === '' && $email === '') {
-            sendJsonResponse(400, [
+            sendJson(400, [
                 'success' => false,
                 'message' => 'Application ID or email is required.'
             ]);
         }
 
-        if ($applicationId !== '' && preg_match('/^PH-GRP-(\d+)(?:-\d+)?$/', $applicationId, $matches)) {
-            $groupPrefix = 'PH-GRP-' . $matches[1];
-            $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? OR application_id LIKE ? ORDER BY id ASC");
-            $stmt->execute([$groupPrefix, $groupPrefix . '-%']);
-            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            if (empty($rows)) {
-                sendJsonResponse(404, [
-                    'success' => false,
-                    'message' => 'Group application records not found in database.'
-                ]);
-            }
-
-            $firstRow = $rows[0];
-            $members = [];
-            if (!empty($firstRow['group_members'])) {
-                $decoded = json_decode((string)$firstRow['group_members'], true);
-                if (is_array($decoded)) {
-                    $members = $decoded;
-                }
-            }
-
-            $applicantCount = count($members) > 0 ? count($members) : count($rows);
-
-            sendJsonResponse(200, [
-                'success' => true,
-                'isGroup' => true,
-                'groupPrefix' => $groupPrefix,
-                'applicantCount' => $applicantCount,
-                'members' => $members,
-                'applications' => $rows,
-                'application' => $firstRow
-            ]);
-        }
+        $rows = [];
 
         if ($applicationId !== '') {
-            $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? OR id = ? ORDER BY id DESC LIMIT 1");
-            $stmt->execute([$applicationId, $applicationId]);
-        } else {
-            $stmt = $pdo->prepare("SELECT * FROM applications WHERE email = ? ORDER BY id DESC LIMIT 1");
-            $stmt->execute([$email]);
+            if (preg_match('/^(PH-GRP-\d+)(?:-\d+)?$/', $applicationId, $m)) {
+                $groupBaseId = $m[1];
+                $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? OR application_id LIKE ? ORDER BY id ASC");
+                $stmt->execute([$groupBaseId, $groupBaseId . '-%']);
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? ORDER BY id DESC LIMIT 1");
+                $stmt->execute([$applicationId]);
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
         }
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Fallback to user's most recent application by email
+        if (empty($rows) && $email !== '') {
+            $stmt = $pdo->prepare("SELECT * FROM applications WHERE email = ? ORDER BY id DESC LIMIT 1");
+            $stmt->execute([$email]);
+            $latest = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($latest) {
+                $latestId = (string)($latest['application_id'] ?? '');
+                if (preg_match('/^(PH-GRP-\d+)(?:-\d+)?$/', $latestId, $m)) {
+                    $groupBaseId = $m[1];
+                    $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? OR application_id LIKE ? ORDER BY id ASC");
+                    $stmt->execute([$groupBaseId, $groupBaseId . '-%']);
+                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                } else {
+                    $rows = [$latest];
+                }
+            }
+        }
 
-        if (!$row) {
-            sendJsonResponse(404, [
+        if (empty($rows)) {
+            sendJson(404, [
                 'success' => false,
                 'message' => 'Active application record not found in database.'
             ]);
         }
 
-        $foundId = (string)($row['application_id'] ?? '');
-        $isGroupRow = strpos($foundId, 'PH-GRP-') === 0;
-        $members = [];
-        if (!empty($row['group_members'])) {
-            $decoded = json_decode((string)$row['group_members'], true);
-            if (is_array($decoded)) {
-                $members = $decoded;
-            }
-        }
+        $primaryRow = $rows[0];
+        $members = parseGroupMembersFromRows($rows);
+        $isGroup = (strpos((string)($primaryRow['application_id'] ?? ''), 'PH-GRP-') === 0) || count($members) > 1;
         $applicantCount = count($members) > 0 ? count($members) : 1;
 
-        sendJsonResponse(200, [
+        sendJson(200, [
             'success' => true,
-            'isGroup' => $isGroupRow,
+            'isGroup' => $isGroup,
             'applicantCount' => $applicantCount,
             'members' => $members,
-            'application' => $row
+            'application' => $primaryRow
         ]);
     }
 
-    $input = json_decode((string)file_get_contents('php://input'), true);
+    // POST: Record payment
+    $rawInput = (string)file_get_contents('php://input');
+    $input = json_decode($rawInput, true);
     if (!is_array($input)) {
-        $input = [];
+        $input = $_POST;
     }
 
-    $sessionEmail = trim($_SESSION['user_email'] ?? ($_SESSION['userEmail'] ?? ''));
-    $email = trim($input['email'] ?? $sessionEmail);
-    $applicationId = trim($input['applicationId'] ?? $input['application_id'] ?? $_GET['id'] ?? $_GET['applicationId'] ?? '');
+    $sessionEmail = trim((string)($_SESSION['user_email'] ?? $_SESSION['userEmail'] ?? ''));
+    $email = trim((string)($input['email'] ?? $sessionEmail));
+    $applicationId = trim((string)($input['applicationId'] ?? $input['application_id'] ?? $_GET['id'] ?? $_GET['applicationId'] ?? ''));
     $amount = isset($input['amount']) ? (float)$input['amount'] : 950.00;
     $deliveryFee = isset($input['deliveryFee']) ? (float)$input['deliveryFee'] : 0.0;
-    $processingType = trim($input['processingType'] ?? 'Regular Processing');
-    $paymentMethod = trim($input['paymentMethod'] ?? 'GCash');
-    $receivingOption = trim($input['receivingOption'] ?? 'In-Person');
+    $processingType = trim((string)($input['processingType'] ?? 'Regular Processing'));
+    $paymentMethod = trim((string)($input['paymentMethod'] ?? 'GCash'));
+    $receivingOption = trim((string)($input['receivingOption'] ?? 'In-Person'));
     $deliveryAddress = isset($input['deliveryAddress']) && trim((string)$input['deliveryAddress']) !== ''
         ? trim((string)$input['deliveryAddress'])
         : null;
 
+    if ($applicationId === '' && !empty($_SESSION['currentApplicationId'])) {
+        $applicationId = trim((string)$_SESSION['currentApplicationId']);
+    }
+
     if ($applicationId === '' && $email === '') {
-        sendJsonResponse(400, [
+        sendJson(400, [
             'success' => false,
             'message' => 'Application ID or email is required for payment.'
         ]);
     }
 
-    // Consolidated Group Checkout Path (Single-row PH-GRP-XXXXXX or legacy PH-GRP-XXXXXX-N)
-    if (preg_match('/^PH-GRP-(\d+)(?:-\d+)?$/', $applicationId, $groupMatches)) {
-        $groupPrefix = 'PH-GRP-' . $groupMatches[1];
-
-        $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? OR application_id LIKE ? ORDER BY id ASC");
-        $stmt->execute([$groupPrefix, $groupPrefix . '-%']);
-        $siblingRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (empty($siblingRows)) {
-            sendJsonResponse(404, [
-                'success' => false,
-                'message' => 'Group application records not found in database.'
-            ]);
-        }
-
-        $firstRow = $siblingRows[0];
-        $appointmentDate = !empty($firstRow['appointment_date']) ? $firstRow['appointment_date'] : date('Y-m-d');
-        $appointmentLocation = !empty($firstRow['appointment_location']) ? $firstRow['appointment_location'] : 'ANGELES';
-
-        $allSiblingIds = array_map(static function ($row) {
-            return $row['application_id'];
-        }, $siblingRows);
-
-        $unpaidRows = array_values(array_filter($siblingRows, static function ($row) {
-            $pStatus = $row['payment_status'] ?? '';
-            $sStatus = $row['status'] ?? '';
-            return $pStatus !== 'Paid' && $sStatus !== 'Paid' && $sStatus !== 'Biometrics Received';
-        }));
-
-        // Determine total applicants in group from group_members JSON or sibling row count
-        $memberCount = count($siblingRows);
-        if (!empty($firstRow['group_members'])) {
-            $decodedMembers = json_decode((string)$firstRow['group_members'], true);
-            if (is_array($decodedMembers) && count($decodedMembers) > 0) {
-                $memberCount = count($decodedMembers);
-            }
-        } elseif (!empty($input['applicantCount']) && (int)$input['applicantCount'] > 0) {
-            $memberCount = (int)$input['applicantCount'];
-        }
-
-        // Idempotent check when group row(s) are already settled
-        if (empty($unpaidRows)) {
-            $existingTotal = 0.0;
-            foreach ($siblingRows as $row) {
-                $existingTotal += isset($row['amount']) ? (float)$row['amount'] : 0.0;
-            }
-
-            sendJsonResponse(200, [
-                'success' => true,
-                'isGroup' => true,
-                'groupPrefix' => $groupPrefix,
-                'applicationId' => $firstRow['application_id'],
-                'settledIds' => $allSiblingIds,
-                'settledCount' => $memberCount,
-                'status' => $firstRow['status'] ?? 'Form Submitted',
-                'payment_status' => 'Paid',
-                'amount' => $existingTotal > 0 ? $existingTotal : $amount,
-                'processingType' => $firstRow['processing_type'] ?? $processingType,
-                'receivingOption' => $firstRow['receiving_option'] ?? $receivingOption,
-                'appointmentDate' => $appointmentDate,
-                'appointmentLocation' => $appointmentLocation,
-                'message' => 'Payment has already been recorded for this group application.'
-            ]);
-        }
-
-        // Check if optional columns (payment_method, updated_at) exist before building UPDATE
-        $existingCols = [];
-        $colsStmt = $pdo->query("SHOW COLUMNS FROM applications");
-        if ($colsStmt) {
-            foreach ($colsStmt->fetchAll(PDO::FETCH_ASSOC) as $colRow) {
-                if (!empty($colRow['Field'])) {
-                    $existingCols[strtolower((string)$colRow['Field'])] = (string)$colRow['Field'];
-                }
-            }
-        }
-
-        $unpaidRowCount = count($unpaidRows);
-        $perRowAmount = $unpaidRowCount > 0
-            ? round(($amount - $deliveryFee) / $unpaidRowCount, 2)
-            : $amount;
-
-        $pdo->beginTransaction();
-
-        $settledIds = [];
-        $queuedAudits = [];
-        $totalSettledAmount = 0.0;
-
-        foreach ($unpaidRows as $index => $row) {
-            $rowAmount = ($index === 0) ? ($perRowAmount + $deliveryFee) : $perRowAmount;
-            $rowAppId = $row['application_id'];
-
-            $setClauses = [
-                "status = 'Form Submitted'",
-                "payment_status = 'Paid'",
-                "processing_type = ?",
-                "amount = ?",
-                "receiving_option = ?"
-            ];
-            $updateParams = [
-                $processingType,
-                $rowAmount,
-                $receivingOption
-            ];
-
-            if (isset($existingCols['payment_method'])) {
-                $setClauses[] = "payment_method = ?";
-                $updateParams[] = $paymentMethod;
-            }
-            if (isset($existingCols['delivery_address'])) {
-                $setClauses[] = "delivery_address = ?";
-                $updateParams[] = $deliveryAddress;
-            }
-            if (isset($existingCols['updated_at'])) {
-                $setClauses[] = "updated_at = CURRENT_TIMESTAMP";
-            }
-
-            $updateParams[] = $rowAppId;
-            $updateSql = "UPDATE applications SET " . implode(', ', $setClauses) . " WHERE application_id = ?";
-            $updateStmt = $pdo->prepare($updateSql);
-            $updateStmt->execute($updateParams);
-
-            $settledIds[] = $rowAppId;
-            $totalSettledAmount += $rowAmount;
-
-            $queuedAudits[] = [
-                'entity_id' => $rowAppId,
-                'old_value' => $row['payment_status'] ?? 'Pending',
-                'new_value' => 'Paid',
-                'details' => 'Consolidated group payment (' . $groupPrefix . ', ' . $memberCount . ' applicants) recorded via ' . $paymentMethod . '; processing: ' . $processingType . '; receiving: ' . $receivingOption . '.',
-                'actor_email' => !empty($row['email']) ? $row['email'] : ($sessionEmail !== '' ? $sessionEmail : $email)
-            ];
-        }
-
-        if ($pdo->inTransaction()) {
-            $pdo->commit();
-        }
-
-        // Non-blocking audit logging AFTER transaction commit
-        foreach ($queuedAudits as $auditEntry) {
-            try {
-                if (function_exists('logAudit')) {
-                    logAudit(
-                        $pdo,
-                        'PAYMENT_RECORDED',
-                        'application',
-                        $auditEntry['entity_id'],
-                        $auditEntry['old_value'],
-                        $auditEntry['new_value'],
-                        $auditEntry['details'],
-                        $auditEntry['actor_email'],
-                        'member'
-                    );
-                }
-            } catch (Throwable $auditErr) {
-                error_log('Payment audit log failed: ' . $auditErr->getMessage());
-            }
-        }
-
-        sendJsonResponse(200, [
-            'success' => true,
-            'isGroup' => true,
-            'groupPrefix' => $groupPrefix,
-            'applicationId' => $settledIds[0] ?? $firstRow['application_id'],
-            'settledIds' => $settledIds,
-            'settledCount' => $memberCount,
-            'status' => 'Form Submitted',
-            'payment_status' => 'Paid',
-            'amount' => $totalSettledAmount,
-            'processingType' => $processingType,
-            'receivingOption' => $receivingOption,
-            'appointmentDate' => $appointmentDate,
-            'appointmentLocation' => $appointmentLocation,
-            'message' => "Group payment verified and recorded for {$memberCount} " . ($memberCount === 1 ? 'applicant' : 'applicants') . '.'
-        ]);
-    }
-
-    // Solo Application Checkout Path (PH-XXXXXX)
+    $rows = [];
     if ($applicationId !== '') {
-        $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? OR id = ? ORDER BY id DESC LIMIT 1");
-        $stmt->execute([$applicationId, $applicationId]);
-    } else {
+        if (preg_match('/^(PH-GRP-\d+)(?:-\d+)?$/', $applicationId, $m)) {
+            $groupBaseId = $m[1];
+            $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? OR application_id LIKE ? ORDER BY id ASC");
+            $stmt->execute([$groupBaseId, $groupBaseId . '-%']);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $stmt = $pdo->prepare("SELECT * FROM applications WHERE application_id = ? ORDER BY id DESC LIMIT 1");
+            $stmt->execute([$applicationId]);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    } elseif ($email !== '') {
         $stmt = $pdo->prepare("SELECT * FROM applications WHERE email = ? ORDER BY id DESC LIMIT 1");
         $stmt->execute([$email]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    $existingApp = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$existingApp) {
-        sendJsonResponse(404, [
+    if (empty($rows)) {
+        sendJson(404, [
             'success' => false,
             'message' => 'Active application record not found in database.'
         ]);
     }
 
-    if (($existingApp['payment_status'] ?? '') === 'Paid') {
-        sendJsonResponse(200, [
-            'success' => true,
-            'applicationId' => $existingApp['application_id'],
-            'status' => $existingApp['status'] ?? 'Form Submitted',
-            'payment_status' => 'Paid',
-            'amount' => $existingApp['amount'] ?? $amount,
-            'processingType' => $existingApp['processing_type'] ?? $processingType,
-            'receivingOption' => $existingApp['receiving_option'] ?? $receivingOption,
-            'appointmentDate' => !empty($existingApp['appointment_date']) ? $existingApp['appointment_date'] : date('Y-m-d'),
-            'appointmentLocation' => !empty($existingApp['appointment_location']) ? $existingApp['appointment_location'] : 'ANGELES',
-            'message' => 'Payment has already been recorded for this application.'
-        ]);
+    $primaryRow = $rows[0];
+    $targetAppId = (string)$primaryRow['application_id'];
+    $members = parseGroupMembersFromRows($rows);
+    $isGroup = (strpos($targetAppId, 'PH-GRP-') === 0) || count($members) > 1;
+    $applicantCount = count($members) > 0 ? count($members) : 1;
+
+    $appointmentDate = !empty($primaryRow['appointment_date']) ? $primaryRow['appointment_date'] : date('Y-m-d');
+    $appointmentLocation = !empty($primaryRow['appointment_location']) ? $primaryRow['appointment_location'] : 'ANGELES';
+
+    $hasUpdatedAt = tableHasColumn($pdo, 'applications', 'updated_at');
+    $hasPaymentMethod = tableHasColumn($pdo, 'applications', 'payment_method');
+
+    $setClauses = [
+        "status = 'Form Submitted'",
+        "payment_status = 'Paid'",
+        "processing_type = ?",
+        "amount = ?",
+        "receiving_option = ?",
+        "delivery_address = ?"
+    ];
+    if ($hasPaymentMethod) {
+        $setClauses[] = "payment_method = ?";
+    }
+    if ($hasUpdatedAt) {
+        $setClauses[] = "updated_at = CURRENT_TIMESTAMP";
     }
 
-    $targetAppId = $existingApp['application_id'];
-    $appointmentDate = !empty($existingApp['appointment_date']) ? $existingApp['appointment_date'] : date('Y-m-d');
-    $appointmentLocation = !empty($existingApp['appointment_location']) ? $existingApp['appointment_location'] : 'ANGELES';
+    $updateSql = "UPDATE applications SET " . implode(', ', $setClauses) . " WHERE application_id = ?";
+    $updateStmt = $pdo->prepare($updateSql);
 
-    $update = $pdo->prepare("
-        UPDATE applications
-        SET status = 'Form Submitted',
-            payment_status = 'Paid',
-            processing_type = ?,
-            amount = ?,
-            payment_method = ?,
-            receiving_option = ?,
-            delivery_address = ?,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE application_id = ?
-    ");
-    $update->execute([
-        $processingType,
-        $amount,
-        $paymentMethod,
-        $receivingOption,
-        $deliveryAddress,
-        $targetAppId
-    ]);
+    // Single-row group or solo application
+    if (count($rows) === 1) {
+        if (($primaryRow['payment_status'] ?? '') === 'Paid') {
+            sendJson(200, [
+                'success' => true,
+                'isGroup' => $isGroup,
+                'applicantCount' => $applicantCount,
+                'applicationId' => $targetAppId,
+                'status' => $primaryRow['status'] ?? 'Form Submitted',
+                'payment_status' => 'Paid',
+                'amount' => isset($primaryRow['amount']) ? (float)$primaryRow['amount'] : $amount,
+                'processingType' => $primaryRow['processing_type'] ?? $processingType,
+                'receivingOption' => $primaryRow['receiving_option'] ?? $receivingOption,
+                'appointmentDate' => $appointmentDate,
+                'appointmentLocation' => $appointmentLocation,
+                'message' => 'Payment has already been recorded for this application.'
+            ]);
+        }
 
-    $actorEmail = $existingApp['email'] ?? ($sessionEmail !== '' ? $sessionEmail : $email);
+        $params = [$processingType, round($amount, 2), $receivingOption, $deliveryAddress];
+        if ($hasPaymentMethod) {
+            $params[] = $paymentMethod;
+        }
+        $params[] = $targetAppId;
+        $updateStmt->execute($params);
+    } else {
+        // Legacy multi-row group fallback
+        $rowCount = count($rows);
+        $perRowBase = round(($amount - $deliveryFee) / $rowCount, 2);
+        foreach ($rows as $idx => $r) {
+            $rowAmount = ($idx === 0) ? ($perRowBase + $deliveryFee) : $perRowBase;
+            $params = [$processingType, $rowAmount, $receivingOption, $deliveryAddress];
+            if ($hasPaymentMethod) {
+                $params[] = $paymentMethod;
+            }
+            $params[] = $r['application_id'];
+            $updateStmt->execute($params);
+        }
+    }
+
+    $actorEmail = !empty($primaryRow['email']) ? $primaryRow['email'] : ($sessionEmail !== '' ? $sessionEmail : $email);
     try {
         if (function_exists('logAudit')) {
             logAudit(
@@ -369,9 +296,10 @@ try {
                 'PAYMENT_RECORDED',
                 'application',
                 $targetAppId,
-                $existingApp['payment_status'] ?? 'Pending',
+                $primaryRow['payment_status'] ?? 'Pending',
                 'Paid',
-                'Payment recorded via ' . $paymentMethod . '; processing: ' . $processingType . '; receiving: ' . $receivingOption . '.',
+                ($isGroup ? "Group payment ({$applicantCount} applicants) " : "Payment ")
+                    . "recorded via {$paymentMethod}; processing: {$processingType}; receiving: {$receivingOption}; amount: {$amount}.",
                 $actorEmail,
                 'member'
             );
@@ -380,23 +308,28 @@ try {
         error_log('Payment audit log failed: ' . $auditErr->getMessage());
     }
 
-    sendJsonResponse(200, [
+    sendJson(200, [
         'success' => true,
+        'isGroup' => $isGroup,
+        'applicantCount' => $applicantCount,
         'applicationId' => $targetAppId,
         'status' => 'Form Submitted',
         'payment_status' => 'Paid',
-        'amount' => $amount,
+        'amount' => round($amount, 2),
         'processingType' => $processingType,
         'receivingOption' => $receivingOption,
         'appointmentDate' => $appointmentDate,
         'appointmentLocation' => $appointmentLocation,
-        'message' => 'Online payment verified and recorded successfully.'
+        'message' => $isGroup
+            ? "Group payment verified and recorded for {$applicantCount} applicants."
+            : 'Online payment verified and recorded successfully.'
     ]);
 } catch (Throwable $e) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    sendJsonResponse(500, [
+    error_log('api/payments.php error: ' . $e->getMessage());
+    sendJson(500, [
         'success' => false,
         'message' => 'Payment Error: ' . $e->getMessage()
     ]);

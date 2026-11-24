@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Payments - Passport Tracking</title>
     <!-- FontAwesome & Google Plus Jakarta Sans Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -92,7 +90,7 @@
        
         .button-row { display: flex; justify-content: flex-end; align-items: center; gap: 16px; margin-top: 24px; }
         .btn-primary, .btn-secondary { border-radius: var(--radius-sm); padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s ease; }
-        .btn-primary { background: var(--primary); color: #fff; border: 0; box-shadow: var(--shadow-subtle); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--primary); color: #fff; border: 0; box-shadow: var(--shadow-subtle); }
         .btn-primary:hover { background: var(--primary-hover); box-shadow: var(--shadow-elevated); }
         .btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; box-shadow: none; }
         .btn-secondary { background: #fff; color: #334155; border: 1px solid var(--border-color); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
@@ -102,81 +100,18 @@
         .summary-line span:first-child { color: var(--text-muted); font-weight: 500; }
         .summary-line strong { color: var(--text-main); text-align: right; overflow-wrap: anywhere; font-weight: 600; }
         .total-line { border: 0; padding-top: 18px; font-size: 16px; }
-        .total-line strong { color: var(--primary); font-weight: 700; font-size: 18px; }
+        .total-line strong { color: var(--primary); font-weight: 700; }
 
-        /* Group Applicants Breakdown Box */
-        .group-breakdown-box {
-            margin: 14px 0 4px;
-            padding: 14px 16px;
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-        }
-        .group-breakdown-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 10px;
-        }
-        .group-member-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 0;
-            border-bottom: 1px dashed #e2e8f0;
-        }
-        .group-member-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        .group-member-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 0;
-        }
-        .group-member-code {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-        .group-member-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            overflow-wrap: anywhere;
-        }
-        .group-member-fee-col {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-        .group-member-fee {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .status-pill {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-        .status-pill.pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        .status-pill.paid {
-            background: #dcfce7;
-            color: #166534;
-        }
+        .group-breakdown-box { margin: 14px 0; padding: 14px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); }
+        .group-breakdown-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
+        .group-member-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; font-size: 12px; }
+        .group-member-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .group-member-name { font-weight: 700; color: var(--text-main); display: block; }
+        .group-member-meta { color: var(--text-muted); font-size: 11px; display: block; margin-top: 2px; }
+        .group-member-right { text-align: right; flex-shrink: 0; }
+        .group-member-fee { font-weight: 700; color: var(--primary); display: block; }
+        .status-pill { display: inline-block; margin-top: 3px; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #fef3c7; color: #92400e; }
+        .status-pill.paid { background: #dcfce7; color: #166534; }
        
         .empty-state, .success-state { text-align: center; padding: 24px 8px; }
         .empty-state i, .success-state i { color: #cbd5e1; font-size: 36px; margin-bottom: 12px; }
@@ -233,15 +168,14 @@
                         <label class="plan-option selected" id="planRegular">
                             <input type="radio" name="processingType" value="Regular Processing" data-amount="950" checked>
                             <span class="plan-copy"><i class="fa-solid fa-circle-check"></i><span><span class="plan-name">Regular Processing</span><span class="plan-time">12 working days</span></span></span>
-                            <span class="plan-price">₱950.00</span>
+                            <span class="plan-price" id="regularPriceDisplay">₱950.00</span>
                         </label>
                         <label class="plan-option" id="planExpedited">
                             <input type="radio" name="processingType" value="Expedited / Rush Processing" data-amount="1200">
                             <span class="plan-copy"><i class="fa-regular fa-circle-check"></i><span><span class="plan-name">Expedited / Rush Processing</span><span class="plan-time">7 working days</span></span></span>
-                            <span class="plan-price">₱1,200.00</span>
+                            <span class="plan-price" id="expeditedPriceDisplay">₱1,200.00</span>
                         </label>
                     </div>
-                    <!-- Delivery vs In-Person Receiving Section -->
                     <span class="section-label">Receiving Option</span>
                     <div class="plan-list" style="margin-bottom: 20px;">
                         <label class="plan-option selected" id="planInPerson">
@@ -262,7 +196,7 @@
                             <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px;">Fare is calculated automatically after you finish typing.</small>
                         </div>
                     </div>
-                    <form id="paymentForm" novalidate>
+                    <form id="paymentForm">
                         <span class="section-label">Payment method</span>
                         <div class="method-list">
                             <label class="method-option"><input type="radio" name="paymentMethod" value="GCash" checked> GCash</label>
@@ -287,12 +221,10 @@
                     <div id="summaryDetails" style="display:none;">
                         <div class="summary-line"><span>Application ID</span><strong id="summaryId">---</strong></div>
                         <div class="summary-line"><span>Applicant</span><strong id="summaryApplicant">---</strong></div>
-
                         <div class="group-breakdown-box" id="groupBreakdownBox" style="display:none;">
-                            <div class="group-breakdown-title" id="groupBreakdownTitle">GROUP APPLICANTS BREAKDOWN (2)</div>
+                            <div class="group-breakdown-title" id="groupBreakdownTitle">GROUP APPLICANTS BREAKDOWN</div>
                             <div id="groupBreakdownList"></div>
                         </div>
-
                         <div class="summary-line"><span>Current status</span><strong id="summaryStatus">Pending</strong></div>
                         <div class="summary-line"><span>Processing</span><strong id="summaryPlan">Regular Processing</strong></div>
                         <div class="summary-line" id="summaryDeliveryLine" style="display:none;"><span>Receiving / Delivery</span><strong id="summaryDeliveryText">Courier Delivery (₱150.00)</strong></div>
@@ -352,20 +284,24 @@
             "ZAMBOANGA": { name: "DFA Regional Consular Office – Zamboanga", address: "Go-Velayoor Building, Vet. Ave., Zamboanga City", contact: "(062) 991-0000" }
         };
 
+        function sanitizeAppId(rawId) {
+            const cleaned = String(rawId || '').trim();
+            if (!cleaned || cleaned === 'undefined' || cleaned === 'null' || cleaned === 'PH-GRP') {
+                return '';
+            }
+            return cleaned;
+        }
+
         const paymentQuery = new URLSearchParams(window.location.search);
-        const storedApplicationId = (
-            paymentQuery.get('id') ||
-            paymentQuery.get('application_id') ||
-            paymentQuery.get('applicationId') ||
-            localStorage.getItem('currentApplicationId') ||
-            localStorage.getItem('activeAppId') ||
-            ''
-        ).trim();
+        const queryAppId = sanitizeAppId(paymentQuery.get('id') || paymentQuery.get('application_id') || paymentQuery.get('applicationId'));
+        const storedApplicationId = queryAppId
+            || sanitizeAppId(localStorage.getItem('currentApplicationId'))
+            || sanitizeAppId(localStorage.getItem('activeAppId'));
 
         let activeApplication = null;
-        let activeMembers = [];
-        let activeApplicantCount = 1;
-        let activeIsAlreadyPaid = false;
+        let groupMembersList = [];
+        let applicantCount = 1;
+        let isGroupApplication = false;
         let resolvedUserEmail = localStorage.getItem('userEmail') || '';
         let resolvedUserName = '';
         let typingTimer = null;
@@ -374,7 +310,24 @@
         const message = document.getElementById('formMessage');
         const payButton = document.getElementById('payButton');
 
-        function formatPHP(amount) {
+        async function fetchJsonSafe(url, options = {}) {
+            const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', ...options });
+            const rawText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(rawText);
+            } catch (parseErr) {
+                const readableSnippet = rawText
+                    .replace(/<[^>]*>/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim()
+                    .slice(0, 320);
+                throw new Error(readableSnippet || 'Server returned an unexpected non-JSON response.');
+            }
+            return { response, data };
+        }
+
+        function formatPeso(amount) {
             return `₱${Number(amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
 
@@ -384,55 +337,6 @@
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;');
-        }
-
-        function parseGroupMembers(application, siblingApps = []) {
-            if (application && application.group_members) {
-                if (Array.isArray(application.group_members) && application.group_members.length > 0) {
-                    return application.group_members;
-                }
-                if (typeof application.group_members === 'string' && application.group_members.trim() !== '') {
-                    try {
-                        const parsed = JSON.parse(application.group_members);
-                        if (Array.isArray(parsed) && parsed.length > 0) {
-                            return parsed;
-                        }
-                    } catch (e) {
-                        // Ignore malformed JSON and fall through
-                    }
-                }
-            }
-            if (Array.isArray(siblingApps) && siblingApps.length > 1) {
-                return siblingApps.map((row, idx) => ({
-                    member_index: idx + 1,
-                    sub_id: row.application_id,
-                    full_name: [row.givenname, row.lastname].filter(Boolean).join(' ') || `Applicant ${idx + 1}`,
-                    email: row.email || '',
-                    payment_status: row.payment_status || 'Pending'
-                }));
-            }
-            return [];
-        }
-
-        function getGroupApplicantCount(application, members = [], siblingApps = []) {
-            if (Array.isArray(members) && members.length > 0) {
-                return members.length;
-            }
-            if (Array.isArray(siblingApps) && siblingApps.length > 1) {
-                return siblingApps.length;
-            }
-            const appType = String(application?.application_type || application?.applicationType || '');
-            const typeMatch = appType.match(/Group\s*\((\d+)\)/i);
-            if (typeMatch && parseInt(typeMatch[1], 10) > 0) {
-                return parseInt(typeMatch[1], 10);
-            }
-            const appId = String(application?.application_id || application?.applicationId || '');
-            const savedAmount = Number(application?.amount || 0);
-            if (appId.startsWith('PH-GRP-') && savedAmount >= 950) {
-                const inferred = Math.round(savedAmount / 950);
-                if (inferred > 1) return inferred;
-            }
-            return 1;
         }
 
         function showMessage(text, type) {
@@ -447,62 +351,69 @@
             return 150 + (words * 15);
         }
 
-        function renderGroupBreakdown(unitRate, isPaid) {
-            const breakdownBox = document.getElementById('groupBreakdownBox');
-            const breakdownTitle = document.getElementById('groupBreakdownTitle');
-            const breakdownList = document.getElementById('groupBreakdownList');
+        function parseMembersFromApplication(app, responseMembers) {
+            if (Array.isArray(responseMembers) && responseMembers.length > 0) {
+                return responseMembers;
+            }
+            if (Array.isArray(app.group_members) && app.group_members.length > 0) {
+                return app.group_members;
+            }
+            if (typeof app.group_members === 'string' && app.group_members.trim() !== '') {
+                try {
+                    const parsed = JSON.parse(app.group_members);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return parsed;
+                    }
+                } catch (e) {
+                    console.warn('Unable to parse group_members JSON:', e);
+                }
+            }
+            return [];
+        }
 
-            if (!activeApplication) {
-                breakdownBox.style.display = 'none';
+        function renderGroupBreakdown(applicationId, perPersonRate, isAlreadyPaid) {
+            const box = document.getElementById('groupBreakdownBox');
+            const titleEl = document.getElementById('groupBreakdownTitle');
+            const listEl = document.getElementById('groupBreakdownList');
+
+            if (!isGroupApplication || groupMembersList.length === 0) {
+                box.style.display = 'none';
                 return;
             }
 
-            const baseId = String(activeApplication.application_id || activeApplication.applicationId || '').replace(/-\d+$/, '');
-            const isGroup = baseId.startsWith('PH-GRP-') || activeApplicantCount > 1;
+            box.style.display = 'block';
+            titleEl.textContent = `GROUP APPLICANTS BREAKDOWN (${applicantCount})`;
 
-            if (!isGroup) {
-                breakdownBox.style.display = 'none';
-                return;
-            }
+            const statusLabel = isAlreadyPaid ? 'PAID' : 'PENDING';
+            const statusClass = isAlreadyPaid ? 'status-pill paid' : 'status-pill';
 
-            const count = activeApplicantCount || 1;
-            breakdownBox.style.display = 'block';
-            breakdownTitle.textContent = `GROUP APPLICANTS BREAKDOWN (${count})`;
+            listEl.innerHTML = groupMembersList.map((member, idx) => {
+                const memberRef = member.application_id || `${applicationId}-${idx + 1}`;
+                const fullName = member.full_name
+                    || [member.givenname, member.middlename, member.lastname, member.extname].filter(Boolean).join(' ')
+                    || `Applicant ${idx + 1}`;
+                const memberEmail = member.email || resolvedUserEmail || '';
 
-            const leadEmail = activeApplication.email || resolvedUserEmail || '';
-            const itemsHtml = [];
-
-            for (let i = 0; i < count; i++) {
-                const m = activeMembers[i] || {};
-                const subCode = m.sub_id || `${baseId}-${i + 1}`;
-                const memberName = m.full_name || [m.givenname, m.lastname].filter(Boolean).join(' ') || `Applicant ${i + 1}`;
-                const memberEmail = m.email || leadEmail;
-                const memberPaid = isPaid || String(m.payment_status || '').toLowerCase() === 'paid';
-                const badgeClass = memberPaid ? 'paid' : 'pending';
-                const badgeText = memberPaid ? 'PAID' : 'PENDING';
-
-                itemsHtml.push(`
-                    <div class="group-member-row">
-                        <div class="group-member-info">
-                            <span class="group-member-code">${escapeHtml(subCode)}</span>
-                            <span class="group-member-sub">${escapeHtml(memberName)}${memberEmail ? ' • ' + escapeHtml(memberEmail) : ''}</span>
+                return `
+                    <div class="group-member-item">
+                        <div>
+                            <span class="group-member-name">${escapeHtml(memberRef)}</span>
+                            <span class="group-member-meta">${escapeHtml(fullName)}</span>
+                            <span class="group-member-meta">${escapeHtml(memberEmail)}</span>
                         </div>
-                        <div class="group-member-fee-col">
-                            <span class="group-member-fee">${formatPHP(unitRate)}</span>
-                            <span class="status-pill ${badgeClass}">${badgeText}</span>
+                        <div class="group-member-right">
+                            <span class="group-member-fee">${formatPeso(perPersonRate)}</span>
+                            <span class="${statusClass}">${statusLabel}</span>
                         </div>
                     </div>
-                `);
-            }
-
-            breakdownList.innerHTML = itemsHtml.join('');
+                `;
+            }).join('');
         }
 
         function updateSelectedPlan() {
             const selectedPlan = document.querySelector('input[name="processingType"]:checked');
             const receivingOption = document.querySelector('input[name="receivingOption"]:checked').value;
             const addressVal = document.getElementById('deliveryAddress').value;
-            const count = activeApplicantCount || 1;
            
             document.querySelectorAll('input[name="processingType"]').forEach(inp => {
                 const parent = inp.closest('.plan-option');
@@ -517,8 +428,11 @@
                 parent.querySelector('i').className = isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle-check';
             });
 
-            const unitRate = Number(selectedPlan.dataset.amount);
-            const baseAmount = unitRate * count;
+            document.getElementById('regularPriceDisplay').textContent = '₱950.00';
+            document.getElementById('expeditedPriceDisplay').textContent = '₱1,200.00';
+
+            const perPersonRate = Number(selectedPlan.dataset.amount);
+            const scaledBaseAmount = perPersonRate * applicantCount;
             let deliveryFee = 0;
             const deliverySection = document.getElementById('deliveryAddressSection');
             const summaryDeliveryLine = document.getElementById('summaryDeliveryLine');
@@ -527,41 +441,41 @@
             if (receivingOption === 'Delivery') {
                 deliverySection.style.display = 'block';
                 deliveryFee = calculateDeliveryFee(addressVal);
-                document.getElementById('deliveryPriceDisplay').textContent = formatPHP(deliveryFee);
+                document.getElementById('deliveryPriceDisplay').textContent = formatPeso(deliveryFee);
                
                 summaryDeliveryLine.style.display = 'flex';
-                summaryDeliveryText.textContent = `Courier Delivery (${formatPHP(deliveryFee)})`;
+                summaryDeliveryText.textContent = `Courier Delivery (${formatPeso(deliveryFee)})`;
             } else {
                 deliverySection.style.display = 'none';
                 summaryDeliveryLine.style.display = 'none';
             }
 
-            const totalDue = baseAmount + deliveryFee;
-            document.getElementById('summaryPlan').textContent = count > 1
-                ? `${selectedPlan.value} (${formatPHP(unitRate)} × ${count})`
+            const totalDue = scaledBaseAmount + deliveryFee;
+            document.getElementById('summaryPlan').textContent = isGroupApplication
+                ? `${selectedPlan.value} (${formatPeso(perPersonRate)} × ${applicantCount})`
                 : selectedPlan.value;
-            document.getElementById('summaryAmount').textContent = formatPHP(totalDue);
+            document.getElementById('summaryAmount').textContent = formatPeso(totalDue);
 
-            renderGroupBreakdown(unitRate, activeIsAlreadyPaid);
+            if (activeApplication) {
+                const paymentStatus = activeApplication.payment_status || activeApplication.paymentStatus;
+                const currentStatus = activeApplication.status;
+                const isAlreadyPaid = (paymentStatus === 'Paid' || currentStatus === 'Paid' || currentStatus === 'Biometrics Received');
+                renderGroupBreakdown(activeApplication.application_id, perPersonRate, isAlreadyPaid);
+            }
         }
 
-        function displayApplication(application, siblingApps = []) {
+        function displayApplication(application, responseMembers = []) {
             message.style.display = 'none';
             message.textContent = '';
            
-            const rawAppId = application.application_id || application.applicationId || storedApplicationId;
-            if (!rawAppId) {
+            const applicationId = application.application_id || application.applicationId || storedApplicationId;
+            if (!applicationId) {
                 throw new Error('No active application was found. Start an application from the dashboard first.');
             }
 
-            const applicationId = String(rawAppId).replace(/-\d+$/, '');
             application.application_id = applicationId;
             application.applicationId = applicationId;
             activeApplication = application;
-
-            activeMembers = parseGroupMembers(application, siblingApps);
-            activeApplicantCount = getGroupApplicantCount(application, activeMembers, siblingApps);
-
             localStorage.setItem('currentApplicationId', applicationId);
             localStorage.setItem('activeAppId', applicationId);
 
@@ -569,28 +483,20 @@
             document.getElementById('applicationSummary').style.display = 'none';
             document.getElementById('summaryDetails').style.display = 'block';
 
-            const isGroup = applicationId.startsWith('PH-GRP-') || activeApplicantCount > 1;
-            document.getElementById('summaryId').textContent = isGroup
-                ? `${applicationId} (${activeApplicantCount} ${activeApplicantCount === 1 ? 'Applicant' : 'Applicants'})`
+            document.getElementById('summaryId').textContent = isGroupApplication
+                ? `${applicationId} (${applicantCount} ${applicantCount === 1 ? 'Applicant' : 'Applicants'})`
                 : applicationId;
 
-            const leadMember = activeMembers[0] || {};
-            const baseApplicantName = resolvedUserName
-                || leadMember.full_name
-                || [application.givenname, application.lastname].filter(Boolean).join(' ')
-                || application.fullname
-                || application.email
-                || resolvedUserEmail
-                || 'User';
-
-            document.getElementById('summaryApplicant').textContent = isGroup
+            const leadFullName = [application.givenname, application.lastname].filter(Boolean).join(' ').trim();
+            const baseApplicantName = resolvedUserName || leadFullName || application.fullname || application.email || resolvedUserEmail || 'User';
+            document.getElementById('summaryApplicant').textContent = isGroupApplication
                 ? `${baseApplicantName} (Group Booking)`
                 : baseApplicantName;
            
             const paymentStatus = application.payment_status || application.paymentStatus;
             const currentStatus = application.status;
-            activeIsAlreadyPaid = (paymentStatus === 'Paid' || currentStatus === 'Paid' || currentStatus === 'Biometrics Received');
-            document.getElementById('summaryStatus').textContent = activeIsAlreadyPaid ? 'Paid' : 'Pending';
+            const isAlreadyPaid = (paymentStatus === 'Paid' || currentStatus === 'Paid' || currentStatus === 'Biometrics Received');
+            document.getElementById('summaryStatus').textContent = isAlreadyPaid ? 'Paid' : (paymentStatus || currentStatus || 'Pending');
            
             const savedProcessing = application.processing_type || application.processingType;
             if (savedProcessing) {
@@ -610,15 +516,11 @@
 
             const paymentEmailEl = document.getElementById('paymentEmail');
             if (paymentEmailEl && !paymentEmailEl.value) {
-                paymentEmailEl.value = application.email || leadMember.email || resolvedUserEmail || '';
-            }
-
-            const accountNameEl = document.getElementById('accountName');
-            if (accountNameEl && !accountNameEl.value && baseApplicantName !== 'User') {
-                accountNameEl.value = baseApplicantName;
+                paymentEmailEl.value = application.email || resolvedUserEmail || '';
             }
            
-            if (activeIsAlreadyPaid) {
+            payButton.disabled = false;
+            if (isAlreadyPaid) {
                 payButton.disabled = true;
                 payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Already Paid';
                 showMessage('This application has already been paid. Your appointment is locked in.', 'success');
@@ -626,20 +528,6 @@
                 document.querySelectorAll('input').forEach(inp => inp.disabled = true);
                 document.querySelectorAll('.plan-option').forEach(opt => opt.style.cursor = 'not-allowed');
                 document.querySelectorAll('.method-option').forEach(opt => opt.style.cursor = 'not-allowed');
-            } else {
-                payButton.disabled = false;
-                payButton.removeAttribute('disabled');
-                payButton.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Now';
-            }
-        }
-
-        async function parseJsonSafe(response) {
-            const rawText = await response.text();
-            try {
-                return JSON.parse(rawText);
-            } catch (e) {
-                const cleaned = rawText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 250);
-                throw new Error(cleaned || 'Server returned an unexpected response.');
             }
         }
 
@@ -649,52 +537,49 @@
             const summaryBox = document.getElementById('applicationSummary');
 
             try {
-                try {
-                    const userResponse = await fetch('../api/user-data.php', { credentials: 'same-origin' });
-                    const userData = await parseJsonSafe(userResponse);
+                const { data: userData } = await fetchJsonSafe('../api/user-data.php');
+                const fetchedName = userData.fullName || userData.fullname || (userData.user && userData.user.fullname) || '';
+                const fetchedEmail = userData.email || (userData.user && userData.user.email) || '';
 
-                    const fetchedName = userData.fullName || userData.fullname || (userData.user && userData.user.fullname) || '';
-                    const fetchedEmail = userData.email || (userData.user && userData.user.email) || '';
-
-                    if (fetchedEmail) {
-                        resolvedUserEmail = fetchedEmail;
-                        localStorage.setItem('userEmail', fetchedEmail);
-                    }
-
-                    if (fetchedName) {
-                        resolvedUserName = fetchedName;
-                        userNameEl.textContent = fetchedName;
-                        greetingEl.textContent = `Good Day, ${fetchedName}`;
-                    } else if (resolvedUserEmail) {
-                        userNameEl.textContent = resolvedUserEmail;
-                    } else {
-                        userNameEl.textContent = 'User';
-                    }
-                } catch (userErr) {
-                    userNameEl.textContent = resolvedUserName || resolvedUserEmail || 'User';
+                if (fetchedEmail) {
+                    resolvedUserEmail = fetchedEmail;
+                    localStorage.setItem('userEmail', fetchedEmail);
                 }
 
+                if (fetchedName) {
+                    resolvedUserName = fetchedName;
+                    userNameEl.textContent = fetchedName;
+                    greetingEl.textContent = `Good Day, ${fetchedName}`;
+                } else if (resolvedUserEmail) {
+                    userNameEl.textContent = resolvedUserEmail;
+                } else {
+                    userNameEl.textContent = 'User';
+                }
+            } catch (userErr) {
+                console.warn('user-data.php warning:', userErr.message);
+                userNameEl.textContent = resolvedUserName || resolvedUserEmail || 'User';
+            }
+
+            try {
                 const queryParts = [];
                 if (storedApplicationId) queryParts.push(`applicationId=${encodeURIComponent(storedApplicationId)}`);
                 if (resolvedUserEmail) queryParts.push(`email=${encodeURIComponent(resolvedUserEmail)}`);
 
-                if (!queryParts.length) {
-                    throw new Error('No active application was found. Start an application from the dashboard first.');
+                const fetchUrl = queryParts.length > 0
+                    ? `../api/payments.php?${queryParts.join('&')}`
+                    : '../api/payments.php';
+
+                const { response, data: result } = await fetchJsonSafe(fetchUrl);
+
+                if (response.ok && result.success && result.application) {
+                    groupMembersList = parseMembersFromApplication(result.application, result.members || []);
+                    isGroupApplication = String(result.application.application_id || '').startsWith('PH-GRP-') || groupMembersList.length > 1;
+                    applicantCount = groupMembersList.length > 0 ? groupMembersList.length : 1;
+                    displayApplication(result.application, result.members || []);
+                } else {
+                    throw new Error(result.message || 'Active application record not found in database.');
                 }
-
-                const directRes = await fetch(`../api/payments.php?${queryParts.join('&')}`, { credentials: 'same-origin' });
-                const directJson = await parseJsonSafe(directRes);
-
-                if (directRes.ok && directJson.success && directJson.application) {
-                    displayApplication(directJson.application, directJson.applications || []);
-                    return;
-                }
-
-                throw new Error(directJson.message || 'No active application was found. Start an application from the dashboard first.');
             } catch (error) {
-                if (userNameEl && userNameEl.textContent === 'Loading...') {
-                    userNameEl.textContent = resolvedUserName || resolvedUserEmail || 'User';
-                }
                 summaryBox.innerHTML = `<i class="fa-regular fa-file-lines"></i><p>${escapeHtml(error.message || 'Unable to load your active application right now.')}</p>`;
                 payButton.disabled = true;
             }
@@ -706,103 +591,64 @@
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => {
                 updateSelectedPlan();
-            }, 1000);
+            }, 2000);
         });
        
         form.addEventListener('submit', async event => {
             event.preventDefault();
-            if (!activeApplication) {
-                return showMessage('No active application is available for payment.', 'error');
-            }
-
-            const accountNameEl = document.getElementById('accountName');
-            const accountRefEl = document.getElementById('accountReference');
-            const paymentEmailEl = document.getElementById('paymentEmail');
-
-            if (!accountNameEl.value.trim()) {
-                accountNameEl.focus();
-                return showMessage('Please enter the account or cardholder name.', 'error');
-            }
-            if (!accountRefEl.value.trim()) {
-                accountRefEl.focus();
-                return showMessage('Please enter your mobile number or card number.', 'error');
-            }
-            if (!paymentEmailEl.value.trim()) {
-                paymentEmailEl.focus();
-                return showMessage('Please enter an email address for your receipt.', 'error');
-            }
+            if (!activeApplication) return showMessage('No active application is available for payment.', 'error');
            
             const receivingOption = document.querySelector('input[name="receivingOption"]:checked').value;
             const deliveryAddressVal = document.getElementById('deliveryAddress').value.trim();
             if (receivingOption === 'Delivery' && !deliveryAddressVal) {
-                document.getElementById('deliveryAddress').focus();
                 return showMessage('Please provide your complete delivery address for courier delivery.', 'error');
             }
-
             payButton.disabled = true;
             payButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
            
-            const count = activeApplicantCount || 1;
             const selectedPlan = document.querySelector('input[name="processingType"]:checked');
-            const unitAmount = Number(selectedPlan.dataset.amount);
-            const baseAmount = unitAmount * count;
+            const perPersonRate = Number(selectedPlan.dataset.amount);
+            const scaledBaseAmount = perPersonRate * applicantCount;
             const deliveryFee = receivingOption === 'Delivery' ? calculateDeliveryFee(deliveryAddressVal) : 0;
-            const totalPaymentAmount = baseAmount + deliveryFee;
-            const applicationType = activeApplication.applicationType
-                || activeApplication.application_type
-                || localStorage.getItem('applicationType')
-                || 'Group Passport Application';
+            const totalPaymentAmount = scaledBaseAmount + deliveryFee;
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-            const currentEmail = paymentEmailEl.value.trim() || resolvedUserEmail;
+            const currentEmail = document.getElementById('paymentEmail').value.trim() || resolvedUserEmail;
 
             try {
-                const response = await fetch('../api/payments.php', {
+                const { response, data: result } = await fetchJsonSafe('../api/payments.php', {
                     method: 'POST',
-                    credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         email: currentEmail,
                         applicationId: activeApplication.applicationId,
                         processingType: selectedPlan.value,
                         amount: totalPaymentAmount,
-                        applicantCount: count,
                         paymentMethod,
                         receivingOption: receivingOption,
                         deliveryAddress: receivingOption === 'Delivery' ? deliveryAddressVal : null,
                         deliveryFee: deliveryFee
                     })
                 });
-                const result = await parseJsonSafe(response);
-                if (!response.ok || !result.success) {
-                    throw new Error(result.message || 'Unable to process payment.');
-                }
+                if (!response.ok || !result.success) throw new Error(result.message || 'Unable to process payment.');
                
-                activeIsAlreadyPaid = true;
-                activeApplication.status = result.status || 'Form Submitted';
+                activeApplication.status = result.status;
                 activeApplication.payment_status = 'Paid';
+                activeApplication.paymentStatus = 'Paid';
                 activeApplication.paymentAmount = result.amount ?? totalPaymentAmount;
-                activeApplication.applicationType = applicationType;
                
                 document.getElementById('summaryStatus').textContent = 'Paid';
-                renderGroupBreakdown(unitAmount, true);
+                renderGroupBreakdown(activeApplication.application_id, perPersonRate, true);
                
-                const rawLoc = result.appointmentLocation || activeApplication.appointment_location || 'DFA NCR CENTRAL';
+                const rawLoc = result.appointmentLocation || 'DFA NCR CENTRAL';
                 const officeInfo = dfaOfficeData[rawLoc];
                 const fullLocationText = officeInfo ? `${officeInfo.name} - ${officeInfo.address}` : rawLoc;
-                const apptDateText = result.appointmentDate
-                    ? new Date(`${result.appointmentDate}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-                    : '';
-
-                document.getElementById('successMessage').textContent = `${result.message}${apptDateText ? ` Appointment date: ${apptDateText} at ${fullLocationText}.` : ''}`;
+                document.getElementById('successMessage').textContent = `${result.message} Appointment date: ${new Date(`${result.appointmentDate}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} at ${fullLocationText}.`;
                 document.getElementById('successState').style.display = 'block';
                 payButton.innerHTML = '<i class="fa-solid fa-circle-check"></i> Already Paid';
                 showMessage('Payment successful.', 'success');
-
-                document.querySelectorAll('input').forEach(inp => inp.disabled = true);
             } catch (error) {
                 showMessage(error.message, 'error');
                 payButton.disabled = false;
-                payButton.removeAttribute('disabled');
                 payButton.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Now';
             }
         });

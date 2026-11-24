@@ -278,14 +278,10 @@
     </aside>
     <div class="main-container">
         <main class="main-content">
-<<<<<<< Updated upstream
-            <div class="header" id="pageHeaderTitle" style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 20px;">GROUP PASSPORT APPLICATION </div>
-=======
             <div class="header" id="pageHeaderTitle" style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 20px;">GROUP PASSPORT APPLICATION WIZARD</div>
             <div id="groupApplicantBadge" style="background: var(--primary-light); color: var(--primary); padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-users"></i> Group Booking: Filling out details for Applicant 1 of 2
             </div>
->>>>>>> Stashed changes
             <div class="dashboard-container">
 
                 <div class="wizard-steps" id="wizardHeader">
@@ -843,7 +839,7 @@
                 }
 
                 const rawSavedId = result.groupCode || result.application_id || result.applicationId || `PH-GRP-${Math.floor(100000 + Math.random() * 900000)}`;
-                const savedAppId = String(rawSavedId).replace(/-\d+$/, '');
+                const savedAppId = String(rawSavedId).replace(/^(PH-GRP-\d+)-\d+$/, '$1');
                 localStorage.setItem('currentApplicationId', savedAppId);
                 localStorage.setItem('activeAppId', savedAppId);
 

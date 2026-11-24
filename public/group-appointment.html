@@ -305,23 +305,17 @@
         <div class="dashboard-container">
             <div class="form-section-card">
                 <div class="section-title"><i class="fa-solid fa-users" style="color:var(--primary);"></i> Number of Applicants</div>
-                <div class="section-subtitle">Fields with asterisks (*) are required. Please specify how many applicants are joining this group booking.</div>
+                <div class="section-subtitle">Fields with asterisks (*) are required. Please specify how many applicants (2 to 5) are joining this group booking.</div>
                
                 <form id="groupSetupForm">
                     <div class="form-group">
                         <label for="numApplicants">Number of Applicants *</label>
                         <select id="numApplicants" class="form-control" required>
                             <option value="" disabled selected>- SELECT NUMBER OF APPLICANTS -</option>
-                            <option value="1">1 Applicant (Solo)</option>
                             <option value="2">2 Applicants</option>
                             <option value="3">3 Applicants</option>
                             <option value="4">4 Applicants</option>
                             <option value="5">5 Applicants</option>
-                            <option value="6">6 Applicants</option>
-                            <option value="7">7 Applicants</option>
-                            <option value="8">8 Applicants</option>
-                            <option value="9">9 Applicants</option>
-                            <option value="10">10 Applicants</option>
                         </select>
                     </div>
                     <div id="validationError" class="validation-error" style="display: none; color: #dc2626; font-size: 12px; margin-bottom: 12px;"></div>
@@ -370,25 +364,18 @@
             }
 
             const num = parseInt(count, 10);
-            if (isNaN(num) || num < 1 || num > 10) {
-                errorEl.textContent = 'Invalid applicant count. Please select a value between 1 and 10.';
+            if (isNaN(num) || num < 2 || num > 5) {
+                errorEl.textContent = 'Invalid applicant count. Please select between 2 and 5 applicants.';
                 errorEl.style.display = 'block';
                 selectEl.style.borderColor = '#dc2626';
                 selectEl.focus();
                 return;
             }
 
-            if (num === 1) {
-                // Solo applicant: clear group state and route to new-passport.html
-                localStorage.removeItem('groupCount');
-                localStorage.removeItem('groupApplicantsData');
-                window.location.href = 'new-passport.html';
-            } else {
-                // Group (2-10): set groupCount, clear stale groupApplicantsData, route to group-wizard.html
-                localStorage.setItem('groupCount', String(num));
-                localStorage.removeItem('groupApplicantsData');
-                window.location.href = `group-wizard.html?step=1&count=${num}`;
-            }
+            // Group (2-5): set groupCount, clear stale groupApplicantsData, route to group-wizard.html
+            localStorage.setItem('groupCount', String(num));
+            localStorage.removeItem('groupApplicantsData');
+            window.location.href = `group-wizard.html?step=1&count=${num}`;
         });
     </script>
 </body>
