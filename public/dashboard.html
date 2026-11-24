@@ -402,6 +402,148 @@
         .app-view.active-view {
             display: block;
         }
+
+        /* Choose Appointment Type Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-elevated);
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideUp 0.25s ease-out;
+            transform-origin: center;
+        }
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-muted);
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            transition: all 0.15s ease;
+        }
+        .modal-close:hover {
+            background: var(--bg-main);
+            color: var(--text-main);
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .modal-description {
+            margin: 0 0 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 20px;
+            background: var(--bg-main);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+        .modal-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateX(4px);
+        }
+        .modal-option:focus-visible {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+        .modal-option-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .modal-option:hover .modal-option-icon {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .modal-option-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .modal-option-content strong {
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+        .modal-option-content span {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .modal-option-arrow {
+            color: var(--text-muted);
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        .modal-option:hover .modal-option-arrow {
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+
         /* ==========================================================
         RESPONSIVE DESIGN FIXES FOR DASHBOARD
         ========================================================== */
@@ -583,7 +725,7 @@
                 </div>
                 <!-- Start Application Section -->
                 <div class="selection-section-title">Start Application</div>
-                <a class="action-banner-card" href="new-passport.html">
+                <a class="action-banner-card" id="startApplicationBtn" href="javascript:void(0);">
                     <div class="action-banner-left">
                         <div class="action-banner-icon">
                             <i class="fa-solid fa-globe"></i>
@@ -598,6 +740,37 @@
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
                 </a>
+
+                <!-- Choose Appointment Type Modal -->
+                <div class="modal-overlay" id="appointmentTypeModal" style="display: none;">
+                    <div class="modal-card" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+                        <div class="modal-header">
+                            <h2 id="modalTitle">Choose Appointment Type</h2>
+                            <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="modal-description">How would you like to proceed with your passport application?</p>
+                            <div class="modal-options">
+                                <button type="button" class="modal-option" id="soloAppointmentBtn" data-type="solo">
+                                    <div class="modal-option-icon"><i class="fa-solid fa-user"></i></div>
+                                    <div class="modal-option-content">
+                                        <strong>Solo Appointment (1 Applicant)</strong>
+                                        <span>Apply for a single passport appointment</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right modal-option-arrow"></i>
+                                </button>
+                                <button type="button" class="modal-option" id="groupAppointmentBtn" data-type="group">
+                                    <div class="modal-option-icon"><i class="fa-solid fa-users"></i></div>
+                                    <div class="modal-option-content">
+                                        <strong>Group Appointment (2&ndash;10 Applicants)</strong>
+                                        <span>Book a shared appointment for multiple applicants</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right modal-option-arrow"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Manage Appointment Section -->
                 <div class="selection-section-title">Manage Appointment</div>
                 <a class="action-banner-card" href="reschedule.html">
@@ -901,7 +1074,71 @@
                 console.error('Unable to load saved application:', error);
             }
         });
+
+        // Choose Appointment Type Modal Logic
+        (function() {
+            const modal = document.getElementById('appointmentTypeModal');
+            const startBtn = document.getElementById('startApplicationBtn');
+            const closeBtn = document.getElementById('modalCloseBtn');
+            const soloBtn = document.getElementById('soloAppointmentBtn');
+            const groupBtn = document.getElementById('groupAppointmentBtn');
+
+            function openModal() {
+                if (!modal) return;
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                // Focus first focusable element for accessibility
+                setTimeout(() => closeBtn?.focus(), 50);
+            }
+
+            function closeModal() {
+                if (!modal) return;
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+
+            function handleSoloClick() {
+                // Clear any stale group state
+                localStorage.removeItem('groupCount');
+                localStorage.removeItem('groupApplicantsData');
+                closeModal();
+                window.location.href = 'new-passport.html';
+            }
+
+            function handleGroupClick() {
+                closeModal();
+                window.location.href = 'group-appointment.html';
+            }
+
+            // Event listeners
+            startBtn?.addEventListener('click', (e) => {
+                e.preventDefault();
+                openModal();
+            });
+
+            closeBtn?.addEventListener('click', closeModal);
+
+            soloBtn?.addEventListener('click', handleSoloClick);
+            groupBtn?.addEventListener('click', handleGroupClick);
+
+            // Close on backdrop click
+            modal?.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal?.style.display === 'flex') {
+                    closeModal();
+                }
+            });
+
+            // Prevent modal card clicks from bubbling to backdrop
+            modal?.querySelector('.modal-card')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        })();
     </script>
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>

@@ -5,6 +5,10 @@ require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/audit-helper.php';
 
 $input = json_decode(file_get_contents('php://input'), true);
+if (!is_array($input)) {
+    $input = [];
+}
+
 $action = $input['action'] ?? '';
 $email = $input['email'] ?? '';
 $applicationId = $input['applicationId'] ?? $input['appId'] ?? '';
@@ -25,7 +29,22 @@ try {
             $stmt = $pdo->prepare("DELETE FROM applications WHERE email = ?");
             $stmt->execute([$email]);
         }
-        logAudit($pdo, 'APPLICATION_CANCELLED', 'application', $applicationId ?: null, null, 'Cancelled', 'Application canceled and removed.', $email, 'member');
+
+        try {
+            logAudit(
+                $pdo,
+                'APPLICATION_CANCELLED',
+                'application',
+                $applicationId ?: null,
+                null,
+                'Cancelled',
+                'Application canceled and removed.',
+                $email ?: null,
+                'member'
+            );
+        } catch (Throwable $auditEx) {
+            error_log('reschedule-application.php cancel audit warning: ' . $auditEx->getMessage());
+        }
 
         echo json_encode([
             'success' => true,
@@ -33,11 +52,13 @@ try {
         ]);
         exit;
     }
-    
+
     if ($action === 'reschedule') {
         $newDate = $input['appointmentDate'] ?? '';
         $newTime = $input['appointmentTime'] ?? '';
-        $newLocation = $input['appointmentLocation'] ?? '';
+        $newLocation = array_key_exists('appointmentLocation', $input) && trim((string)$input['appointmentLocation']) !== ''
+            ? trim((string)$input['appointmentLocation'])
+            : null;
 
         if (!$newDate || !$newTime) {
             http_response_code(400);
@@ -53,17 +74,22 @@ try {
             $stmt = $pdo->prepare("UPDATE applications SET appointment_date = ?, appointment_time = ?, appointment_location = COALESCE(?, appointment_location), status = 'Appointment Rescheduled', updated_at = CURRENT_TIMESTAMP WHERE email = ?");
             $stmt->execute([$newDate, $newTime, $newLocation, $email]);
         }
-        logAudit(
-            $pdo,
-            'APPLICATION_RESCHEDULED',
-            'application',
-            $applicationId ?: null,
-            null,
-            $newDate . ' ' . $newTime,
-            'Appointment rescheduled.',
-            $email ?: null,
-            'member'
-        );
+
+        try {
+            logAudit(
+                $pdo,
+                'APPLICATION_RESCHEDULED',
+                'application',
+                $applicationId ?: null,
+                null,
+                $newDate . ' ' . $newTime,
+                'Appointment rescheduled.',
+                $email ?: null,
+                'member'
+            );
+        } catch (Throwable $auditEx) {
+            error_log('reschedule-application.php reschedule audit warning: ' . $auditEx->getMessage());
+        }
 
         echo json_encode([
             'success' => true,

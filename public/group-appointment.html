@@ -305,7 +305,7 @@
         <div class="dashboard-container">
             <div class="form-section-card">
                 <div class="section-title"><i class="fa-solid fa-users" style="color:var(--primary);"></i> Number of Applicants</div>
-                <div class="section-subtitle">Fields with asterisks (*) are required. Please specify how many applicants are joining this group booking.</div>
+                <div class="section-subtitle">Fields with asterisks (*) are required. Please specify how many applicants (2 to 5) are joining this group booking.</div>
                
                 <form id="groupSetupForm">
                     <div class="form-group">
@@ -318,8 +318,9 @@
                             <option value="5">5 Applicants</option>
                         </select>
                     </div>
+                    <div id="validationError" class="validation-error" style="display: none; color: #dc2626; font-size: 12px; margin-bottom: 12px;"></div>
                     <div class="action-buttons">
-                        <a href="new-passport.html" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back</a>
+                        <a href="dashboard.html" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back</a>
                         <button type="submit" class="btn-primary">Next <i class="fa-solid fa-arrow-right"></i></button>
                     </div>
                 </form>
@@ -344,10 +345,37 @@
 
         document.getElementById('groupSetupForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            const count = document.getElementById('numApplicants').value;
-            if (!count) return alert('Please select the number of applicants.');
-            localStorage.setItem('groupCount', count);
-            window.location.href = `group-wizard.html?step=1&count=${count}`;
+            const selectEl = document.getElementById('numApplicants');
+            const errorEl = document.getElementById('validationError');
+            const count = selectEl.value;
+
+            // Clear previous error
+            errorEl.style.display = 'none';
+            errorEl.textContent = '';
+            selectEl.style.borderColor = '';
+
+            // Validate
+            if (!count) {
+                errorEl.textContent = 'Please select the number of applicants.';
+                errorEl.style.display = 'block';
+                selectEl.style.borderColor = '#dc2626';
+                selectEl.focus();
+                return;
+            }
+
+            const num = parseInt(count, 10);
+            if (isNaN(num) || num < 2 || num > 5) {
+                errorEl.textContent = 'Invalid applicant count. Please select between 2 and 5 applicants.';
+                errorEl.style.display = 'block';
+                selectEl.style.borderColor = '#dc2626';
+                selectEl.focus();
+                return;
+            }
+
+            // Group (2-5): set groupCount, clear stale groupApplicantsData, route to group-wizard.html
+            localStorage.setItem('groupCount', String(num));
+            localStorage.removeItem('groupApplicantsData');
+            window.location.href = `group-wizard.html?step=1&count=${num}`;
         });
     </script>
 </body>
