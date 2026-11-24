@@ -269,7 +269,7 @@
                 <li><a href="enquiries.html"><i class="fa-solid fa-circle-question"></i> Enquiries</a></li>
                 <li><a href="faq.html?from=dashboard"><i class="fa-solid fa-book-open"></i> Passport FAQs</a></li>
                 <li><a href="emergency.html"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Assistance</a></li>
-                <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a></li>
                 <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
         </div>
@@ -637,6 +637,8 @@
             </div>
         </main>
     </div>
+    <script src="passport-application.js"></script>
+    <script src="csrf.js"></script>
     <script>
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -821,10 +823,15 @@
         const urlParams = new URLSearchParams(window.location.search);
         let currentStep = parseInt(urlParams.get('step')) || 1;
         let currentApplicant = parseInt(urlParams.get('applicant')) || 1;
+        const requestedCount = parseInt(urlParams.get('count')) || 0;
+        if (requestedCount >= 2) {
+            localStorage.setItem('groupCount', String(requestedCount));
+        }
         const totalApplicants = parseInt(localStorage.getItem('groupCount')) || 2;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (currentApplicant > 1 && currentStep < 3) currentStep = 3;
+            restoreCurrentApplicantData();
             goToStep(currentStep);
             updateApplicantBadge();
 
@@ -844,6 +851,33 @@
             // Initialize group-specific event listeners
             initializeGroupEventListeners();
         });
+
+        function restoreCurrentApplicantData() {
+            const groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            const app1 = groupData['applicant_1'] || {};
+            const appData = groupData[`applicant_${currentApplicant}`] || {};
+
+            Object.entries(appData).forEach(([key, value]) => {
+                document.querySelectorAll(`[name="${key}"]`).forEach((field) => {
+                    if (field.type === 'checkbox') {
+                        field.checked = field.value === value;
+                    } else if (field.type === 'radio') {
+                        field.checked = field.value === value;
+                    } else {
+                        field.value = value;
+                    }
+                });
+            });
+
+            const siteSelect = document.getElementById('siteSelect');
+            const dateValue = document.getElementById('selectedDateVal');
+            const timeSelect = document.getElementById('appTimeSelect');
+            if (siteSelect) siteSelect.value = app1.site_selection || appData.site_selection || '';
+            if (dateValue) dateValue.value = app1.app_date_selection || appData.app_date_selection || '';
+            if (timeSelect && (app1.app_time_selection || appData.app_time_selection)) {
+                timeSelect.value = app1.app_time_selection || appData.app_time_selection;
+            }
+        }
 
         function updateApplicantBadge() {
             const badgeDiv = document.getElementById('groupApplicantBadge') || document.createElement('div');
@@ -950,7 +984,7 @@
                 alert(validation.message);
                 return;
             }
-            goToStep(7);
+            groupHandleNext(7);
         }
 
         function groupHandleNext(targetStep) {
@@ -1125,6 +1159,5 @@
             }
         });
     </script>
-    <script src="csrf.js"></script>
 </body>
 </html>

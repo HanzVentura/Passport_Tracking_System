@@ -2,6 +2,10 @@
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/auth-helper.php';
+startSecureSession();
+requireMember();
+requireCsrfToken();
 
 if (!isset($_SESSION['user_email']) || trim($_SESSION['user_email']) === '') {
     http_response_code(401);

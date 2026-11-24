@@ -23,7 +23,12 @@ if (($_SESSION['user_role'] ?? '') === 'admin') {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT fullname, email, two_factor_enabled FROM users WHERE email = ?");
+    $columnsStmt = $pdo->query("SHOW COLUMNS FROM users");
+    $columns = $columnsStmt ? $columnsStmt->fetchAll(PDO::FETCH_COLUMN) : [];
+    $nicknameColumn = in_array('nickname', $columns, true) ? 'nickname' : "NULL AS nickname";
+    $photoColumn = in_array('profile_photo', $columns, true) ? 'profile_photo' : "NULL AS profile_photo";
+
+    $stmt = $pdo->prepare("SELECT fullname, email, two_factor_enabled, {$nicknameColumn}, {$photoColumn} FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -31,7 +36,16 @@ try {
         echo json_encode([
             'loggedIn' => true,
             'fullName' => $user['fullname'],
+            'fullname' => $user['fullname'],
             'email' => $user['email'],
+            'nickname' => $user['nickname'],
+            'profile_photo' => $user['profile_photo'],
+            'user' => [
+                'fullname' => $user['fullname'],
+                'email' => $user['email'],
+                'nickname' => $user['nickname'],
+                'profile_photo' => $user['profile_photo']
+            ],
             'two_factor_enabled' => (int)$user['two_factor_enabled'],
             'csrfToken' => getCsrfToken()
         ]);
