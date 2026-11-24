@@ -14,7 +14,7 @@ try {
     }
 
     $sessionEmail = trim($_SESSION['user_email'] ?? '');
-    $email = trim($input['email'] ?? $sessionEmail);
+    $email = $sessionEmail;
     if (strtolower($email) !== strtolower((string)$sessionEmail)) {
         jsonError('You cannot pay for another member.', 403);
     }
