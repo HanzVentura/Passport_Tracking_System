@@ -28,6 +28,7 @@ try {
         delivery_address TEXT DEFAULT NULL,
         delivery_fee DECIMAL(10,2) DEFAULT 0.00,
         tracking_number VARCHAR(100) DEFAULT NULL,
+        applicant_count INT NOT NULL DEFAULT 1,
         appointment_date VARCHAR(50) DEFAULT NULL,
         appointment_time VARCHAR(50) DEFAULT NULL,
         appointment_location VARCHAR(255) DEFAULT NULL,
@@ -41,6 +42,7 @@ try {
         'delivery_address' => "ALTER TABLE applications ADD COLUMN delivery_address TEXT DEFAULT NULL",
         'delivery_fee' => "ALTER TABLE applications ADD COLUMN delivery_fee DECIMAL(10,2) DEFAULT 0.00",
         'tracking_number' => "ALTER TABLE applications ADD COLUMN tracking_number VARCHAR(100) DEFAULT NULL",
+        'applicant_count' => "ALTER TABLE applications ADD COLUMN applicant_count INT NOT NULL DEFAULT 1",
     ];
     foreach ($applicationColumns as $column => $alterSql) {
         $columnStmt = $pdo->prepare(

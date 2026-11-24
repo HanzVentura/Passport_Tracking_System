@@ -33,7 +33,12 @@ try {
     $application_type = $input['applicationType'] ?? ($input['application_type'] ?? 'Group Passport Application');
     $status = 'Form Submitted';
     $processing_type = 'Regular Processing';
-    $amount = 950.00;
+    $groupPayload = is_array($input['groupPayload'] ?? null) ? $input['groupPayload'] : [];
+    $applicantCount = (int)($input['applicantCount'] ?? $input['groupCount'] ?? count($groupPayload));
+    if ($applicantCount < 2) {
+        $applicantCount = max(2, count($groupPayload));
+    }
+    $amount = 950.00 * $applicantCount;
     $payment_status = 'Pending';
     $receiving_option = 'In-Person';
 
@@ -88,8 +93,8 @@ try {
     }
 
     // Insert group application (files are transient - not saved to disk)
-    $sql = "INSERT INTO applications (application_id, email, application_type, status, processing_type, amount, payment_status, receiving_option, appointment_date, appointment_location, appointment_time, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+    $sql = "INSERT INTO applications (application_id, email, application_type, status, processing_type, amount, payment_status, receiving_option, applicant_count, appointment_date, appointment_location, appointment_time, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
@@ -101,6 +106,7 @@ try {
         $amount,
         $payment_status,
         $receiving_option,
+        $applicantCount,
         $appointment_date,
         $appointment_location,
         $appointment_time

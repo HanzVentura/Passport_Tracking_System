@@ -27,6 +27,7 @@ try {
         ? trim($input['deliveryAddress'])
         : null;
     $deliveryFee = isset($input['deliveryFee']) ? (float)$input['deliveryFee'] : 0.00;
+    $applicantCount = max(1, (int)($input['applicantCount'] ?? 1));
     if ($amount < 0 || $deliveryFee < 0) {
         jsonError('Payment amounts cannot be negative.', 400);
     }
@@ -56,6 +57,15 @@ try {
             'message' => 'Active application record not found in database.'
         ]);
         exit;
+    }
+
+    $existingType = (string)($existingApp['application_type'] ?? '');
+    if (isset($existingApp['applicant_count']) && (int)$existingApp['applicant_count'] >= 2) {
+        $applicantCount = (int)$existingApp['applicant_count'];
+    }
+    if (stripos($existingType, 'group') !== false && $applicantCount >= 2) {
+        $perApplicantAmount = stripos($processingType, 'expedited') !== false ? 1200.00 : 950.00;
+        $amount = ($perApplicantAmount * $applicantCount) + $deliveryFee;
     }
 
     if (($existingApp['payment_status'] ?? '') === 'Paid') {

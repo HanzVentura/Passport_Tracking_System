@@ -822,6 +822,7 @@
                         ? `PHP ${Number(application.amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                         : '-';
                     const tracking = application.tracking_number || '-';
+                    const applicantCount = application.applicant_count ? Number(application.applicant_count) : 1;
                     const detailsId = `application-history-details-${index}`;
                     return `
                         <div style="border:1px solid var(--border-color); border-radius:10px; margin-bottom:10px; background:#fff; overflow:hidden;">
@@ -844,6 +845,7 @@
                                     <div><strong style="color:var(--text-muted); display:block;">Payment Method</strong>${escapeHistoryValue(paymentMethod)}</div>
                                     <div><strong style="color:var(--text-muted); display:block;">Amount</strong>${escapeHistoryValue(amount)}</div>
                                     <div><strong style="color:var(--text-muted); display:block;">Receiving Option</strong>${escapeHistoryValue(receiving)}</div>
+                                    <div><strong style="color:var(--text-muted); display:block;">Applicants</strong>${escapeHistoryValue(applicantCount)}</div>
                                     <div><strong style="color:var(--text-muted); display:block;">Appointment Date</strong>${escapeHistoryValue(appointmentDate)}</div>
                                     <div><strong style="color:var(--text-muted); display:block;">Appointment Time</strong>${escapeHistoryValue(appointmentTime)}</div>
                                     <div style="grid-column:1/-1;"><strong style="color:var(--text-muted); display:block;">Appointment Location</strong>${escapeHistoryValue(location)}</div>
