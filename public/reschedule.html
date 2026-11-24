@@ -69,7 +69,7 @@
         </div>
 
         <!-- Action Forms Container -->
-        <div id="action-container" style="display: none; display: grid; grid-template-columns: 1fr; gap: 24px;">
+        <div id="action-container" style="display: none; grid-template-columns: 1fr; gap: 24px;">
            
             <!-- Reschedule Form Card with Interactive Calendar -->
             <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
@@ -148,9 +148,10 @@
         let userEmail = '';
         let selectedDateStr = '';
 
-        // Calendar State (Defaulting to September 2026 or current system date)
-        let currYear = 2026;
-        let currMonth = 8; // September (0-indexed)
+        // Start on the current month so past months are not shown as selectable.
+        const initialToday = new Date();
+        let currYear = initialToday.getFullYear();
+        let currMonth = initialToday.getMonth();
 
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -170,6 +171,10 @@
             if (type === '' || type === 'passport application') return 'First Time Passport';
             // Already Title Case or unknown - capitalize first letter of each word
             return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
+        function gridDateCell(dateString) {
+            return Array.from(document.querySelectorAll('.calendar-date')).find((cell) => cell.dataset.date === dateString);
         }
 
         function renderCalendar(year, month) {
@@ -194,6 +199,7 @@
                 const cell = document.createElement('div');
                 cell.className = 'calendar-date';
                 cell.textContent = day;
+                cell.dataset.date = dateString;
 
                 // Format YYYY-MM-DD
                 const yyyy = year;
@@ -226,6 +232,8 @@
         }
 
         document.getElementById('prev-month').addEventListener('click', () => {
+            const today = new Date();
+            if (currYear === today.getFullYear() && currMonth === today.getMonth()) return;
             currMonth--;
             if (currMonth < 0) { currMonth = 11; currYear--; }
             renderCalendar(currYear, currMonth);
@@ -273,6 +281,36 @@
                     document.getElementById('display-date').textContent = app.appointmentDate || app.appointment_date || 'Not set';
                     document.getElementById('display-time').textContent = app.appointmentTime || app.appointment_time || '09:00 AM';
                     document.getElementById('display-location').textContent = app.appointmentLocation || app.appointment_location || 'DFA NCR Central - Lingkod Pinoy Center';
+
+                    const existingDate = app.appointmentDate || app.appointment_date || '';
+                    const existingTime = app.appointmentTime || app.appointment_time || '';
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(existingDate)) {
+                        const existing = new Date(`${existingDate}T00:00:00`);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (existing >= today) {
+                            currYear = existing.getFullYear();
+                            currMonth = existing.getMonth();
+                            renderCalendar(currYear, currMonth);
+                            const existingCell = gridDateCell(existingDate);
+                            if (existingCell && !existingCell.classList.contains('disabled')) {
+                                document.querySelectorAll('.calendar-date').forEach((cell) => cell.classList.remove('selected'));
+                                existingCell.classList.add('selected');
+                                selectedDateStr = existingDate;
+                                document.getElementById('selected-date').value = existingDate;
+                            }
+                        }
+                    }
+
+                    if (existingTime) {
+                        const timeSelect = document.getElementById('new-time');
+                        const matchingOption = Array.from(timeSelect.options).find((option) => {
+                            return option.value && option.value.startsWith(existingTime.slice(0, 5));
+                        });
+                        if (matchingOption && !matchingOption.disabled) {
+                            timeSelect.value = matchingOption.value;
+                        }
+                    }
 
                     document.getElementById('loading-details').style.display = 'none';
                     document.getElementById('app-details').style.display = 'block';

@@ -601,7 +601,7 @@
                 </a>
                 <!-- Manage Appointment Section -->
                 <div class="selection-section-title">Manage Appointment</div>
-                <a class="action-banner-card" href="reschedule.html">
+                <a class="action-banner-card" id="manageAppointmentLink" href="reschedule.html">
                     <div class="action-banner-left">
                         <div class="action-banner-icon" style="background: #eff6ff; color: #2563eb;">
                             <i class="fa-solid fa-calendar-days"></i>
@@ -728,6 +728,10 @@
             document.getElementById('dispAppId').innerText = appId;
             localStorage.setItem('currentApplicationId', appId);
             localStorage.setItem('activeAppId', appId);
+            const manageAppointmentLink = document.getElementById('manageAppointmentLink');
+            if (manageAppointmentLink && appId) {
+                manageAppointmentLink.href = `reschedule.html?id=${encodeURIComponent(appId)}`;
+            }
 
             const rawAppType = application.application_type || application.applicationType || 'New First-Time Application';
             document.getElementById('dispAppType').innerText = normalizeAppTypeForDisplay(rawAppType);
