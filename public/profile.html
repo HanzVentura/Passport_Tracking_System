@@ -171,10 +171,6 @@
                             </button>
                         </div>
                     </form>
-                    <div class="quick-links">
-                        <a href="dashboard.html" class="quick-link-item"><i class="fa-solid fa-house"></i> Back to Dashboard</a>
-                        <a href="settings.html" class="quick-link-item"><i class="fa-solid fa-shield-halved"></i> Security & 2FA Settings</a>
-                    </div>
                 </section>
             </div>
         </div>
@@ -189,7 +185,7 @@
         const previewIcon = document.getElementById('previewIcon');
         const nicknameInput = document.getElementById('nicknameInput');
         const fullNameInput = document.getElementById('fullNameInput');
-        const emailInput = document.getElementById('emailInput');
+        const profileEmailInput = document.getElementById('emailInput');
         const cardDisplayName = document.getElementById('cardDisplayName');
         const cardDisplayEmail = document.getElementById('cardDisplayEmail');
         const profileBannerTitle = document.getElementById('profileBannerTitle');
@@ -256,7 +252,7 @@
             }
 
             fullNameInput.value = currentUserData.fullname;
-            emailInput.value = currentUserData.email;
+            profileEmailInput.value = currentUserData.email;
             nicknameInput.value = currentUserData.nickname;
 
             if (currentUserData.profile_photo) {
@@ -276,7 +272,7 @@
         async function loadProfilePage() {
             const fallbackEmail = (localStorage.getItem('userEmail') || '').trim();
             if (fallbackEmail) {
-                emailInput.value = fallbackEmail;
+                profileEmailInput.value = fallbackEmail;
                 cardDisplayEmail.textContent = fallbackEmail;
             }
 
