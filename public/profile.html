@@ -258,8 +258,7 @@
         }
 
         function refreshCardLabels() {
-            const nick = nicknameInput.value.trim();
-            const activeName = nick || currentUserData.fullname || currentUserData.email || '';
+            const activeName = currentUserData.nickname || currentUserData.fullname || currentUserData.email || '';
             cardDisplayName.textContent = activeName;
             cardDisplayEmail.textContent = currentUserData.email || '---';
             profileBannerTitle.textContent = activeName ? `Good Day, ${activeName}` : 'My Profile';
