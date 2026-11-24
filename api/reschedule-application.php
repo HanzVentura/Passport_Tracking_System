@@ -62,10 +62,10 @@ try {
 
         // Update appointment details in the database
         if ($applicationId) {
-            $stmt = $pdo->prepare("UPDATE applications SET appointment_date = ?, appointment_time = ?, appointment_location = COALESCE(?, appointment_location), status = 'Appointment Rescheduled', updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
+            $stmt = $pdo->prepare("UPDATE applications SET appointment_date = ?, appointment_time = ?, appointment_location = COALESCE(?, appointment_location), updated_at = CURRENT_TIMESTAMP WHERE application_id = ?");
             $stmt->execute([$newDate, $newTime, $newLocation, $applicationId]);
         } else {
-            $stmt = $pdo->prepare("UPDATE applications SET appointment_date = ?, appointment_time = ?, appointment_location = COALESCE(?, appointment_location), status = 'Appointment Rescheduled', updated_at = CURRENT_TIMESTAMP WHERE email = ?");
+            $stmt = $pdo->prepare("UPDATE applications SET appointment_date = ?, appointment_time = ?, appointment_location = COALESCE(?, appointment_location), updated_at = CURRENT_TIMESTAMP WHERE email = ?");
             $stmt->execute([$newDate, $newTime, $newLocation, $email]);
         }
         logAudit(

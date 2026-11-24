@@ -3,6 +3,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/auth-helper.php';
 startSecureSession();
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/audit-helper.php';
 
 try {
     $applicationId = trim($_GET['applicationId'] ?? $_GET['application_id'] ?? $_GET['id'] ?? '');
@@ -46,6 +47,28 @@ try {
             'message' => 'No active application record was found.'
         ]);
         exit;
+    }
+
+    if (($application['status'] ?? '') === 'Appointment Rescheduled') {
+        ensureAuditTable($pdo);
+        $statusAuditStmt = $pdo->prepare(
+            "SELECT new_value FROM audit_logs
+             WHERE entity_type = 'application'
+               AND entity_id = ?
+               AND action_name = 'APPLICATION_STATUS_UPDATED'
+               AND new_value IS NOT NULL
+               AND new_value <> ''
+             ORDER BY id DESC LIMIT 1"
+        );
+        $statusAuditStmt->execute([$application['application_id']]);
+        $restoredStatus = $statusAuditStmt->fetchColumn();
+        if (is_string($restoredStatus) && $restoredStatus !== '') {
+            $application['status'] = $restoredStatus;
+            $restoreStmt = $pdo->prepare(
+                "UPDATE applications SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+            );
+            $restoreStmt->execute([$restoredStatus, $application['id']]);
+        }
     }
 
     echo json_encode([
