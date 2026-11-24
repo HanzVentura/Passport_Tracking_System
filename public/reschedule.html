@@ -254,23 +254,56 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const explicitAppId = urlParams.get('id') || urlParams.get('applicationId') || localStorage.getItem('activeAppId');
 
-                if (!userEmail && !explicitAppId) {
-                    alert('Please log in or select an application to manage your appointment.');
-                    window.location.href = 'login.html';
+                try {
+                    const sessionResponse = await fetch('../api/user-data.php', {
+                        credentials: 'same-origin',
+                        cache: 'no-store'
+                    });
+                    const sessionData = await sessionResponse.json();
+                    if (sessionData.loggedIn && sessionData.email) {
+                        userEmail = sessionData.email;
+                        localStorage.setItem('userEmail', userEmail);
+                    }
+                } catch (sessionError) {
+                    console.warn('Unable to verify session for reschedule page.', sessionError);
+                }
+
+                if (!explicitAppId && !userEmail) {
+                    document.getElementById('loading-details').textContent = 'Please log in and select an application first.';
                     return;
                 }
 
-                let fetchUrl = `../api/get-application.php`;
+                const fetchApplication = async (fetchUrl) => {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 8000);
+                    let appRes;
+                    let appData;
+                    try {
+                        appRes = await fetch(fetchUrl, {
+                            credentials: 'same-origin',
+                            cache: 'no-store',
+                            signal: controller.signal
+                        });
+                        appData = await appRes.json();
+                    } finally {
+                        clearTimeout(timeout);
+                    }
+                    return { response: appRes, data: appData };
+                };
+
+                let lookup;
                 if (explicitAppId) {
-                    fetchUrl += `?applicationId=${encodeURIComponent(explicitAppId)}`;
+                    lookup = await fetchApplication(`../api/get-application.php?applicationId=${encodeURIComponent(explicitAppId)}`);
+                    if (!lookup.response.ok && userEmail) {
+                        lookup = await fetchApplication(`../api/get-application.php?email=${encodeURIComponent(userEmail)}`);
+                    }
                 } else {
-                    fetchUrl += `?email=${encodeURIComponent(userEmail)}`;
+                    lookup = await fetchApplication(`../api/get-application.php?email=${encodeURIComponent(userEmail)}`);
                 }
 
-                const appRes = await fetch(fetchUrl);
-                const appData = await appRes.json();
+                const appData = lookup.data;
 
-                if (appData.success && appData.application) {
+                if (lookup.response.ok && appData.success && appData.application) {
                     const app = appData.application;
                     currentAppId = app.applicationId || app.application_id;
                     userEmail = app.email || userEmail;
