@@ -263,9 +263,6 @@
             cardDisplayName.textContent = activeName;
             cardDisplayEmail.textContent = currentUserData.email || '---';
             profileBannerTitle.textContent = activeName ? `Good Day, ${activeName}` : 'My Profile';
-            if (activeName && typeof applySidebarName === 'function') {
-                applySidebarName(activeName);
-            }
         }
 
         function applyLoadedProfile(data, fallbackEmail) {
