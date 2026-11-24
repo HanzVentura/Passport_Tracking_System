@@ -33,9 +33,13 @@ try {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
+        $displayName = trim((string)($user['nickname'] ?? ''));
+        if ($displayName === '') {
+            $displayName = trim((string)$user['fullname']);
+        }
         echo json_encode([
             'loggedIn' => true,
-            'fullName' => $user['fullname'],
+            'fullName' => $displayName,
             'fullname' => $user['fullname'],
             'email' => $user['email'],
             'nickname' => $user['nickname'],
