@@ -1184,6 +1184,10 @@
                 if (event.key === 'Escape') closeAppointmentModeModal();
             });
 
+            if (new URLSearchParams(window.location.search).get('chooseAppointment') === '1') {
+                openAppointmentModeModal();
+            }
+
             let sessionEmail = '';
             try {
                 const response = await fetch('../api/user-data.php');

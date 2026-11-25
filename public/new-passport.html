@@ -276,40 +276,6 @@
         .btn-secondary:hover {
             background-color: #e2e8f0;
         }
-        .mode-btn-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 25px;
-        }
-        .mode-btn {
-            padding: 24px;
-            font-size: 16px;
-            font-weight: 700;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            background: #fff;
-            color: var(--text-main);
-            transition: all 0.25s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            text-decoration: none;
-            box-shadow: var(--shadow-subtle);
-        }
-        .mode-btn i {
-            font-size: 28px;
-            color: var(--primary);
-        }
-        .mode-btn:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-elevated);
-        }
         /* DFA Custom Calendar Grid Styles */
         .dfa-calendar-container { background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 18px; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; margin-bottom: 15px; font-size: 15px; color: var(--text-main); }
@@ -385,6 +351,7 @@
             </div>
 
             <div class="dashboard-container">
+                <div id="draftSaveStatus" role="status" aria-live="polite" style="min-height: 20px; margin-bottom: 10px; color: var(--text-muted); font-size: 12px;">Your form details save automatically. Uploaded documents must be selected again after a reload.</div>
                 <div class="wizard-steps" id="wizardHeader" style="display: none;">
                     <div class="wizard-step active" id="wStep1"><div class="step-badge">1</div><span>Site</span></div>
                     <div class="wizard-step" id="wStep2"><div class="step-badge">2</div><span>Schedule</span></div>
@@ -394,11 +361,11 @@
                     <div class="wizard-step" id="wStep6"><div class="step-badge">6</div><span>Documents</span></div>
                     <div class="wizard-step" id="wStep7"><div class="step-badge">7</div><span>Review</span></div>
                 </div>
-                <form id="passportForm" action="../api/submit-application.php" method="POST" enctype="multipart/form-data" novalidate>
+                <form id="passportForm" data-draft-type="individual" action="../api/submit-application.php" method="POST" enctype="multipart/form-data" novalidate>
                     <input type="hidden" name="appointment_mode" id="appointmentMode" value="individual">
                     <input type="hidden" name="appointment_location" id="appointmentLocationFull">
 
-                    <!-- STEP 0: Terms & Mode Selection -->
+                    <!-- STEP 0: Terms and Conditions -->
                     <section class="step-pane active" id="step0">
                         <div class="form-section-card">
                             <div class="section-title"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Terms and Conditions</div>
@@ -417,16 +384,9 @@
                                     <em>I signify my unequivocal consent to the collection, use, and processing of my personal data under the Philippine Passport Act and the Data Privacy Act of 2012, along with all DFA rules and guidelines.</em>
                                 </label>
                             </div>
-                            <div class="mode-btn-container">
-                                <button type="button" class="mode-btn" onclick="selectModeAndNext('individual')">
-                                    <i class="fa-solid fa-user-check"></i>
-                                    <span>Individual Appointment</span>
-                                    <span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">Book a standard single slot</span>
-                                </button>
-                                <button type="button" class="mode-btn" onclick="startGroupAppointment()">
-                                    <i class="fa-solid fa-users"></i>
-                                    <span>Group Appointment</span>
-                                    <span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">Book slots for multiple applicants</span>
+                            <div class="action-buttons">
+                                <button type="button" class="btn-primary" onclick="acceptTermsAndContinue()">
+                                    I Agree and Continue <i class="fa-solid fa-arrow-right"></i>
                                 </button>
                             </div>
                         </div>
@@ -517,7 +477,7 @@
                                     <div class="dfa-calendar-container">
                                         <div class="cal-header">
                                             <button type="button" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                                            <span id="calMonthYear">September 2026</span>
+                                            <span id="calMonthYear">Current Month</span>
                                             <button type="button" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
                                         </div>
                                         <div class="cal-weekdays">
@@ -814,6 +774,7 @@
         </main>
     </div>
     <script src="csrf.js"></script>
+    <script src="application-draft.js"></script>
     <script src="script.js"></script>
     <script src="member-profile.js"></script>
     <script src="passport-application.js"></script>
@@ -851,8 +812,9 @@
             return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         }
 
-        let currentYear = 2026;
-        let currentMonth = 8;
+        const calendarToday = new Date();
+        let currentYear = calendarToday.getFullYear();
+        let currentMonth = calendarToday.getMonth();
         let selectedDateStr = '';
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -874,7 +836,8 @@
             grid.innerHTML = '';
             const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
             const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const todayObj = new Date(2026, 8, 20);
+            const todayObj = new Date();
+            todayObj.setHours(0, 0, 0, 0);
             for (let i = 0; i < firstDayIndex; i++) grid.appendChild(document.createElement('div'));
             for (let day = 1; day <= totalDays; day++) {
                 const cell = document.createElement('div');
@@ -895,6 +858,8 @@
             }
         }
         function changeMonth(dir) {
+            const today = new Date();
+            if (dir < 0 && currentYear === today.getFullYear() && currentMonth <= today.getMonth()) return;
             currentMonth += dir;
             if (currentMonth > 11) { currentMonth = 0; currentYear++; }
             else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
@@ -916,6 +881,7 @@
             });
             // Trigger document re-render since appointment date changed
             refreshDocumentSlots();
+            scheduleIndividualDraftSave();
         }
         document.addEventListener('DOMContentLoaded', () => renderCalendar());
 
@@ -973,13 +939,9 @@
             document.getElementById('officeAddress').value = info.address;
             document.getElementById('officeContact').value = info.contact;
         }
-        function startGroupAppointment() {
+        function acceptTermsAndContinue() {
             if (!document.getElementById('termsAgree').checked) { alert('Please accept the Terms and Conditions.'); return; }
-            window.location.href = 'group-appointment.html';
-        }
-        function selectModeAndNext(mode) {
-            if (!document.getElementById('termsAgree').checked) { alert('Please accept the Terms and Conditions.'); return; }
-            document.getElementById('appointmentMode').value = mode;
+            document.getElementById('appointmentMode').value = 'individual';
             document.getElementById('wizardHeader').style.display = 'grid';
             goToStep(1);
         }
@@ -987,6 +949,7 @@
             document.getElementById('wizardHeader').style.display = 'none';
             document.querySelectorAll('.step-pane').forEach(p => p.classList.remove('active'));
             document.getElementById('step0').classList.add('active');
+            scheduleIndividualDraftSave();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function goToStep(step) {
@@ -1014,6 +977,7 @@
                 if (w) w.classList.toggle('active', i === step);
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            scheduleIndividualDraftSave();
         }
 
         // Validation wrappers for navigation
@@ -1152,7 +1116,7 @@
                 const dobVal = document.getElementById('dobInput').value;
                 if (dobVal) {
                     const dob = new Date(dobVal);
-                    const today = new Date(2026, 8, 20);
+                    const today = new Date();
                     let age = today.getFullYear() - dob.getFullYear();
                     const m = today.getMonth() - dob.getMonth();
                     if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
@@ -1186,6 +1150,143 @@
             document.getElementById('officeAddress').value = info.address;
             document.getElementById('officeContact').value = info.contact;
         }
+
+        let individualDraftTimer = null;
+        let isRestoringIndividualDraft = false;
+
+        function captureIndividualDraft() {
+            const form = document.getElementById('passportForm');
+            const seenNames = {};
+            const controls = Array.from(form.elements).filter((field) =>
+                field.id || field.name
+            ).filter((field) => !['file', 'submit', 'button', 'reset'].includes(field.type));
+
+            return {
+                step: Number(document.querySelector('.step-pane.active')?.id.replace('step', '') || 0),
+                controls: controls.map((field) => {
+                    const nameIndex = field.name ? (seenNames[field.name] || 0) : 0;
+                    if (field.name) seenNames[field.name] = nameIndex + 1;
+                    return {
+                        id: field.id,
+                        name: field.name,
+                        nameIndex: nameIndex,
+                        type: field.type,
+                        value: field.value,
+                        checked: field.checked,
+                        selectedValues: field.multiple
+                            ? Array.from(field.selectedOptions).map((option) => option.value)
+                            : null
+                    };
+                })
+            };
+        }
+
+        function applyIndividualDraftControls(controls) {
+            const form = document.getElementById('passportForm');
+            controls.forEach((saved) => {
+                let field = saved.id ? document.getElementById(saved.id) : null;
+                if (!field && saved.name) {
+                    const matching = Array.from(form.elements).filter((item) => item.name === saved.name);
+                    field = matching[saved.nameIndex] || null;
+                }
+                if (!field || field.type === 'file') return;
+
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    field.checked = Boolean(saved.checked);
+                } else if (field.multiple && Array.isArray(saved.selectedValues)) {
+                    Array.from(field.options).forEach((option) => {
+                        option.selected = saved.selectedValues.includes(option.value);
+                    });
+                } else if (saved.value !== undefined) {
+                    field.value = saved.value;
+                }
+            });
+        }
+
+        function restoreIndividualAppointment(dateValue, timeValue) {
+            if (!dateValue) return;
+            const [year, month, day] = dateValue.split('-').map(Number);
+            if (!year || !month || !day) return;
+
+            currentYear = year;
+            currentMonth = month - 1;
+            selectedDateStr = '';
+            renderCalendar();
+            const cell = Array.from(document.querySelectorAll('.cal-day')).find((item) =>
+                Number(item.textContent) === day && !item.classList.contains('disabled')
+            );
+            if (!cell) return;
+
+            selectDate(dateValue, day, cell);
+            const timeSelect = document.getElementById('appTimeSelect');
+            if (timeSelect && timeValue) timeSelect.value = timeValue;
+        }
+
+        async function restoreIndividualDraft() {
+            isRestoringIndividualDraft = true;
+            const status = document.getElementById('draftSaveStatus');
+            try {
+                const result = await window.ApplicationDraft.load('individual');
+                if (!result.draft) return;
+
+                const draft = result.draft;
+                applyIndividualDraftControls(Array.isArray(draft.controls) ? draft.controls : []);
+                document.getElementById('siteSelect')?.dispatchEvent(new Event('change', { bubbles: true }));
+                document.getElementById('applicationTypeSelect')?.dispatchEvent(new Event('change', { bubbles: true }));
+                document.getElementById('credentialReasonSelect')?.dispatchEvent(new Event('change', { bubbles: true }));
+                document.getElementById('dobInput')?.dispatchEvent(new Event('change', { bubbles: true }));
+                document.getElementById('citizenshipBasisSelect')?.dispatchEvent(new Event('change', { bubbles: true }));
+                applyIndividualDraftControls(Array.isArray(draft.controls) ? draft.controls : []);
+
+                const savedValues = Object.fromEntries(
+                    (draft.controls || []).filter((item) => item.id).map((item) => [item.id, item.value])
+                );
+                restoreIndividualAppointment(savedValues.selectedDateVal, savedValues.appTimeSelect);
+                updateSiteInfo();
+
+                const step = Number.isInteger(draft.step) && draft.step >= 0 && draft.step <= 7
+                    ? draft.step
+                    : 0;
+                document.querySelectorAll('.step-pane').forEach((pane) => {
+                    pane.classList.toggle('active', pane.id === `step${step}`);
+                });
+                document.getElementById('wizardHeader').style.display = step === 0 ? 'none' : 'grid';
+                for (let index = 1; index <= 7; index++) {
+                    document.getElementById(`wStep${index}`)?.classList.toggle('active', index === step);
+                }
+                status.textContent = 'Your saved information has been restored. Uploaded documents must be selected again.';
+            } catch (error) {
+                console.error('Unable to restore application draft:', error);
+                status.textContent = error.message === 'Authentication required.'
+                    ? 'Sign in to your account to save and restore application information.'
+                    : 'Unable to load your saved information. Please keep this page open and try again.';
+            } finally {
+                isRestoringIndividualDraft = false;
+            }
+        }
+
+        function scheduleIndividualDraftSave() {
+            if (isRestoringIndividualDraft || !window.ApplicationDraft) return;
+            window.clearTimeout(individualDraftTimer);
+            individualDraftTimer = window.setTimeout(async () => {
+                const status = document.getElementById('draftSaveStatus');
+                status.textContent = 'Saving your application...';
+                try {
+                    await window.ApplicationDraft.save('individual', captureIndividualDraft());
+                    status.textContent = 'Application information saved. Uploaded documents are not saved.';
+                } catch (error) {
+                    console.error('Unable to save application draft:', error);
+                    status.textContent = 'Could not save your information. Please keep this page open and try again.';
+                }
+            }, 500);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const form = document.getElementById('passportForm');
+            form.addEventListener('input', scheduleIndividualDraftSave);
+            form.addEventListener('change', scheduleIndividualDraftSave);
+            await restoreIndividualDraft();
+        });
     </script>
 </body>
 </html>

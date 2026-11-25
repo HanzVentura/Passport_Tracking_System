@@ -291,6 +291,7 @@
                     <div class="wizard-step" id="wStep6"><div class="step-badge">6</div><span>Documents</span></div>
                     <div class="wizard-step" id="wStep7"><div class="step-badge">7</div><span>Review</span></div>
                 </div>
+                <div id="draftSaveStatus" role="status" aria-live="polite" style="min-height: 20px; margin-bottom: 10px; color: var(--text-muted); font-size: 12px;">Group form details save automatically. Uploaded documents must be selected again after a reload.</div>
                 <form id="passportForm" action="../api/submit-group-application.php" method="POST" enctype="multipart/form-data" novalidate>
                     <input type="hidden" name="appointment_mode" id="appointmentMode" value="group">
                     <input type="hidden" name="site" id="hiddenSite">
@@ -384,7 +385,7 @@
                                     <div class="dfa-calendar-container">
                                         <div class="cal-header">
                                             <button type="button" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                                            <span id="calMonthYear">September 2026</span>
+                                            <span id="calMonthYear">Current Month</span>
                                             <button type="button" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
                                         </div>
                                         <div class="cal-weekdays">
@@ -639,6 +640,7 @@
     </div>
     <script src="passport-application.js"></script>
     <script src="csrf.js"></script>
+    <script src="application-draft.js"></script>
     <script>
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -682,8 +684,9 @@
             return rawType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         }
 
-        let currentYear = 2026;
-        let currentMonth = 8;
+        const calendarToday = new Date();
+        let currentYear = calendarToday.getFullYear();
+        let currentMonth = calendarToday.getMonth();
         let selectedDateStr = '';
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -702,7 +705,8 @@
             grid.innerHTML = '';
             const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
             const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const todayObj = new Date(2026, 8, 20);
+            const todayObj = new Date();
+            todayObj.setHours(0, 0, 0, 0);
             for (let i = 0; i < firstDayIndex; i++) grid.appendChild(document.createElement('div'));
             for (let day = 1; day <= totalDays; day++) {
                 const cell = document.createElement('div');
@@ -723,6 +727,8 @@
             }
         }
         function changeMonth(direction) {
+            const today = new Date();
+            if (direction < 0 && currentYear === today.getFullYear() && currentMonth <= today.getMonth()) return;
             currentMonth += direction;
             if (currentMonth > 11) { currentMonth = 0; currentYear++; }
             else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
@@ -742,17 +748,18 @@
                 opt.textContent = slot.status === 'booked' ? `${slot.time} (Fully Booked)` : `${slot.time} (${slot.slots} Slots)`;
                 timeSelect.appendChild(opt);
             });
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            let groupData = groupApplicationData;
             if (!groupData['applicant_1']) groupData['applicant_1'] = {};
             groupData['applicant_1']['site_selection'] = document.getElementById('siteSelect')?.value || '';
             groupData['applicant_1']['app_date_selection'] = dateStr;
-            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+            groupApplicationData = groupData;
+            scheduleGroupDraftSave();
         }
         function updateTimeSelection() {
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            let groupData = groupApplicationData;
             if (!groupData['applicant_1']) groupData['applicant_1'] = {};
             groupData['applicant_1']['app_time_selection'] = document.getElementById('appTimeSelect').value;
-            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+            groupApplicationData = groupData;
         }
         document.addEventListener('DOMContentLoaded', () => renderCalendar());
         const dfaOfficeData = {
@@ -810,6 +817,7 @@
             }
         }
         function goToStep(stepNumber) {
+            currentStep = stepNumber;
             document.querySelectorAll('.step-pane').forEach(pane => pane.classList.remove('active'));
             document.getElementById('step' + stepNumber).classList.add('active');
             for (let i = 1; i <= 7; i++) {
@@ -817,6 +825,7 @@
                 if (wStep) wStep.classList.toggle('active', i === stepNumber);
             }
             if (stepNumber === 7) populateReviewSummary();
+            scheduleGroupDraftSave();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -824,19 +833,65 @@
         let currentStep = parseInt(urlParams.get('step')) || 1;
         let currentApplicant = parseInt(urlParams.get('applicant')) || 1;
         const requestedCount = parseInt(urlParams.get('count')) || 0;
+        let groupApplicationData = {};
         if (requestedCount >= 2) {
             localStorage.setItem('groupCount', String(requestedCount));
         }
-        const totalApplicants = parseInt(localStorage.getItem('groupCount')) || 2;
+        let totalApplicants = parseInt(localStorage.getItem('groupCount')) || 2;
+        let groupDraftTimer = null;
+        let isRestoringGroupDraft = false;
 
-        document.addEventListener('DOMContentLoaded', () => {
+        async function restoreGroupDraft() {
+            isRestoringGroupDraft = true;
+            try {
+                const result = await window.ApplicationDraft.load('group');
+                const draft = result.draft || {};
+                if (draft.groupData && typeof draft.groupData === 'object') {
+                    groupApplicationData = draft.groupData;
+                } else {
+                    const legacyGroupData = localStorage.getItem('groupApplicantsData');
+                    if (legacyGroupData) {
+                        groupApplicationData = JSON.parse(legacyGroupData);
+                        localStorage.removeItem('groupApplicantsData');
+                    }
+                }
+                if (Number.isInteger(draft.groupCount) && draft.groupCount >= 2) {
+                    totalApplicants = draft.groupCount;
+                    localStorage.setItem('groupCount', String(totalApplicants));
+                }
+                if (Number.isInteger(draft.currentStep) && draft.currentStep >= 1 && draft.currentStep <= 7) {
+                    currentStep = draft.currentStep;
+                }
+                if (Number.isInteger(draft.currentApplicant) && draft.currentApplicant >= 1) {
+                    currentApplicant = Math.min(draft.currentApplicant, totalApplicants);
+                }
+                const finalAgree = document.getElementById('finalAgree');
+                if (finalAgree && typeof draft.finalAgree === 'boolean') finalAgree.checked = draft.finalAgree;
+                const infoAgree = document.getElementById('infoAgree');
+                if (infoAgree && typeof draft.infoAgree === 'boolean') infoAgree.checked = draft.infoAgree;
+                if (result.draft || Object.keys(groupApplicationData).length > 0) {
+                    document.getElementById('draftSaveStatus').textContent = 'Your saved group information has been restored. Uploaded documents must be selected again.';
+                }
+            } catch (error) {
+                console.error('Unable to restore group application draft:', error);
+                document.getElementById('draftSaveStatus').textContent = error.message === 'Authentication required.'
+                    ? 'Sign in to your account to save and restore application information.'
+                    : 'Unable to load your saved information. Please keep this page open and try again.';
+            } finally {
+                isRestoringGroupDraft = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initializeGroupEventListeners();
+            await restoreGroupDraft();
             if (currentApplicant > 1 && currentStep < 3) currentStep = 3;
             restoreCurrentApplicantData();
             goToStep(currentStep);
             updateApplicantBadge();
 
             if (currentApplicant > 1) {
-                let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+                let groupData = groupApplicationData;
                 let app1 = groupData['applicant_1'] || {};
                 let currApp = groupData[`applicant_${currentApplicant}`] || {};
 
@@ -845,15 +900,15 @@
                 currApp['app_time_selection'] = app1['app_time_selection'] || '';
 
                 groupData[`applicant_${currentApplicant}`] = currApp;
-                localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+                groupApplicationData = groupData;
             }
-
-            // Initialize group-specific event listeners
-            initializeGroupEventListeners();
+            const form = document.getElementById('passportForm');
+            form.addEventListener('input', scheduleGroupDraftSave);
+            form.addEventListener('change', scheduleGroupDraftSave);
         });
 
         function restoreCurrentApplicantData() {
-            const groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            const groupData = groupApplicationData;
             const app1 = groupData['applicant_1'] || {};
             const appData = groupData[`applicant_${currentApplicant}`] || {};
 
@@ -874,9 +929,27 @@
             const timeSelect = document.getElementById('appTimeSelect');
             if (siteSelect) siteSelect.value = app1.site_selection || appData.site_selection || '';
             if (dateValue) dateValue.value = app1.app_date_selection || appData.app_date_selection || '';
+            const appointmentDate = dateValue?.value || '';
+            if (appointmentDate) {
+                const [year, month, day] = appointmentDate.split('-').map(Number);
+                if (year && month && day) {
+                    currentYear = year;
+                    currentMonth = month - 1;
+                    renderCalendar();
+                    const cell = Array.from(document.querySelectorAll('.cal-day')).find((item) =>
+                        Number(item.textContent) === day && !item.classList.contains('disabled')
+                    );
+                    if (cell) selectDate(appointmentDate, day, cell);
+                }
+            }
             if (timeSelect && (app1.app_time_selection || appData.app_time_selection)) {
                 timeSelect.value = app1.app_time_selection || appData.app_time_selection;
             }
+            siteSelect?.dispatchEvent(new Event('change', { bubbles: true }));
+            document.getElementById('applicationTypeSelectGroup')?.dispatchEvent(new Event('change', { bubbles: true }));
+            document.getElementById('credentialReasonSelectGroup')?.dispatchEvent(new Event('change', { bubbles: true }));
+            document.getElementById('dobInput')?.dispatchEvent(new Event('change', { bubbles: true }));
+            document.getElementById('citizenshipBasisSelectGroup')?.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
         function updateApplicantBadge() {
@@ -919,7 +992,7 @@
                 const dobVal = document.getElementById('dobInput').value;
                 if (dobVal) {
                     const dob = new Date(dobVal);
-                    const today = new Date(2026, 8, 20);
+                    const today = new Date();
                     let age = today.getFullYear() - dob.getFullYear();
                     const m = today.getMonth() - dob.getMonth();
                     if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
@@ -987,12 +1060,13 @@
             groupHandleNext(7);
         }
 
-        function groupHandleNext(targetStep) {
+        async function groupHandleNext(targetStep) {
             saveCurrentApplicantData();
             if (targetStep > 6) {
                 if (currentApplicant < totalApplicants) {
                     currentApplicant++;
                     currentStep = 3;
+                    await saveGroupDraft();
                     window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
                     return;
                 } else {
@@ -1001,20 +1075,24 @@
             } else {
                 currentStep = targetStep;
             }
+            await saveGroupDraft();
             goToStep(currentStep);
         }
-        function groupHandleBack(targetStep) {
+        async function groupHandleBack(targetStep) {
             if (targetStep < 3 && currentApplicant > 1) {
                 currentApplicant--;
                 currentStep = 6;
+                await saveGroupDraft();
                 window.location.href = `group-wizard.html?step=${currentStep}&applicant=${currentApplicant}&count=${totalApplicants}`;
                 return;
             }
+            currentStep = targetStep;
+            await saveGroupDraft();
             goToStep(targetStep);
         }
         function saveCurrentApplicantData() {
             const formData = new FormData(document.getElementById('passportForm'));
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            let groupData = groupApplicationData;
 
             let sharedSite = document.getElementById('siteSelect')?.value || '';
             let sharedDate = document.getElementById('selectedDateVal')?.value || '';
@@ -1022,7 +1100,7 @@
 
             let appData = groupData[`applicant_${currentApplicant}`] || {};
             formData.forEach((value, key) => {
-                appData[key] = value;
+                if (typeof value === 'string') appData[key] = value;
             });
 
             if (currentApplicant === 1) {
@@ -1037,12 +1115,39 @@
             }
 
             groupData[`applicant_${currentApplicant}`] = appData;
-            localStorage.setItem('groupApplicantsData', JSON.stringify(groupData));
+            groupApplicationData = groupData;
+        }
+
+        async function saveGroupDraft() {
+            await window.ApplicationDraft.save('group', {
+                groupData: groupApplicationData,
+                groupCount: totalApplicants,
+                currentStep: currentStep,
+                currentApplicant: currentApplicant,
+                finalAgree: document.getElementById('finalAgree')?.checked || false,
+                infoAgree: document.getElementById('infoAgree')?.checked || false
+            });
+            document.getElementById('draftSaveStatus').textContent = 'Group application information saved. Uploaded documents are not saved.';
+        }
+
+        function scheduleGroupDraftSave() {
+            if (isRestoringGroupDraft || !window.ApplicationDraft) return;
+            saveCurrentApplicantData();
+            window.clearTimeout(groupDraftTimer);
+            groupDraftTimer = window.setTimeout(async () => {
+                try {
+                    document.getElementById('draftSaveStatus').textContent = 'Saving your group application...';
+                    await saveGroupDraft();
+                } catch (error) {
+                    console.error('Unable to save group application draft:', error);
+                    document.getElementById('draftSaveStatus').textContent = 'Could not save your information. Please keep this page open and try again.';
+                }
+            }, 500);
         }
 
         // Populate review summary for all applicants
         function populateReviewSummary() {
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            let groupData = groupApplicationData;
             let app1 = groupData['applicant_1'] || {};
             const reviewGrid = document.getElementById('groupReviewGrid');
             if (!reviewGrid) return;
@@ -1113,7 +1218,7 @@
         document.getElementById('passportForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             saveCurrentApplicantData();
-            let groupData = JSON.parse(localStorage.getItem('groupApplicantsData')) || {};
+            let groupData = groupApplicationData;
             let app1 = groupData['applicant_1'] || {};
 
             document.getElementById('hiddenSite').value = app1.site_selection || '';
@@ -1153,6 +1258,15 @@
                 const savedAppId = result.application_id || result.applicationId || randomGrpId;
                 localStorage.setItem('currentApplicationId', savedAppId);
                 localStorage.setItem('activeAppId', savedAppId);
+
+                try {
+                    await window.ApplicationDraft.clear('group');
+                    localStorage.removeItem('groupApplicantsData');
+                    localStorage.removeItem('groupCount');
+                } catch (draftError) {
+                    console.error('Unable to clear submitted group application draft:', draftError);
+                    alert('Your group application was submitted, but the saved draft could not be cleared.');
+                }
 
                 window.location.href = 'payments.html?id=' + savedAppId;
             } catch (error) {

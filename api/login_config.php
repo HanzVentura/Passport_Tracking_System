@@ -1,5 +1,6 @@
 <?php
 
+// Initial admin seed data imported by migrate-mysql.php; runtime logins use the admin_users table.
 return [
 
     'hanzchristian.ventura@neu.edu.ph' => [
