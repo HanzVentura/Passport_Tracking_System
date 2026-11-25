@@ -312,6 +312,21 @@
                 <div class="section-subtitle">Fields with asterisks (*) are required. Please specify how many applicants are joining this group booking.</div>
                
                 <form id="groupSetupForm">
+                    <div id="draftSaveStatus" role="status" aria-live="polite" style="min-height: 20px; margin-bottom: 10px; color: var(--text-muted); font-size: 12px;"></div>
+                    <div class="form-group">
+                        <div class="section-title"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Terms and Conditions</div>
+                        <div style="background: #f8fafc; padding: 22px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px; line-height: 1.7; margin-bottom: 16px; color: #334155;">
+                            <p style="margin-top:0; margin-bottom: 12px;">This appointment platform distributes available slots strictly on a first-come, first-served basis.</p>
+                            <p style="margin-bottom: 12px;">All applicants bear full responsibility for inputting, checking, and validating every detail supplied. Submitting inaccurate or false details can lead to the outright forfeiture of your application.</p>
+                            <p style="margin-bottom: 0;"><strong>ePayment Services:</strong> All paid fees are strictly non-refundable and will be forfeited upon failure to attend your scheduled slot or application rejection due to incorrect/fraudulent paperwork.</p>
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 12px;">
+                            <input type="checkbox" id="groupTermsAgree" required style="width: 18px; height: 18px; margin-top: 3px; accent-color: var(--primary);">
+                            <label for="groupTermsAgree" style="margin: 0; cursor: pointer; font-weight: 500; font-size: 13px; line-height: 1.5; color: #1e293b;">
+                                <em>I signify my unequivocal consent to the collection, use, and processing of my personal data under the Philippine Passport Act and the Data Privacy Act of 2012, along with all DFA rules and guidelines.</em>
+                            </label>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="numApplicants">Number of Applicants *</label>
                         <select id="numApplicants" class="form-control" required>
@@ -323,7 +338,7 @@
                         </select>
                     </div>
                     <div class="action-buttons">
-                        <a href="new-passport.html" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back</a>
+                        <a href="dashboard.html?chooseAppointment=1" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back</a>
                         <button type="submit" class="btn-primary">Next <i class="fa-solid fa-arrow-right"></i></button>
                     </div>
                 </form>
@@ -331,7 +346,12 @@
         </div>
     </div>
 
+    <script src="csrf.js"></script>
+    <script src="application-draft.js"></script>
     <script>
+        let groupSetupDraft = {};
+        let groupSetupDraftTimer = null;
+
         async function loadUserData() {
             try {
                 const response = await fetch('../api/user-data.php');
@@ -346,11 +366,72 @@
         }
         document.addEventListener('DOMContentLoaded', loadUserData);
 
-        document.getElementById('groupSetupForm').addEventListener('submit', (e) => {
+        async function restoreGroupSetupDraft() {
+            const status = document.getElementById('draftSaveStatus');
+            try {
+                const result = await window.ApplicationDraft.load('group');
+                groupSetupDraft = result.draft || {};
+                if (!groupSetupDraft.groupData) {
+                    const existingGroupData = localStorage.getItem('groupApplicantsData');
+                    if (existingGroupData) {
+                        groupSetupDraft.groupData = JSON.parse(existingGroupData);
+                    }
+                }
+                const count = document.getElementById('numApplicants');
+                const savedCount = groupSetupDraft.groupCount || localStorage.getItem('groupCount');
+                if (savedCount) count.value = String(savedCount);
+                document.getElementById('groupTermsAgree').checked = Boolean(groupSetupDraft.setupTermsAccepted);
+                if (result.draft) status.textContent = 'Your saved group application choices have been restored.';
+            } catch (error) {
+                console.error('Unable to restore group setup draft:', error);
+                status.textContent = error.message === 'Authentication required.'
+                    ? 'Sign in to your account to save and restore your group choices.'
+                    : 'Unable to load your saved choices. Please keep this page open and try again.';
+            }
+        }
+
+        async function saveGroupSetupDraft() {
+            groupSetupDraft = {
+                ...groupSetupDraft,
+                groupCount: Number(document.getElementById('numApplicants').value) || null,
+                setupTermsAccepted: document.getElementById('groupTermsAgree').checked
+            };
+            await window.ApplicationDraft.save('group', groupSetupDraft);
+            document.getElementById('draftSaveStatus').textContent = 'Group application choices saved.';
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await restoreGroupSetupDraft();
+            const form = document.getElementById('groupSetupForm');
+            form.addEventListener('change', () => {
+                window.clearTimeout(groupSetupDraftTimer);
+                groupSetupDraftTimer = window.setTimeout(async () => {
+                    try {
+                        document.getElementById('draftSaveStatus').textContent = 'Saving your choices...';
+                        await saveGroupSetupDraft();
+                    } catch (error) {
+                        console.error('Unable to save group setup draft:', error);
+                        document.getElementById('draftSaveStatus').textContent = 'Could not save your choices. Please keep this page open and try again.';
+                    }
+                }, 400);
+            });
+        });
+
+        document.getElementById('groupSetupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!document.getElementById('groupTermsAgree').checked) {
+                return alert('Please accept the Terms and Conditions.');
+            }
             const count = document.getElementById('numApplicants').value;
             if (!count) return alert('Please select the number of applicants.');
             localStorage.setItem('groupCount', count);
+            try {
+                await saveGroupSetupDraft();
+            } catch (error) {
+                console.error('Unable to save group setup before continuing:', error);
+                document.getElementById('draftSaveStatus').textContent = 'Could not save your choices. Please try again.';
+                return alert('Your group appointment choices could not be saved. Please try again.');
+            }
             localStorage.removeItem('groupApplicantsData');
             window.location.href = `group-wizard.html?step=1&count=${count}`;
         });

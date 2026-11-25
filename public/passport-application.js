@@ -189,6 +189,13 @@ async function completePayment() {
         localStorage.setItem('activeAppId', savedApplicationId);
         localStorage.setItem('applicationType', result.applicationType || labels.category);
 
+        try {
+            if (window.ApplicationDraft) await window.ApplicationDraft.clear('individual');
+        } catch (draftError) {
+            console.error('Unable to clear submitted application draft:', draftError);
+            alert('Your application was submitted, but the saved draft could not be cleared.');
+        }
+
         window.location.href = 'payments.html?id=' + savedApplicationId;
 
     } catch (error) {

@@ -13,7 +13,7 @@ try {
     if ($requestedEmail !== '' && $sessionEmail !== null && strtolower($requestedEmail) !== $sessionEmail) {
         jsonError('You cannot view another member\'s application.', 403);
     }
-    $email = $applicationId === '' ? ($sessionEmail ?: $requestedEmail) : $sessionEmail;
+    $email = $applicationId === '' ? ($sessionEmail ?: $requestedEmail) : ($sessionEmail ?? '');
 
     if ($applicationId === '' && $email === '') {
         http_response_code(400);

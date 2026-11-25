@@ -197,7 +197,7 @@
                         <div class="form-row">
                             <div class="form-group full"><label for="accountName">Account or cardholder name</label><input class="form-control" id="accountName" type="text" autocomplete="name" required placeholder="Juan Dela Cruz"></div>
                             <div class="form-group full"><label for="accountReference">Mobile number or card number</label><input class="form-control" id="accountReference" type="text" required placeholder="09XX XXX XXXX"></div>
-                            <div class="form-group"><label for="paymentEmail">Email receipt to</label><input class="form-control" id="paymentEmail" type="email" required></div>
+                            <div class="form-group"><label for="paymentEmail">Email receipt to</label><input class="form-control" id="paymentEmail" type="email" required readonly></div>
                             <div class="form-group"><label for="paymentNote">Reference note <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label><input class="form-control" id="paymentNote" type="text" placeholder="e.g. payment reference"></div>
                         </div>
                         <div id="formMessage" class="message" role="status"></div>
@@ -284,6 +284,25 @@
         let resolvedUserName = '';
         let typingTimer = null;
 
+        function getGroupApplicantCount(application) {
+            const applicationType = application?.applicationType
+                || application?.application_type
+                || '';
+            if (!applicationType.toLowerCase().includes('group')) return 1;
+
+            const storedCount = parseInt(localStorage.getItem('groupCount') || '0', 10);
+            if (storedCount >= 2) return storedCount;
+
+            try {
+                const groupData = JSON.parse(localStorage.getItem('groupApplicantsData') || '{}');
+                const applicantKeys = Object.keys(groupData).filter((key) => /^applicant_\d+$/.test(key));
+                if (applicantKeys.length >= 2) return applicantKeys.length;
+            } catch (error) {
+                console.warn('Unable to read group applicant count.', error);
+            }
+            return 1;
+        }
+
         const form = document.getElementById('paymentForm');
         const message = document.getElementById('formMessage');
         const payButton = document.getElementById('payButton');
@@ -319,6 +338,19 @@
             });
 
             const baseAmount = Number(selectedPlan.dataset.amount);
+            const applicantCount = activeApplication ? getGroupApplicantCount(activeApplication) : 1;
+            const processingPerApplicant = baseAmount * applicantCount;
+            document.querySelectorAll('.plan-option').forEach((option) => {
+                const input = option.querySelector('input[name="processingType"]');
+                const price = option.querySelector('.plan-price');
+                if (input && price) {
+                    const optionBase = Number(input.dataset.amount);
+                    const optionTotal = optionBase * applicantCount;
+                    price.textContent = applicantCount > 1
+                        ? `₱${optionTotal.toLocaleString('en-PH', { minimumFractionDigits: 2 })} (${applicantCount} applicants)`
+                        : `₱${optionTotal.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+                }
+            });
             let deliveryFee = 0;
             const deliverySection = document.getElementById('deliveryAddressSection');
             const summaryDeliveryLine = document.getElementById('summaryDeliveryLine');
@@ -336,8 +368,10 @@
                 summaryDeliveryLine.style.display = 'none';
             }
 
-            const totalDue = baseAmount + deliveryFee;
-            document.getElementById('summaryPlan').textContent = selectedPlan.value;
+            const totalDue = processingPerApplicant + deliveryFee;
+            document.getElementById('summaryPlan').textContent = applicantCount > 1
+                ? `${selectedPlan.value} × ${applicantCount} applicants`
+                : selectedPlan.value;
             document.getElementById('summaryAmount').textContent = `₱${totalDue.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
         }
 
@@ -386,8 +420,8 @@
             updateSelectedPlan();
 
             const paymentEmailEl = document.getElementById('paymentEmail');
-            if (paymentEmailEl && !paymentEmailEl.value) {
-                paymentEmailEl.value = application.email || resolvedUserEmail || '';
+            if (paymentEmailEl) {
+                paymentEmailEl.value = resolvedUserEmail || application.email || '';
             }
            
             payButton.disabled = false;
@@ -479,14 +513,15 @@
            
             const selectedPlan = document.querySelector('input[name="processingType"]:checked');
             const baseAmount = Number(selectedPlan.dataset.amount);
+            const applicantCount = activeApplication ? getGroupApplicantCount(activeApplication) : 1;
             const deliveryFee = receivingOption === 'Delivery' ? calculateDeliveryFee(deliveryAddressVal) : 0;
-            const totalPaymentAmount = baseAmount + deliveryFee;
+            const totalPaymentAmount = (baseAmount * applicantCount) + deliveryFee;
             const applicationType = activeApplication.applicationType
                 || activeApplication.application_type
                 || localStorage.getItem('applicationType')
                 || 'Credential Updating';
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-            const currentEmail = document.getElementById('paymentEmail').value.trim() || resolvedUserEmail;
+            const currentEmail = resolvedUserEmail;
 
             try {
                 const response = await fetch('../api/payments.php', {
@@ -498,6 +533,7 @@
                         applicationId: activeApplication.applicationId,
                         processingType: selectedPlan.value,
                         amount: totalPaymentAmount,
+                        applicantCount,
                         paymentMethod,
                         receivingOption: receivingOption,
                         deliveryAddress: receivingOption === 'Delivery' ? deliveryAddressVal : null,
